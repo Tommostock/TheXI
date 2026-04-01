@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Jersey_25 } from 'next/font/google'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import { DevAutoLogin } from '@/components/DevAutoLogin'
 import './globals.css'
 
-const inter = Inter({
-  variable: '--font-inter',
+const jersey = Jersey_25({
+  variable: '--font-jersey',
+  weight: '400',
   subsets: ['latin'],
 })
 
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2A398D',
+  themeColor: '#00F0C0',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${jersey.variable} h-full`}>
       <body className="flex min-h-dvh flex-col bg-bg-primary font-sans text-white">
         {/* TODO: Remove DevAutoLogin before deploy */}
         <DevAutoLogin />

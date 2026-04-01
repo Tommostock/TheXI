@@ -32,8 +32,8 @@ const EVENT_COLORS: Record<string, string> = {
 }
 
 // Draft countdown target
-const DRAFT_DATE = new Date('2025-05-20T19:00:00Z')
-const DRAFT_TOTAL_MS = DRAFT_DATE.getTime() - new Date('2025-04-01T00:00:00Z').getTime()
+const DRAFT_DATE = new Date('2026-05-20T19:00:00Z')
+const DRAFT_TOTAL_MS = DRAFT_DATE.getTime() - new Date('2026-04-01T00:00:00Z').getTime()
 
 function DraftCountdown() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
@@ -65,12 +65,12 @@ function DraftCountdown() {
   const isLive = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.mins === 0 && timeLeft.secs === 0
 
   return (
-    <div className="rounded-xl border border-wc-purple/40 bg-wc-purple/10 p-4 text-center">
-      <p className="text-xs font-bold uppercase tracking-wider text-wc-lavender mb-3">
+    <div className="rounded-xl border border-wc-cyan/30 bg-wc-cyan/5 p-4 text-center">
+      <p className="text-xs font-bold uppercase tracking-wider text-wc-cyan mb-3">
         Countdown To Draft Picks
       </p>
       {isLive ? (
-        <p className="text-xl font-black text-wc-lime">Draft Picks Are Live!</p>
+        <p className="text-xl font-black text-wc-cyan">Draft Picks Are Live!</p>
       ) : (
         <div className="flex justify-center gap-3">
           {[
@@ -90,11 +90,11 @@ function DraftCountdown() {
           ))}
         </div>
       )}
-      <p className="mt-3 text-xs text-text-secondary">May 20th, 2025 — 7:00 PM</p>
+      <p className="mt-3 text-xs text-text-secondary">May 20th, 2026 — 7:00 PM</p>
       {/* Progress bar */}
-      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-purple/20 overflow-hidden">
+      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-cyan/20 overflow-hidden">
         <div
-          className="h-full rounded-full bg-wc-lavender transition-all duration-1000"
+          className="h-full rounded-full bg-wc-cyan transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -266,7 +266,7 @@ export function DashboardClient({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-white">
-            THE <span className="text-wc-lime">XI</span>
+            THE <span className="text-wc-cyan">XI</span>
           </h1>
           <p className="text-sm text-text-secondary">Welcome, {displayName}</p>
         </div>
@@ -290,7 +290,7 @@ export function DashboardClient({
               <div
                 key={i}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
-                  entry.isMe ? 'bg-wc-lime/10' : ''
+                  entry.isMe ? 'bg-wc-cyan/10' : ''
                 }`}
               >
                 <span
@@ -306,7 +306,7 @@ export function DashboardClient({
                 >
                   {i + 1}
                 </span>
-                <span className={`flex-1 text-sm ${entry.isMe ? 'text-wc-lime font-semibold' : 'text-white'}`}>
+                <span className={`flex-1 text-sm ${entry.isMe ? 'text-wc-cyan font-semibold' : 'text-white'}`}>
                   {entry.displayName}
                 </span>
                 <span className="text-sm font-bold text-white">{entry.points}</span>
@@ -322,7 +322,7 @@ export function DashboardClient({
           onClick={() => setActiveTab('fixtures')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             activeTab === 'fixtures'
-              ? 'bg-wc-lime text-bg-primary'
+              ? 'bg-wc-cyan text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -332,7 +332,7 @@ export function DashboardClient({
           onClick={() => setActiveTab('groups')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             activeTab === 'groups'
-              ? 'bg-wc-lime text-bg-primary'
+              ? 'bg-wc-cyan text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >

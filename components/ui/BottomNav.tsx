@@ -32,7 +32,7 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={`flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors ${
-              isActive ? 'text-wc-lime' : 'text-text-muted'
+              isActive ? 'text-wc-cyan' : 'text-text-muted'
             }`}
           >
             <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
