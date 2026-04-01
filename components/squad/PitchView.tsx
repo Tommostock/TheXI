@@ -1,6 +1,7 @@
 'use client'
 
 import { getNextOpponent } from '@/lib/tournament/schedule'
+import { getShortName } from '@/lib/utils/names'
 
 type SquadSlot = {
   id: string
@@ -72,10 +73,7 @@ function PitchPlayer({
 
   const shirtColor = POS_SHIRT[player.position] || POS_SHIRT.MID
 
-  // Last name for display
-  const displayName = player.name.includes(' ')
-    ? player.name.split(' ').pop()!
-    : player.name
+  const displayName = getShortName(player.name)
   const truncatedName = displayName.length > 10
     ? displayName.substring(0, 9) + '.'
     : displayName
@@ -147,9 +145,7 @@ function BenchPlayer({
 
   const shirtColor = POS_SHIRT[player.position] || POS_SHIRT.MID
 
-  const displayName = player.name.includes(' ')
-    ? player.name.split(' ').pop()!
-    : player.name
+  const displayName = getShortName(player.name)
   const truncatedName = displayName.length > 9
     ? displayName.substring(0, 8) + '.'
     : displayName

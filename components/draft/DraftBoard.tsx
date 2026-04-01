@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PlayerBrowser } from './PlayerBrowser'
+import { getShortName } from '@/lib/utils/names'
 import { makePick } from '@/lib/draft/actions'
 import {
   getCurrentDraftState,
@@ -286,7 +287,7 @@ export function DraftBoard({
                             {pick ? (
                               <div className="rounded bg-bg-card px-1 py-1">
                                 <p className="truncate text-xs font-medium text-white">
-                                  {pick.player?.name?.split(' ').pop() || '?'}
+                                  {pick.player?.name ? getShortName(pick.player.name) : '?'}
                                 </p>
                                 <p
                                   className={`text-[10px] font-bold ${

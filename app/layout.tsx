@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Roboto, Jersey_25 } from 'next/font/google'
+import { Poppins, Jersey_25 } from 'next/font/google'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import { DevAutoLogin } from '@/components/DevAutoLogin'
 import './globals.css'
 
-const roboto = Roboto({
-  variable: '--font-roboto',
+const poppins = Poppins({
+  variable: '--font-poppins',
+  weight: ['200', '300', '400'],
   subsets: ['latin'],
 })
 
@@ -41,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${roboto.variable} ${jersey.variable} h-full`}>
+    <html lang="en" className={`${poppins.variable} ${jersey.variable} h-full`}>
       <body className="flex min-h-dvh flex-col bg-bg-primary font-sans text-white">
         {/* TODO: Remove DevAutoLogin before deploy */}
         <DevAutoLogin />
