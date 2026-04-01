@@ -43,11 +43,13 @@ export function SquadView({
   formation: initialFormation,
   slots: initialSlots,
   totalPoints,
+  playerPoints = {},
 }: {
   leagueId: string
   formation: Formation
   slots: SquadSlot[]
   totalPoints: number
+  playerPoints?: Record<string, number>
 }) {
   const [formation, setFormation] = useState<Formation>(initialFormation)
   const [slots, setSlots] = useState<SquadSlot[]>(initialSlots)
@@ -214,6 +216,7 @@ export function SquadView({
           formation={formation}
           slots={slots as Parameters<typeof PitchView>[0]['slots']}
           totalPoints={totalPoints}
+          playerPoints={playerPoints}
         />
       )}
 

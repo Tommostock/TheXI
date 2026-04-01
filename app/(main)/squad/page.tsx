@@ -48,7 +48,24 @@ export default async function SquadPage() {
     .select('total_points')
     .eq('league_id', leagueId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
+
+  // Get per-player match points (sum from match_events)
+  const playerIds = (slots || []).map((s) => s.player_id)
+  let playerPoints: Record<string, number> = {}
+
+  if (playerIds.length > 0) {
+    const { data: events } = await supabase
+      .from('match_events')
+      .select('player_id, points_awarded')
+      .in('player_id', playerIds)
+
+    if (events) {
+      for (const e of events) {
+        playerPoints[e.player_id] = (playerPoints[e.player_id] || 0) + e.points_awarded
+      }
+    }
+  }
 
   return (
     <div className="p-4">
@@ -58,6 +75,7 @@ export default async function SquadPage() {
         formation={formation}
         slots={(slots || []) as Parameters<typeof SquadView>[0]['slots']}
         totalPoints={score?.total_points || 0}
+        playerPoints={playerPoints}
       />
     </div>
   )
