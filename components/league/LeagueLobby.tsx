@@ -80,28 +80,28 @@ export function LeagueLobby({
     <div className="p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">{league.name}</h1>
-        <span className="rounded-full bg-tournament-blue/20 px-3 py-1 text-xs font-medium text-tournament-blue">
+        <span className="rounded-full bg-wc-blue/20 px-3 py-1 text-xs font-medium text-wc-blue">
           {league.draft_status === 'pre_draft' ? 'Pre-Draft' : league.draft_status}
         </span>
       </div>
 
       {/* Invite Code */}
-      <div className="mt-4 rounded-lg border border-dark-grey bg-deep-navy p-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-light-grey">
+      <div className="mt-4 rounded-lg border border-border bg-bg-card p-4">
+        <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">
           Invite Code
         </p>
         <div className="mt-2 flex items-center gap-3">
-          <span className="text-2xl font-mono font-bold tracking-widest text-trophy-gold">
+          <span className="text-2xl font-mono font-bold tracking-widest text-wc-gold">
             {league.invite_code}
           </span>
           <button
             onClick={copyCode}
-            className="rounded-md border border-dark-grey p-2 text-light-grey transition-colors hover:border-tournament-green hover:text-tournament-green"
+            className="rounded-md border border-border p-2 text-text-secondary transition-colors hover:border-wc-teal hover:text-wc-teal"
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
           </button>
         </div>
-        <p className="mt-2 text-xs text-light-grey">
+        <p className="mt-2 text-xs text-text-secondary">
           Share this code with your mates to join
         </p>
       </div>
@@ -109,8 +109,8 @@ export function LeagueLobby({
       {/* Participants */}
       <div className="mt-6">
         <div className="flex items-center gap-2">
-          <Users size={16} className="text-light-grey" />
-          <h2 className="text-sm font-medium uppercase tracking-wider text-light-grey">
+          <Users size={16} className="text-text-secondary" />
+          <h2 className="text-sm font-medium uppercase tracking-wider text-text-secondary">
             Participants ({members.length}/6)
           </h2>
         </div>
@@ -121,24 +121,24 @@ export function LeagueLobby({
             return (
               <div
                 key={member.id}
-                className="flex items-center justify-between rounded-lg border border-dark-grey bg-deep-navy px-4 py-3"
+                className="flex items-center justify-between rounded-lg border border-border bg-bg-card px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-tournament-blue text-xs font-bold text-white">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-wc-blue text-xs font-bold text-white">
                     {index + 1}
                   </span>
                   <span className="font-medium text-white">
                     {member.display_name}
                   </span>
                   {member.user_id === currentUserId && (
-                    <span className="text-xs text-tournament-green">(You)</span>
+                    <span className="text-xs text-wc-teal">(You)</span>
                   )}
                   {member.user_id === league.created_by && (
-                    <span className="text-xs text-trophy-gold">Host</span>
+                    <span className="text-xs text-wc-gold">Host</span>
                   )}
                 </div>
                 {isCreator && draftPosition > 0 && (
-                  <span className="text-xs text-light-grey">
+                  <span className="text-xs text-text-secondary">
                     Draft #{draftPosition}
                   </span>
                 )}
@@ -147,8 +147,8 @@ export function LeagueLobby({
           })}
 
           {members.length < 6 && (
-            <div className="flex items-center justify-center rounded-lg border border-dashed border-dark-grey px-4 py-3">
-              <span className="text-sm text-dark-grey">
+            <div className="flex items-center justify-center rounded-lg border border-dashed border-border px-4 py-3">
+              <span className="text-sm text-text-muted">
                 Waiting for {6 - members.length} more...
               </span>
             </div>
@@ -160,8 +160,8 @@ export function LeagueLobby({
       {isCreator && members.length >= 2 && (
         <div className="mt-6">
           <div className="flex items-center gap-2">
-            <Shuffle size={16} className="text-light-grey" />
-            <h2 className="text-sm font-medium uppercase tracking-wider text-light-grey">
+            <Shuffle size={16} className="text-text-secondary" />
+            <h2 className="text-sm font-medium uppercase tracking-wider text-text-secondary">
               Draft Order
             </h2>
           </div>
@@ -171,9 +171,9 @@ export function LeagueLobby({
               return (
                 <div
                   key={userId}
-                  className="flex items-center gap-2 rounded-full border border-dark-grey bg-deep-navy px-3 py-1.5"
+                  className="flex items-center gap-2 rounded-full border border-border bg-bg-card px-3 py-1.5"
                 >
-                  <span className="text-xs font-bold text-trophy-gold">
+                  <span className="text-xs font-bold text-wc-gold">
                     {index + 1}.
                   </span>
                   <span className="text-sm text-white">
@@ -183,7 +183,7 @@ export function LeagueLobby({
               )
             })}
           </div>
-          <p className="mt-2 text-xs text-light-grey">
+          <p className="mt-2 text-xs text-text-secondary">
             Draft order will be randomised when the draft begins.
           </p>
         </div>
@@ -193,7 +193,7 @@ export function LeagueLobby({
       {isCreator && league.draft_status === 'pre_draft' && members.length >= 2 && (
         <div className="mt-6">
           {startError && (
-            <p className="mb-2 text-sm text-tournament-red">{startError}</p>
+            <p className="mb-2 text-sm text-wc-crimson">{startError}</p>
           )}
           <button
             onClick={async () => {
@@ -208,7 +208,7 @@ export function LeagueLobby({
               }
             }}
             disabled={starting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-tournament-green px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-wc-teal px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             <Play size={18} />
             {starting ? 'Starting Draft...' : 'Start Draft'}
@@ -221,7 +221,7 @@ export function LeagueLobby({
         <div className="mt-6">
           <a
             href={`/draft/${league.id}`}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-tournament-green px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-wc-teal px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
           >
             <Play size={18} />
             Go to Draft Board

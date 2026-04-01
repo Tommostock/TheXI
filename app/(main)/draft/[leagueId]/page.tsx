@@ -2,6 +2,7 @@ import { requireUser } from '@/lib/supabase/auth'
 import { redirect } from 'next/navigation'
 import { DraftBoard } from '@/components/draft/DraftBoard'
 import type { DraftPick } from '@/lib/draft/logic'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function DraftLeaguePage({
   params,
@@ -10,6 +11,7 @@ export default async function DraftLeaguePage({
 }) {
   const { leagueId } = await params
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   // Get league
   const { data: league } = await supabase
@@ -60,7 +62,7 @@ export default async function DraftLeaguePage({
   return (
     <div className="p-4">
       <h1 className="mb-1 text-xl font-bold text-white">{league.name}</h1>
-      <p className="mb-4 text-xs text-light-grey">Initial Draft</p>
+      <p className="mb-4 text-xs text-text-secondary">Initial Draft</p>
       <DraftBoard
         leagueId={leagueId}
         draftOrder={draftOrder}

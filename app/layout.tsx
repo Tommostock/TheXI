@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="flex min-h-dvh flex-col bg-dark-charcoal font-sans text-white">
+      <body className="flex min-h-dvh flex-col bg-bg-primary font-sans text-white">
         {/* TODO: Remove DevAutoLogin before deploy */}
         <DevAutoLogin />
         {children}

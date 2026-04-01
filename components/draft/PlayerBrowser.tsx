@@ -10,10 +10,10 @@ type Position = 'GK' | 'DEF' | 'MID' | 'ATT'
 const POSITIONS: Position[] = ['GK', 'DEF', 'MID', 'ATT']
 
 const POSITION_COLORS: Record<Position, string> = {
-  GK: 'bg-trophy-gold/20 text-trophy-gold',
-  DEF: 'bg-tournament-blue/20 text-tournament-blue',
-  MID: 'bg-tournament-green/20 text-tournament-green',
-  ATT: 'bg-tournament-red/20 text-tournament-red',
+  GK: 'bg-wc-gold/20 text-wc-gold',
+  DEF: 'bg-wc-blue/20 text-wc-blue',
+  MID: 'bg-wc-teal/20 text-wc-teal',
+  ATT: 'bg-wc-crimson/20 text-wc-crimson',
 }
 
 export function PlayerBrowser({
@@ -62,19 +62,19 @@ export function PlayerBrowser({
       <div className="relative">
         <Search
           size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-grey"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
         />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search players or nations..."
-          className="w-full rounded-md border border-dark-grey bg-deep-navy py-2 pl-9 pr-8 text-sm text-white placeholder-dark-grey focus:border-tournament-green focus:outline-none focus:ring-1 focus:ring-tournament-green"
+          className="w-full rounded-md border border-border bg-bg-card py-2 pl-9 pr-8 text-sm text-white placeholder-text-muted focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
         />
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-grey hover:text-light-grey"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
           >
             <X size={14} />
           </button>
@@ -87,8 +87,8 @@ export function PlayerBrowser({
           onClick={() => setSelectedPosition(null)}
           className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
             !selectedPosition
-              ? 'bg-tournament-green text-white'
-              : 'border border-dark-grey text-light-grey hover:border-light-grey'
+              ? 'bg-wc-teal text-white'
+              : 'border border-border text-text-secondary hover:border-text-secondary'
           }`}
         >
           All
@@ -101,8 +101,8 @@ export function PlayerBrowser({
             }
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               selectedPosition === pos
-                ? 'bg-tournament-green text-white'
-                : 'border border-dark-grey text-light-grey hover:border-light-grey'
+                ? 'bg-wc-teal text-white'
+                : 'border border-border text-text-secondary hover:border-text-secondary'
             }`}
           >
             {pos}
@@ -114,7 +114,7 @@ export function PlayerBrowser({
       <select
         value={selectedNation || ''}
         onChange={(e) => setSelectedNation(e.target.value || null)}
-        className="rounded-md border border-dark-grey bg-deep-navy px-3 py-2 text-sm text-white focus:border-tournament-green focus:outline-none focus:ring-1 focus:ring-tournament-green"
+        className="rounded-md border border-border bg-bg-card px-3 py-2 text-sm text-white focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
       >
         <option value="">All Nations</option>
         {nations.map((nation) => (
@@ -125,7 +125,7 @@ export function PlayerBrowser({
       </select>
 
       {/* Results Count */}
-      <p className="text-xs text-dark-grey">
+      <p className="text-xs text-text-muted">
         {filtered.length} player{filtered.length !== 1 ? 's' : ''}
       </p>
 
@@ -136,9 +136,9 @@ export function PlayerBrowser({
             key={player.id}
             onClick={() => onSelect?.(player)}
             disabled={!onSelect}
-            className={`flex w-full items-center gap-3 rounded-lg border border-dark-grey bg-deep-navy px-3 py-2.5 text-left transition-colors ${
+            className={`flex w-full items-center gap-3 rounded-lg border border-border bg-bg-card px-3 py-2.5 text-left transition-colors ${
               onSelect
-                ? 'hover:border-tournament-green cursor-pointer'
+                ? 'hover:border-wc-teal cursor-pointer'
                 : 'cursor-default'
             }`}
           >
@@ -157,7 +157,7 @@ export function PlayerBrowser({
               <p className="truncate text-sm font-medium text-white">
                 {player.name}
               </p>
-              <p className="text-xs text-light-grey">{player.nation}</p>
+              <p className="text-xs text-text-secondary">{player.nation}</p>
             </div>
 
             {/* Position Badge */}
@@ -170,7 +170,7 @@ export function PlayerBrowser({
         ))}
 
         {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-dark-grey">
+          <p className="py-8 text-center text-sm text-text-muted">
             No players found
           </p>
         )}

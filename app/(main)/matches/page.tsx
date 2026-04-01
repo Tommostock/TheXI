@@ -1,8 +1,10 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { MatchCentre } from '@/components/match/MatchCentre'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function MatchesPage() {
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   // Get user's first league
   const { data: memberships } = await supabase

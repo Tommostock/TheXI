@@ -21,19 +21,19 @@ export default function CreateLeaguePage() {
 
   return (
     <div className="p-4">
-      <Link href="/dashboard" className="inline-flex items-center gap-1 text-sm text-light-grey hover:text-white">
+      <Link href="/dashboard" className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-white">
         <ArrowLeft size={16} />
         Back
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-white">Create a League</h1>
-      <p className="mt-1 text-sm text-light-grey">
+      <p className="mt-1 text-sm text-text-secondary">
         Start a new league and invite your mates with the code.
       </p>
 
       <form action={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-light-grey">
+          <label htmlFor="name" className="block text-sm font-medium text-text-secondary">
             League Name
           </label>
           <input
@@ -42,13 +42,13 @@ export default function CreateLeaguePage() {
             type="text"
             required
             maxLength={30}
-            className="mt-1 block w-full rounded-md border border-dark-grey bg-deep-navy px-3 py-2 text-white placeholder-dark-grey focus:border-tournament-green focus:outline-none focus:ring-1 focus:ring-tournament-green"
+            className="mt-1 block w-full rounded-md border border-border bg-bg-card px-3 py-2 text-white placeholder-text-muted focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
             placeholder="e.g. The Lads WC 2026"
           />
         </div>
 
         <div>
-          <label htmlFor="displayName" className="block text-sm font-medium text-light-grey">
+          <label htmlFor="displayName" className="block text-sm font-medium text-text-secondary">
             Your Display Name
           </label>
           <input
@@ -57,17 +57,17 @@ export default function CreateLeaguePage() {
             type="text"
             required
             maxLength={20}
-            className="mt-1 block w-full rounded-md border border-dark-grey bg-deep-navy px-3 py-2 text-white placeholder-dark-grey focus:border-tournament-green focus:outline-none focus:ring-1 focus:ring-tournament-green"
+            className="mt-1 block w-full rounded-md border border-border bg-bg-card px-3 py-2 text-white placeholder-text-muted focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
             placeholder="e.g. Tom"
           />
         </div>
 
-        {error && <p className="text-sm text-tournament-red">{error}</p>}
+        {error && <p className="text-sm text-wc-crimson">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-tournament-green px-4 py-2.5 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-md bg-wc-teal px-4 py-2.5 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {loading ? 'Creating...' : 'Create League'}
         </button>

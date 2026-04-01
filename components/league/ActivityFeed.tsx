@@ -7,12 +7,12 @@ import type { Tables } from '@/types/database.types'
 type FeedEvent = Tables<'activity_feed'>
 
 const EVENT_ICONS: Record<string, string> = {
-  draft_pick: 'bg-tournament-blue/20 text-tournament-blue',
-  transfer: 'bg-tournament-green/20 text-tournament-green',
-  formation_change: 'bg-light-grey/20 text-light-grey',
-  scoring_event: 'bg-trophy-gold/20 text-trophy-gold',
-  auto_pick: 'bg-tournament-red/20 text-tournament-red',
-  league_joined: 'bg-tournament-green/20 text-tournament-green',
+  draft_pick: 'bg-wc-blue/20 text-wc-blue',
+  transfer: 'bg-wc-teal/20 text-wc-teal',
+  formation_change: 'bg-text-secondary/20 text-text-secondary',
+  scoring_event: 'bg-wc-gold/20 text-wc-gold',
+  auto_pick: 'bg-wc-crimson/20 text-wc-crimson',
+  league_joined: 'bg-wc-teal/20 text-wc-teal',
 }
 
 function timeAgo(dateStr: string): string {
@@ -60,9 +60,9 @@ export function ActivityFeed({
 
   if (events.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-dark-grey p-8 text-center">
-        <p className="text-light-grey">No activity yet.</p>
-        <p className="mt-1 text-sm text-dark-grey">
+      <div className="rounded-lg border border-dashed border-border p-8 text-center">
+        <p className="text-text-secondary">No activity yet.</p>
+        <p className="mt-1 text-sm text-text-muted">
           Events will appear here as the league progresses.
         </p>
       </div>
@@ -74,11 +74,11 @@ export function ActivityFeed({
       {events.map((event) => (
         <div
           key={event.id}
-          className="flex items-start gap-3 rounded-lg border border-dark-grey bg-deep-navy p-3"
+          className="flex items-start gap-3 rounded-lg border border-border bg-bg-card p-3"
         >
           <div
             className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
-              EVENT_ICONS[event.event_type] || 'bg-dark-grey/20 text-dark-grey'
+              EVENT_ICONS[event.event_type] || 'bg-border/20 text-text-muted'
             }`}
           >
             {event.event_type === 'scoring_event'
@@ -95,7 +95,7 @@ export function ActivityFeed({
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-white">{event.description}</p>
-            <p className="mt-0.5 text-xs text-dark-grey">
+            <p className="mt-0.5 text-xs text-text-muted">
               {timeAgo(event.created_at)}
             </p>
           </div>

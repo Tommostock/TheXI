@@ -97,9 +97,9 @@ export function GroupChat({
   return (
     <div className="flex h-[calc(100dvh-4rem)] flex-col">
       {/* Header */}
-      <div className="shrink-0 border-b border-dark-grey bg-deep-navy px-4 py-3">
+      <div className="shrink-0 border-b border-border bg-bg-card px-4 py-3">
         <h1 className="text-lg font-bold text-white">Group Chat</h1>
-        <p className="text-xs text-light-grey">
+        <p className="text-xs text-text-secondary">
           {Object.keys(memberMap).length} participants
         </p>
       </div>
@@ -107,7 +107,7 @@ export function GroupChat({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
         {messages.length === 0 && (
-          <p className="py-12 text-center text-sm text-dark-grey">
+          <p className="py-12 text-center text-sm text-text-muted">
             No messages yet. Start the conversation.
           </p>
         )}
@@ -122,9 +122,9 @@ export function GroupChat({
             <div key={msg.id}>
               {showDate && (
                 <div className="my-4 flex items-center gap-2">
-                  <div className="flex-1 border-t border-dark-grey" />
-                  <span className="text-xs text-dark-grey">{msgDate}</span>
-                  <div className="flex-1 border-t border-dark-grey" />
+                  <div className="flex-1 border-t border-border" />
+                  <span className="text-xs text-text-muted">{msgDate}</span>
+                  <div className="flex-1 border-t border-border" />
                 </div>
               )}
               <div
@@ -135,19 +135,19 @@ export function GroupChat({
                 <div
                   className={`max-w-[80%] rounded-lg px-3 py-2 ${
                     isMe
-                      ? 'bg-tournament-green/20 text-white'
-                      : 'bg-deep-navy text-white'
+                      ? 'bg-wc-teal/20 text-white'
+                      : 'bg-bg-card text-white'
                   }`}
                 >
                   {!isMe && (
-                    <p className="mb-0.5 text-xs font-medium text-tournament-green">
+                    <p className="mb-0.5 text-xs font-medium text-wc-teal">
                       {memberMap[msg.user_id] || 'Unknown'}
                     </p>
                   )}
                   <p className="text-sm break-words">{msg.message}</p>
                   <p
                     className={`mt-1 text-right text-[10px] ${
-                      isMe ? 'text-tournament-green/50' : 'text-dark-grey'
+                      isMe ? 'text-wc-teal/50' : 'text-text-muted'
                     }`}
                   >
                     {formatTime(msg.sent_at)}
@@ -164,7 +164,7 @@ export function GroupChat({
       {/* Input */}
       <form
         onSubmit={handleSend}
-        className="shrink-0 border-t border-dark-grey bg-deep-navy p-3"
+        className="shrink-0 border-t border-border bg-bg-card p-3"
       >
         <div className="flex gap-2">
           <input
@@ -173,12 +173,12 @@ export function GroupChat({
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
             maxLength={500}
-            className="flex-1 rounded-lg border border-dark-grey bg-dark-charcoal px-3 py-2 text-sm text-white placeholder-dark-grey focus:border-tournament-green focus:outline-none focus:ring-1 focus:ring-tournament-green"
+            className="flex-1 rounded-lg border border-border bg-bg-primary px-3 py-2 text-sm text-white placeholder-text-muted focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
           />
           <button
             type="submit"
             disabled={!input.trim() || sending}
-            className="flex h-10 w-10 items-center justify-center rounded-lg bg-tournament-green text-white transition-opacity hover:opacity-90 disabled:opacity-30"
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-wc-teal text-white transition-opacity hover:opacity-90 disabled:opacity-30"
           >
             <Send size={16} />
           </button>

@@ -37,14 +37,14 @@ const EVENT_LABELS: Record<string, string> = {
 }
 
 const EVENT_COLORS: Record<string, string> = {
-  goal: 'text-tournament-green',
-  assist: 'text-tournament-green',
-  clean_sheet: 'text-tournament-blue',
-  own_goal: 'text-tournament-red',
-  yellow: 'text-trophy-gold',
-  red: 'text-tournament-red',
-  appearance_full: 'text-light-grey',
-  appearance_sub: 'text-dark-grey',
+  goal: 'text-wc-teal',
+  assist: 'text-wc-teal',
+  clean_sheet: 'text-wc-blue',
+  own_goal: 'text-wc-crimson',
+  yellow: 'text-wc-gold',
+  red: 'text-wc-crimson',
+  appearance_full: 'text-text-secondary',
+  appearance_sub: 'text-text-muted',
 }
 
 export function MatchCentre({
@@ -62,9 +62,9 @@ export function MatchCentre({
 
   if (matches.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-dark-grey p-8 text-center">
-        <p className="text-light-grey">No match data yet.</p>
-        <p className="mt-1 text-sm text-dark-grey">
+      <div className="rounded-lg border border-dashed border-border p-8 text-center">
+        <p className="text-text-secondary">No match data yet.</p>
+        <p className="mt-1 text-sm text-text-muted">
           Scores will appear here once World Cup matches are underway.
         </p>
       </div>
@@ -97,15 +97,15 @@ export function MatchCentre({
               }
               className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
                 hasMyPlayers
-                  ? 'border-tournament-green/30 bg-tournament-green/5'
-                  : 'border-dark-grey bg-deep-navy'
+                  ? 'border-wc-teal/30 bg-wc-teal/5'
+                  : 'border-border bg-bg-card'
               }`}
             >
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">
                   {nations.join(' vs ') || `Match ${match.matchId}`}
                 </p>
-                <p className="text-xs text-light-grey">
+                <p className="text-xs text-text-secondary">
                   {new Date(match.matchDate).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'short',
@@ -113,20 +113,20 @@ export function MatchCentre({
                 </p>
               </div>
               {hasMyPlayers && (
-                <Circle size={6} className="fill-tournament-green text-tournament-green" />
+                <Circle size={6} className="fill-wc-teal text-wc-teal" />
               )}
               <span className="text-sm font-bold text-white">
                 {goals} goal{goals !== 1 ? 's' : ''}
               </span>
               {isExpanded ? (
-                <ChevronUp size={16} className="text-dark-grey" />
+                <ChevronUp size={16} className="text-text-muted" />
               ) : (
-                <ChevronDown size={16} className="text-dark-grey" />
+                <ChevronDown size={16} className="text-text-muted" />
               )}
             </button>
 
             {isExpanded && (
-              <div className="mt-1 rounded-b-lg border border-t-0 border-dark-grey bg-dark-charcoal p-3">
+              <div className="mt-1 rounded-b-lg border border-t-0 border-border bg-bg-primary p-3">
                 <div className="space-y-1.5">
                   {match.events
                     .filter(
@@ -143,7 +143,7 @@ export function MatchCentre({
                         <div
                           key={event.id}
                           className={`flex items-center gap-2 rounded px-2 py-1.5 ${
-                            isMine ? 'bg-tournament-green/10' : 'bg-deep-navy/50'
+                            isMine ? 'bg-wc-teal/10' : 'bg-bg-card/50'
                           }`}
                         >
                           {event.player?.nation_flag_url && (
@@ -155,28 +155,28 @@ export function MatchCentre({
                           )}
                           <span
                             className={`text-xs font-medium ${
-                              isMine ? 'text-tournament-green' : 'text-white'
+                              isMine ? 'text-wc-teal' : 'text-white'
                             }`}
                           >
                             {event.player?.name || 'Unknown'}
                           </span>
                           <span
                             className={`ml-auto text-xs ${
-                              EVENT_COLORS[event.event_type] || 'text-light-grey'
+                              EVENT_COLORS[event.event_type] || 'text-text-secondary'
                             }`}
                           >
                             {EVENT_LABELS[event.event_type] || event.event_type}
                           </span>
-                          <span className="text-xs text-dark-grey">
+                          <span className="text-xs text-text-muted">
                             {event.minute ? `${event.minute}'` : ''}
                           </span>
                           <span
                             className={`text-xs font-bold ${
                               event.points_awarded > 0
-                                ? 'text-tournament-green'
+                                ? 'text-wc-teal'
                                 : event.points_awarded < 0
-                                ? 'text-tournament-red'
-                                : 'text-dark-grey'
+                                ? 'text-wc-crimson'
+                                : 'text-text-muted'
                             }`}
                           >
                             {event.points_awarded > 0

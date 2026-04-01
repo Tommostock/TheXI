@@ -1,8 +1,10 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { LeaderboardView } from '@/components/league/LeaderboardView'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function LeaderboardPage() {
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   // Get user's first league
   const { data: memberships } = await supabase
@@ -15,7 +17,7 @@ export default async function LeaderboardPage() {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
-        <p className="mt-4 text-center text-light-grey">
+        <p className="mt-4 text-center text-text-secondary">
           Join a league to see standings.
         </p>
       </div>

@@ -62,8 +62,8 @@ export function ReplacementPicker({
 
   if (remaining.length === 0 && eliminatedSlots.length > 0) {
     return (
-      <div className="rounded-lg border border-tournament-green/30 bg-tournament-green/10 p-4 text-center">
-        <p className="font-medium text-tournament-green">
+      <div className="rounded-lg border border-wc-teal/30 bg-wc-teal/10 p-4 text-center">
+        <p className="font-medium text-wc-teal">
           All replacements confirmed
         </p>
       </div>
@@ -72,15 +72,15 @@ export function ReplacementPicker({
 
   if (eliminatedSlots.length === 0) {
     return (
-      <div className="rounded-lg border border-dark-grey bg-deep-navy p-4 text-center">
-        <p className="text-light-grey">No eliminated players in your squad</p>
+      <div className="rounded-lg border border-border bg-bg-card p-4 text-center">
+        <p className="text-text-secondary">No eliminated players in your squad</p>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2 text-tournament-red">
+      <div className="flex items-center gap-2 text-wc-crimson">
         <AlertTriangle size={16} />
         <p className="text-sm font-medium">
           {remaining.length} eliminated player{remaining.length !== 1 ? 's' : ''} to replace
@@ -88,7 +88,7 @@ export function ReplacementPicker({
       </div>
 
       {error && (
-        <p className="text-sm text-tournament-red">{error}</p>
+        <p className="text-sm text-wc-crimson">{error}</p>
       )}
 
       {/* Eliminated players list */}
@@ -98,7 +98,7 @@ export function ReplacementPicker({
             <button
               key={slot.slotId}
               onClick={() => setReplacingSlot(slot)}
-              className="flex w-full items-center gap-3 rounded-lg border border-tournament-red/30 bg-tournament-red/5 p-3 text-left transition-colors hover:border-tournament-red/50"
+              className="flex w-full items-center gap-3 rounded-lg border border-wc-crimson/30 bg-wc-crimson/5 p-3 text-left transition-colors hover:border-wc-crimson/50"
             >
               {slot.player.nation_flag_url && (
                 <img
@@ -111,9 +111,9 @@ export function ReplacementPicker({
                 <p className="text-sm font-medium text-white line-through opacity-60">
                   {slot.player.name}
                 </p>
-                <p className="text-xs text-tournament-red">Eliminated</p>
+                <p className="text-xs text-wc-crimson">Eliminated</p>
               </div>
-              <ArrowRight size={16} className="text-light-grey" />
+              <ArrowRight size={16} className="text-text-secondary" />
             </button>
           ))}
         </div>
@@ -125,11 +125,11 @@ export function ReplacementPicker({
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm text-white">
               Replace <span className="line-through opacity-60">{replacingSlot.player.name}</span>{' '}
-              <span className="text-light-grey">({replacingSlot.player.position})</span>
+              <span className="text-text-secondary">({replacingSlot.player.position})</span>
             </p>
             <button
               onClick={() => setReplacingSlot(null)}
-              className="text-xs text-light-grey hover:text-white"
+              className="text-xs text-text-secondary hover:text-white"
             >
               Cancel
             </button>
@@ -143,7 +143,7 @@ export function ReplacementPicker({
             positionFilter={replacingSlot.player.position as 'GK' | 'DEF' | 'MID' | 'ATT'}
           />
           {loading && (
-            <p className="mt-2 text-center text-sm text-light-grey">
+            <p className="mt-2 text-center text-sm text-text-secondary">
               Confirming replacement...
             </p>
           )}

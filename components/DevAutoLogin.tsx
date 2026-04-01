@@ -22,17 +22,16 @@ export function DevAutoLogin() {
 
       setStatus('signing-in')
       const { error } = await supabase.auth.signInWithPassword({
-        email: 'tom@thexi.test',
-        password: 'test123456',
+        email: 'testplayer@thexi.dev',
+        password: 'thexi2026test',
       })
 
       if (error) {
         console.error('Auto-login failed:', error.message)
+        setStatus('done')
       } else {
-        // Reload to pick up the session in server components
         window.location.reload()
       }
-      setStatus('done')
     }
 
     autoLogin()
@@ -40,8 +39,8 @@ export function DevAutoLogin() {
 
   if (status === 'signing-in') {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-dark-charcoal">
-        <p className="text-light-grey">Signing in as test user...</p>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary">
+        <p className="text-text-secondary">Signing in...</p>
       </div>
     )
   }

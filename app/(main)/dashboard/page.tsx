@@ -1,10 +1,12 @@
 import { requireUser } from '@/lib/supabase/auth'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 import Link from 'next/link'
 import { Plus, LogIn, ChevronRight, Trophy, Calendar, Newspaper } from 'lucide-react'
 import { SignOutButton } from '@/components/ui/SignOutButton'
 
 export default async function DashboardPage() {
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   const displayName =
     user.user_metadata?.display_name || user.email?.split('@')[0] || 'Player'
@@ -230,7 +232,7 @@ export default async function DashboardPage() {
                       ? 'Draft In Progress'
                       : 'Draft Complete'}
                     {' | '}
-                    {league.current_stage.replace(/_/g, ' ')}
+                    {(league.current_stage || 'pre_tournament').replace(/_/g, ' ')}
                   </p>
                 </div>
                 <ChevronRight size={16} className="text-text-muted" />

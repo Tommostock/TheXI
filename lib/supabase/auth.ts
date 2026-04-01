@@ -3,11 +3,10 @@ import { redirect } from 'next/navigation'
 
 // DEV_MODE: set to false before deploy to re-enable auth redirects
 const DEV_MODE = true
-const TEST_USER_ID = 'e4efa400-df79-4ea9-95df-17fa689e64a1'
 
 /**
- * Get the current authenticated user.
- * In dev mode, returns a test user stub instead of redirecting.
+ * Get the current authenticated user for pages.
+ * In dev mode, returns null user without redirecting (DevAutoLogin handles sign-in).
  * In production, redirects to /login if not authenticated.
  */
 export async function requireUser() {
@@ -18,12 +17,20 @@ export async function requireUser() {
     redirect('/login')
   }
 
-  // In dev mode with no session yet, return a stub so pages don't crash
-  const effectiveUser = user ?? {
-    id: TEST_USER_ID,
-    email: 'tom@thexi.test',
-    user_metadata: { display_name: 'Tom' },
+  return { user, supabase }
+}
+
+/**
+ * Get the current authenticated user for server actions.
+ * Returns null instead of redirecting so actions can return error messages.
+ */
+export async function getActionUser() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { user: null, supabase }
   }
 
-  return { user: effectiveUser, supabase }
+  return { user, supabase }
 }

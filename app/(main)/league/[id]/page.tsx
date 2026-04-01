@@ -1,6 +1,7 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { redirect } from 'next/navigation'
 import { LeagueLobby } from '@/components/league/LeagueLobby'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function LeaguePage({
   params,
@@ -9,6 +10,7 @@ export default async function LeaguePage({
 }) {
   const { id } = await params
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   // Fetch league data
   const { data: league } = await supabase

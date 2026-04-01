@@ -1,7 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getActionUser } from '@/lib/supabase/auth'
 import {
   getCurrentDraftState,
   canDraftPosition,
@@ -19,9 +18,8 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export async function startDraft(leagueId: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   // Verify creator
   const { data: league } = await supabase
@@ -88,9 +86,8 @@ export async function startDraft(leagueId: string) {
 }
 
 export async function makePick(leagueId: string, playerId: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   // Get league
   const { data: league } = await supabase

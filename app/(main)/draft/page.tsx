@@ -2,9 +2,11 @@ import { requireUser } from '@/lib/supabase/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { PlayerBrowser } from '@/components/draft/PlayerBrowser'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function DraftPage() {
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   // Find user's leagues that have an active draft
   const { data: memberships } = await supabase
@@ -34,10 +36,10 @@ export default async function DraftPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-white">Draft Board</h1>
-      <p className="mt-1 text-sm text-light-grey">
+      <p className="mt-1 text-sm text-text-secondary">
         No active drafts. Browse available players below, or start a draft from
         your{' '}
-        <Link href="/dashboard" className="text-tournament-green hover:underline">
+        <Link href="/dashboard" className="text-wc-teal hover:underline">
           league lobby
         </Link>
         .

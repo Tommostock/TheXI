@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { getActionUser } from '@/lib/supabase/auth'
 
 type DraftWindowType = 'post_groups' | 'post_r32' | 'post_r16' | 'post_qf' | 'post_sf'
 
@@ -89,9 +89,8 @@ export async function makeReplacementPick(
   pickedPlayerId: string,
   windowType: DraftWindowType
 ) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   // Verify the dropped player is eliminated
   const { data: droppedPlayer } = await supabase

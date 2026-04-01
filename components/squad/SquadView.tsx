@@ -27,17 +27,17 @@ const FORMATION_SLOTS: Record<Formation, Record<string, number>> = {
 }
 
 const POS_COLORS: Record<string, string> = {
-  GK: 'border-trophy-gold/40 bg-trophy-gold/10',
-  DEF: 'border-tournament-blue/40 bg-tournament-blue/10',
-  MID: 'border-tournament-green/40 bg-tournament-green/10',
-  ATT: 'border-tournament-red/40 bg-tournament-red/10',
+  GK: 'border-wc-gold/40 bg-wc-gold/10',
+  DEF: 'border-wc-blue/40 bg-wc-blue/10',
+  MID: 'border-wc-teal/40 bg-wc-teal/10',
+  ATT: 'border-wc-crimson/40 bg-wc-crimson/10',
 }
 
 const POS_TEXT: Record<string, string> = {
-  GK: 'text-trophy-gold',
-  DEF: 'text-tournament-blue',
-  MID: 'text-tournament-green',
-  ATT: 'text-tournament-red',
+  GK: 'text-wc-gold',
+  DEF: 'text-wc-blue',
+  MID: 'text-wc-teal',
+  ATT: 'text-wc-crimson',
 }
 
 export function SquadView({
@@ -124,9 +124,9 @@ export function SquadView({
         onClick={() => handleSwap(slot.id)}
         className={`flex w-full items-center gap-2 rounded-lg border p-3 text-left transition-all ${
           isSelected
-            ? 'border-tournament-green bg-tournament-green/10'
+            ? 'border-wc-teal bg-wc-teal/10'
             : isSwapTarget && swapSource
-            ? 'border-dashed border-tournament-green/50 hover:border-tournament-green'
+            ? 'border-dashed border-wc-teal/50 hover:border-wc-teal'
             : POS_COLORS[slot.position]
         } ${isEliminated ? 'opacity-40' : ''}`}
       >
@@ -139,16 +139,16 @@ export function SquadView({
           />
         )}
         <div className="min-w-0 flex-1">
-          <p className={`truncate text-sm font-medium ${isEliminated ? 'line-through text-dark-grey' : 'text-white'}`}>
+          <p className={`truncate text-sm font-medium ${isEliminated ? 'line-through text-text-muted' : 'text-white'}`}>
             {player.name}
           </p>
-          <p className="text-xs text-light-grey">{player.nation}</p>
+          <p className="text-xs text-text-secondary">{player.nation}</p>
         </div>
         <span className={`shrink-0 text-xs font-bold ${POS_TEXT[slot.position]}`}>
           {slot.position}
         </span>
         {isSelected && (
-          <ArrowUpDown size={14} className="shrink-0 text-tournament-green" />
+          <ArrowUpDown size={14} className="shrink-0 text-wc-teal" />
         )}
       </button>
     )
@@ -157,14 +157,14 @@ export function SquadView({
   return (
     <div className="flex flex-col gap-4">
       {/* Points */}
-      <div className="rounded-lg border border-dark-grey bg-deep-navy p-4 text-center">
-        <p className="text-xs uppercase tracking-wider text-light-grey">Total Points</p>
-        <p className="mt-1 text-3xl font-bold text-trophy-gold">{totalPoints}</p>
+      <div className="rounded-lg border border-border bg-bg-card p-4 text-center">
+        <p className="text-xs uppercase tracking-wider text-text-secondary">Total Points</p>
+        <p className="mt-1 text-3xl font-bold text-wc-gold">{totalPoints}</p>
       </div>
 
       {/* Formation Selector */}
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-light-grey">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-text-secondary">
           Formation
         </p>
         <div className="flex gap-2">
@@ -175,8 +175,8 @@ export function SquadView({
               disabled={loading}
               className={`flex-1 rounded-lg border py-2.5 text-center text-sm font-bold transition-colors ${
                 formation === f
-                  ? 'border-tournament-green bg-tournament-green/10 text-tournament-green'
-                  : 'border-dark-grey text-light-grey hover:border-light-grey'
+                  ? 'border-wc-teal bg-wc-teal/10 text-wc-teal'
+                  : 'border-border text-text-secondary hover:border-text-secondary'
               }`}
             >
               {f}
@@ -187,7 +187,7 @@ export function SquadView({
 
       {/* Starting XI */}
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-light-grey">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-text-secondary">
           Starting XI
         </p>
         <div className="space-y-1.5">
@@ -199,14 +199,14 @@ export function SquadView({
 
       {/* Swap Hint */}
       {swapSource && (
-        <p className="rounded border border-tournament-green/30 bg-tournament-green/5 p-2 text-center text-xs text-tournament-green">
+        <p className="rounded border border-wc-teal/30 bg-wc-teal/5 p-2 text-center text-xs text-wc-teal">
           Tap a player to swap with
         </p>
       )}
 
       {/* Bench */}
       <div>
-        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-light-grey">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wider text-text-secondary">
           Bench (50% points)
         </p>
         <div className="space-y-1.5">
@@ -217,9 +217,9 @@ export function SquadView({
       </div>
 
       {slots.length === 0 && (
-        <div className="rounded-lg border border-dashed border-dark-grey p-8 text-center">
-          <p className="text-light-grey">No players drafted yet.</p>
-          <p className="mt-1 text-sm text-dark-grey">
+        <div className="rounded-lg border border-dashed border-border p-8 text-center">
+          <p className="text-text-secondary">No players drafted yet.</p>
+          <p className="mt-1 text-sm text-text-muted">
             Complete the draft to build your squad.
           </p>
         </div>

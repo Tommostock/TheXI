@@ -1,8 +1,10 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { GroupChat } from '@/components/league/GroupChat'
+import { LoadingShell } from '@/components/ui/LoadingShell'
 
 export default async function ChatPage() {
   const { user, supabase } = await requireUser()
+  if (!user) return <LoadingShell />
 
   const { data: memberships } = await supabase
     .from('league_members')
@@ -14,7 +16,7 @@ export default async function ChatPage() {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-bold text-white">Group Chat</h1>
-        <p className="mt-4 text-center text-light-grey">
+        <p className="mt-4 text-center text-text-secondary">
           Join a league to chat with your mates.
         </p>
       </div>

@@ -1,7 +1,7 @@
 'use server'
 
+import { getActionUser } from '@/lib/supabase/auth'
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
 const FORMATION_SLOTS: Record<string, Record<string, number>> = {
   '4-4-2': { GK: 1, DEF: 4, MID: 4, ATT: 2 },
@@ -10,9 +10,8 @@ const FORMATION_SLOTS: Record<string, Record<string, number>> = {
 }
 
 export async function changeFormation(leagueId: string, formation: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   if (!FORMATION_SLOTS[formation]) {
     return { error: 'Invalid formation' }
@@ -102,9 +101,8 @@ export async function toggleStarting(
   slotId: string,
   swapWithSlotId: string
 ) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   // Get both slots
   const { data: slots } = await supabase

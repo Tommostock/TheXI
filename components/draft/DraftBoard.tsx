@@ -20,10 +20,10 @@ type Player = Tables<'players'>
 type LeagueMember = Tables<'league_members'>
 
 const POS_COLORS: Record<string, string> = {
-  GK: 'text-trophy-gold',
-  DEF: 'text-tournament-blue',
-  MID: 'text-tournament-green',
-  ATT: 'text-tournament-red',
+  GK: 'text-wc-gold',
+  DEF: 'text-wc-blue',
+  MID: 'text-wc-teal',
+  ATT: 'text-wc-crimson',
 }
 
 export function DraftBoard({
@@ -128,22 +128,22 @@ export function DraftBoard({
   return (
     <div className="flex flex-col gap-4">
       {/* Status Bar */}
-      <div className="rounded-lg border border-dark-grey bg-deep-navy p-4">
+      <div className="rounded-lg border border-border bg-bg-card p-4">
         {draftState.isComplete ? (
           <div className="text-center">
-            <Check size={24} className="mx-auto text-tournament-green" />
+            <Check size={24} className="mx-auto text-wc-teal" />
             <p className="mt-2 font-bold text-white">Draft Complete</p>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wider text-light-grey">
+                <p className="text-xs uppercase tracking-wider text-text-secondary">
                   Round {draftState.currentRound} of {TOTAL_ROUNDS}
                 </p>
                 <p className="mt-1 text-lg font-bold text-white">
                   {isMyTurn ? (
-                    <span className="text-tournament-green">Your Pick</span>
+                    <span className="text-wc-teal">Your Pick</span>
                   ) : (
                     <>
                       {memberMap.get(draftState.currentPickerUserId!)
@@ -154,8 +154,8 @@ export function DraftBoard({
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-light-grey">Pick #{draftState.pickNumber}</p>
-                <Clock size={16} className="mt-1 inline text-light-grey" />
+                <p className="text-xs text-text-secondary">Pick #{draftState.pickNumber}</p>
+                <Clock size={16} className="mt-1 inline text-text-secondary" />
               </div>
             </div>
 
@@ -165,14 +165,14 @@ export function DraftBoard({
                 {Object.entries(POSITION_LIMITS).map(([pos, limit]) => (
                   <div
                     key={pos}
-                    className={`flex-1 rounded border border-dark-grey p-2 text-center ${
+                    className={`flex-1 rounded border border-border p-2 text-center ${
                       remaining[pos] > 0 ? '' : 'opacity-40'
                     }`}
                   >
                     <p className={`text-xs font-bold ${POS_COLORS[pos]}`}>
                       {pos}
                     </p>
-                    <p className="text-xs text-light-grey">
+                    <p className="text-xs text-text-secondary">
                       {limit - remaining[pos]}/{limit}
                     </p>
                   </div>
@@ -184,7 +184,7 @@ export function DraftBoard({
       </div>
 
       {error && (
-        <p className="rounded border border-tournament-red/30 bg-tournament-red/10 p-2 text-center text-sm text-tournament-red">
+        <p className="rounded border border-wc-crimson/30 bg-wc-crimson/10 p-2 text-center text-sm text-wc-crimson">
           {error}
         </p>
       )}
@@ -200,7 +200,7 @@ export function DraftBoard({
                 </p>
                 <button
                   onClick={() => setShowPicker(false)}
-                  className="text-xs text-light-grey hover:text-white"
+                  className="text-xs text-text-secondary hover:text-white"
                 >
                   Cancel
                 </button>
@@ -213,7 +213,7 @@ export function DraftBoard({
                 onSelect={handlePick}
               />
               {loading && (
-                <p className="mt-2 text-center text-sm text-light-grey">
+                <p className="mt-2 text-center text-sm text-text-secondary">
                   Confirming pick...
                 </p>
               )}
@@ -221,7 +221,7 @@ export function DraftBoard({
           ) : (
             <button
               onClick={() => setShowPicker(true)}
-              className="w-full rounded-lg bg-tournament-green px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+              className="w-full rounded-lg bg-wc-teal px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
             >
               Make Your Pick
             </button>
@@ -231,23 +231,23 @@ export function DraftBoard({
 
       {/* Draft Grid */}
       <div>
-        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-light-grey">
+        <h2 className="mb-2 text-sm font-medium uppercase tracking-wider text-text-secondary">
           Draft Board
         </h2>
         <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full min-w-[500px] border-collapse">
             <thead>
               <tr>
-                <th className="border-b border-dark-grey p-2 text-left text-xs text-dark-grey">
+                <th className="border-b border-border p-2 text-left text-xs text-text-muted">
                   Rd
                 </th>
                 {draftOrder.map((userId) => (
                   <th
                     key={userId}
-                    className={`border-b border-dark-grey p-2 text-center text-xs ${
+                    className={`border-b border-border p-2 text-center text-xs ${
                       userId === draftState.currentPickerUserId && !draftState.isComplete
-                        ? 'text-tournament-green'
-                        : 'text-light-grey'
+                        ? 'text-wc-teal'
+                        : 'text-text-secondary'
                     }`}
                   >
                     {memberMap.get(userId)?.display_name?.substring(0, 8) ||
@@ -259,13 +259,12 @@ export function DraftBoard({
             <tbody>
               {Array.from({ length: TOTAL_ROUNDS }, (_, i) => i + 1).map(
                 (round) => {
-                  const roundOrder = getPickOrderForRound(draftOrder, round)
                   return (
                     <tr key={round}>
-                      <td className="border-b border-dark-grey/50 p-2 text-xs text-dark-grey">
+                      <td className="border-b border-border/50 p-2 text-xs text-text-muted">
                         {round}
                       </td>
-                      {roundOrder.map((userId, idx) => {
+                      {draftOrder.map((userId) => {
                         const pick = picks.find(
                           (p) =>
                             p.user_id === userId && p.round === round
@@ -278,34 +277,34 @@ export function DraftBoard({
                         return (
                           <td
                             key={`${round}-${userId}`}
-                            className={`border-b border-dark-grey/50 p-1 text-center ${
+                            className={`border-b border-border/50 p-1 text-center ${
                               isCurrent
-                                ? 'bg-tournament-green/10'
+                                ? 'bg-wc-teal/10'
                                 : ''
                             }`}
                           >
                             {pick ? (
-                              <div className="rounded bg-deep-navy px-1 py-1">
+                              <div className="rounded bg-bg-card px-1 py-1">
                                 <p className="truncate text-xs font-medium text-white">
                                   {pick.player?.name?.split(' ').pop() || '?'}
                                 </p>
                                 <p
                                   className={`text-[10px] font-bold ${
-                                    POS_COLORS[pick.player?.position || ''] || 'text-light-grey'
+                                    POS_COLORS[pick.player?.position || ''] || 'text-text-secondary'
                                   }`}
                                 >
                                   {pick.player?.position}
                                   {pick.is_auto_pick && (
                                     <Zap
                                       size={8}
-                                      className="ml-0.5 inline text-trophy-gold"
+                                      className="ml-0.5 inline text-wc-gold"
                                     />
                                   )}
                                 </p>
                               </div>
                             ) : isCurrent ? (
-                              <div className="rounded border border-dashed border-tournament-green px-1 py-2">
-                                <p className="text-[10px] text-tournament-green">
+                              <div className="rounded border border-dashed border-wc-teal px-1 py-2">
+                                <p className="text-[10px] text-wc-teal">
                                   NOW
                                 </p>
                               </div>

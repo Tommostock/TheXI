@@ -23,10 +23,10 @@ type Ranking = {
 }
 
 const POS_TEXT: Record<string, string> = {
-  GK: 'text-trophy-gold',
-  DEF: 'text-tournament-blue',
-  MID: 'text-tournament-green',
-  ATT: 'text-tournament-red',
+  GK: 'text-wc-gold',
+  DEF: 'text-wc-blue',
+  MID: 'text-wc-teal',
+  ATT: 'text-wc-crimson',
 }
 
 export function LeaderboardView({
@@ -53,20 +53,20 @@ export function LeaderboardView({
               }
               className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
                 rank === 1
-                  ? 'border-trophy-gold/40 bg-trophy-gold/5'
-                  : 'border-dark-grey bg-deep-navy'
-              } ${isMe ? 'ring-1 ring-tournament-green/30' : ''}`}
+                  ? 'border-wc-gold/40 bg-wc-gold/5'
+                  : 'border-border bg-bg-card'
+              } ${isMe ? 'ring-1 ring-wc-teal/30' : ''}`}
             >
               {/* Rank */}
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                   rank === 1
-                    ? 'bg-trophy-gold text-dark-charcoal'
+                    ? 'bg-wc-gold text-bg-primary'
                     : rank === 2
-                    ? 'bg-light-grey text-dark-charcoal'
+                    ? 'bg-text-secondary text-bg-primary'
                     : rank === 3
-                    ? 'bg-[#CD7F32] text-dark-charcoal'
-                    : 'bg-dark-grey text-light-grey'
+                    ? 'bg-[#CD7F32] text-bg-primary'
+                    : 'bg-border text-text-secondary'
                 }`}
               >
                 {rank}
@@ -79,36 +79,36 @@ export function LeaderboardView({
                     {entry.displayName}
                   </p>
                   {isMe && (
-                    <span className="text-xs text-tournament-green">You</span>
+                    <span className="text-xs text-wc-teal">You</span>
                   )}
                 </div>
-                <p className="text-xs text-light-grey">{entry.formation}</p>
+                <p className="text-xs text-text-secondary">{entry.formation}</p>
               </div>
 
               {/* Points */}
               <div className="shrink-0 text-right">
                 <p
                   className={`text-lg font-bold ${
-                    rank === 1 ? 'text-trophy-gold' : 'text-white'
+                    rank === 1 ? 'text-wc-gold' : 'text-white'
                   }`}
                 >
                   {entry.totalPoints}
                 </p>
-                <p className="text-[10px] text-light-grey">pts</p>
+                <p className="text-[10px] text-text-secondary">pts</p>
               </div>
 
               {/* Expand */}
               {isExpanded ? (
-                <ChevronUp size={16} className="shrink-0 text-dark-grey" />
+                <ChevronUp size={16} className="shrink-0 text-text-muted" />
               ) : (
-                <ChevronDown size={16} className="shrink-0 text-dark-grey" />
+                <ChevronDown size={16} className="shrink-0 text-text-muted" />
               )}
             </button>
 
             {/* Expanded Squad */}
             {isExpanded && entry.squad.length > 0 && (
-              <div className="mt-1 rounded-b-lg border border-t-0 border-dark-grey bg-dark-charcoal p-3">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-light-grey">
+              <div className="mt-1 rounded-b-lg border border-t-0 border-border bg-bg-primary p-3">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-text-secondary">
                   Starting XI
                 </p>
                 <div className="grid grid-cols-2 gap-1">
@@ -124,7 +124,7 @@ export function LeaderboardView({
                     .map((s) => (
                       <div
                         key={s.player!.id}
-                        className="flex items-center gap-1.5 rounded bg-deep-navy px-2 py-1.5"
+                        className="flex items-center gap-1.5 rounded bg-bg-card px-2 py-1.5"
                       >
                         {s.player!.nation_flag_url && (
                           <img
@@ -138,7 +138,7 @@ export function LeaderboardView({
                         </span>
                         <span
                           className={`ml-auto text-[10px] font-bold ${
-                            POS_TEXT[s.player!.position] || 'text-light-grey'
+                            POS_TEXT[s.player!.position] || 'text-text-secondary'
                           }`}
                         >
                           {s.player!.position}
@@ -149,7 +149,7 @@ export function LeaderboardView({
 
                 {entry.squad.some((s) => !s.isStarting && s.player) && (
                   <>
-                    <p className="mb-1 mt-3 text-xs font-medium uppercase tracking-wider text-dark-grey">
+                    <p className="mb-1 mt-3 text-xs font-medium uppercase tracking-wider text-text-muted">
                       Bench
                     </p>
                     <div className="grid grid-cols-2 gap-1">
@@ -158,12 +158,12 @@ export function LeaderboardView({
                         .map((s) => (
                           <div
                             key={s.player!.id}
-                            className="flex items-center gap-1.5 rounded bg-deep-navy/50 px-2 py-1.5 opacity-60"
+                            className="flex items-center gap-1.5 rounded bg-bg-card/50 px-2 py-1.5 opacity-60"
                           >
-                            <span className="truncate text-xs text-light-grey">
+                            <span className="truncate text-xs text-text-secondary">
                               {s.player!.name.split(' ').pop()}
                             </span>
-                            <span className="ml-auto text-[10px] text-dark-grey">
+                            <span className="ml-auto text-[10px] text-text-muted">
                               {s.player!.position}
                             </span>
                           </div>
@@ -178,7 +178,7 @@ export function LeaderboardView({
       })}
 
       {rankings.length === 0 && (
-        <p className="py-8 text-center text-light-grey">
+        <p className="py-8 text-center text-text-secondary">
           No scores yet. Points will appear once matches begin.
         </p>
       )}

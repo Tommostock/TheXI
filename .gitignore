@@ -45,3 +45,5 @@ The XI Supabase.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

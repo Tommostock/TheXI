@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getActionUser } from '@/lib/supabase/auth'
 import { redirect } from 'next/navigation'
 
 function generateInviteCode(): string {
@@ -12,20 +12,9 @@ function generateInviteCode(): string {
   return code
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
 export async function createLeague(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   const name = (formData.get('name') as string)?.trim()
   if (!name || name.length < 2) {
@@ -37,19 +26,17 @@ export async function createLeague(formData: FormData) {
     return { error: 'Display name must be at least 2 characters' }
   }
 
-  // Generate unique invite code
+  // Generate unique invite code — use maybeSingle to avoid error on zero rows
   let inviteCode = generateInviteCode()
-  let attempts = 0
-  while (attempts < 5) {
+  for (let i = 0; i < 5; i++) {
     const { data: existing } = await supabase
       .from('leagues')
       .select('id')
       .eq('invite_code', inviteCode)
-      .single()
+      .maybeSingle()
 
     if (!existing) break
     inviteCode = generateInviteCode()
-    attempts++
   }
 
   // Create league
@@ -83,10 +70,8 @@ export async function createLeague(formData: FormData) {
 }
 
 export async function joinLeague(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
 
   const code = (formData.get('code') as string)?.trim().toUpperCase()
   if (!code || code.length !== 6) {
@@ -99,13 +84,13 @@ export async function joinLeague(formData: FormData) {
   }
 
   // Find league by invite code
-  const { data: league, error: findError } = await supabase
+  const { data: league } = await supabase
     .from('leagues')
     .select('id, draft_order')
     .eq('invite_code', code)
-    .single()
+    .maybeSingle()
 
-  if (findError || !league) {
+  if (!league) {
     return { error: 'No league found with that invite code' }
   }
 
@@ -115,7 +100,7 @@ export async function joinLeague(formData: FormData) {
     .select('id')
     .eq('league_id', league.id)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (existing) {
     redirect(`/league/${league.id}`)
