@@ -33,39 +33,71 @@ const EVENT_COLORS: Record<string, string> = {
 
 // Draft countdown target
 const DRAFT_DATE = new Date('2025-05-20T19:00:00Z')
+const DRAFT_TOTAL_MS = DRAFT_DATE.getTime() - new Date('2025-04-01T00:00:00Z').getTime()
 
 function DraftCountdown() {
-  const [timeLeft, setTimeLeft] = useState('')
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     function update() {
       const now = Date.now()
       const diff = DRAFT_DATE.getTime() - now
       if (diff <= 0) {
-        setTimeLeft('Draft is live!')
+        setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 })
+        setProgress(100)
         return
       }
-      const days = Math.floor(diff / 86400000)
-      const hours = Math.floor((diff % 86400000) / 3600000)
-      const mins = Math.floor((diff % 3600000) / 60000)
-      const secs = Math.floor((diff % 60000) / 1000)
-      setTimeLeft(`${days}d ${hours}h ${mins}m ${secs}s`)
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        mins: Math.floor((diff % 3600000) / 60000),
+        secs: Math.floor((diff % 60000) / 1000),
+      })
+      const elapsed = DRAFT_TOTAL_MS - diff
+      setProgress(Math.min(100, Math.max(0, (elapsed / DRAFT_TOTAL_MS) * 100)))
     }
     update()
     const interval = setInterval(update, 1000)
     return () => clearInterval(interval)
   }, [])
 
+  const isLive = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.mins === 0 && timeLeft.secs === 0
+
   return (
     <div className="rounded-xl border border-wc-purple/40 bg-wc-purple/10 p-4 text-center">
-      <div className="flex items-center justify-center gap-2 mb-2">
-        <Clock size={14} className="text-wc-lavender" />
-        <p className="text-xs font-bold uppercase tracking-wider text-wc-lavender">
-          Draft Begins
-        </p>
+      <p className="text-xs font-bold uppercase tracking-wider text-wc-lavender mb-3">
+        Countdown To Draft Picks
+      </p>
+      {isLive ? (
+        <p className="text-xl font-black text-wc-lime">Draft Picks Are Live!</p>
+      ) : (
+        <div className="flex justify-center gap-3">
+          {[
+            { value: timeLeft.days, label: 'Days' },
+            { value: timeLeft.hours, label: 'Hours' },
+            { value: timeLeft.mins, label: 'Mins' },
+            { value: timeLeft.secs, label: 'Secs' },
+          ].map((unit) => (
+            <div key={unit.label} className="flex flex-col items-center">
+              <span className="text-2xl font-black text-white tabular-nums w-10 text-center">
+                {String(unit.value).padStart(2, '0')}
+              </span>
+              <span className="text-[9px] uppercase tracking-wider text-text-muted mt-0.5">
+                {unit.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      <p className="mt-3 text-xs text-text-secondary">May 20th, 2025 — 7:00 PM</p>
+      {/* Progress bar */}
+      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-purple/20 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-wc-lavender transition-all duration-1000"
+          style={{ width: `${progress}%` }}
+        />
       </div>
-      <p className="text-2xl font-black text-white tracking-wide">{timeLeft}</p>
-      <p className="mt-1 text-xs text-text-secondary">May 20th, 2025 — 7:00 PM</p>
     </div>
   )
 }
@@ -89,7 +121,7 @@ function FixtureCard({
     <div>
       <button
         onClick={() => isFinished && keyEvents.length > 0 && setExpanded(!expanded)}
-        className={`flex w-full items-center gap-2 rounded-lg border p-3 text-left transition-colors ${
+        className={`relative flex w-full items-center rounded-lg border p-3 text-left transition-colors ${
           isFinished
             ? 'border-border bg-bg-card hover:border-text-muted'
             : 'border-border/50 bg-bg-card/50'
@@ -104,7 +136,7 @@ function FixtureCard({
         </div>
 
         {/* Score / Time */}
-        <div className="w-16 text-center shrink-0">
+        <div className="w-16 text-center shrink-0 mx-1">
           {isFinished ? (
             <span className="text-sm font-bold text-white">
               {fixture.homeScore} - {fixture.awayScore}
@@ -124,13 +156,15 @@ function FixtureCard({
           </span>
         </div>
 
-        {/* Expand indicator for finished matches */}
+        {/* Expand indicator — absolute so it doesn't shift layout */}
         {isFinished && keyEvents.length > 0 && (
-          expanded ? (
-            <ChevronDown size={12} className="text-text-muted shrink-0" />
-          ) : (
-            <ChevronRight size={12} className="text-text-muted shrink-0" />
-          )
+          <span className="absolute right-2 top-1/2 -translate-y-1/2">
+            {expanded ? (
+              <ChevronDown size={12} className="text-text-muted" />
+            ) : (
+              <ChevronRight size={12} className="text-text-muted" />
+            )}
+          </span>
         )}
       </button>
 
