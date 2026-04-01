@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { Trophy, ChevronDown, ChevronRight, Clock } from 'lucide-react'
 import { GROUPS, FIXTURES, type Fixture } from '@/lib/tournament/groups'
 import { SignOutButton } from '@/components/ui/SignOutButton'
+import { HowToPlayButton } from './HowToPlay'
+import { KnockoutBracket } from './KnockoutBracket'
 
 type EventRow = {
   match_id: string
@@ -255,7 +257,7 @@ export function DashboardClient({
   leaderboard: Array<{ displayName: string; points: number; isMe: boolean }>
   eventsByMatch: Record<string, EventRow[]>
 }) {
-  const [activeTab, setActiveTab] = useState<'fixtures' | 'groups'>('fixtures')
+  const [activeTab, setActiveTab] = useState<'fixtures' | 'groups' | 'knockouts'>('fixtures')
 
   const finishedFixtures = FIXTURES.filter((f) => f.status === 'finished')
   const upcomingFixtures = FIXTURES.filter((f) => f.status === 'upcoming')
@@ -270,7 +272,10 @@ export function DashboardClient({
           </h1>
           <p className="text-sm text-text-secondary">Welcome, {displayName}</p>
         </div>
-        <SignOutButton />
+        <div className="flex items-center gap-2">
+          <HowToPlayButton />
+          <SignOutButton />
+        </div>
       </div>
 
       {/* Draft Countdown */}
@@ -318,26 +323,19 @@ export function DashboardClient({
 
       {/* Match Centre Tabs */}
       <div className="flex rounded-xl border border-border overflow-hidden">
-        <button
-          onClick={() => setActiveTab('fixtures')}
-          className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
-            activeTab === 'fixtures'
-              ? 'bg-wc-blue text-bg-primary'
-              : 'bg-bg-card text-text-secondary'
-          }`}
-        >
-          Fixtures
-        </button>
-        <button
-          onClick={() => setActiveTab('groups')}
-          className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
-            activeTab === 'groups'
-              ? 'bg-wc-blue text-bg-primary'
-              : 'bg-bg-card text-text-secondary'
-          }`}
-        >
-          Groups
-        </button>
+        {(['fixtures', 'groups', 'knockouts'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 py-2.5 text-center text-xs font-semibold transition-colors ${
+              activeTab === tab
+                ? 'bg-wc-blue text-white'
+                : 'bg-bg-card text-text-secondary'
+            }`}
+          >
+            {tab === 'fixtures' ? 'Fixtures' : tab === 'groups' ? 'Groups' : 'Knockouts'}
+          </button>
+        ))}
       </div>
 
       {/* Fixtures Tab */}
@@ -388,6 +386,11 @@ export function DashboardClient({
             <GroupTable key={name} groupName={name} teams={teams} />
           ))}
         </div>
+      )}
+
+      {/* Knockouts Tab */}
+      {activeTab === 'knockouts' && (
+        <KnockoutBracket />
       )}
     </div>
   )
