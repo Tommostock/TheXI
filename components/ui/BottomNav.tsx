@@ -7,7 +7,7 @@ import {
   ListOrdered,
   Users,
   Trophy,
-  MessageCircle,
+  Newspaper,
 } from 'lucide-react'
 
 const navItems = [
@@ -15,7 +15,7 @@ const navItems = [
   { href: '/draft', label: 'Draft', icon: ListOrdered },
   { href: '/squad', label: 'Squad', icon: Users },
   { href: '/leaderboard', label: 'Board', icon: Trophy },
-  { href: '/chat', label: 'Chat', icon: MessageCircle },
+  { href: '/feed', label: 'Feed', icon: Newspaper },
 ]
 
 export function BottomNav() {
