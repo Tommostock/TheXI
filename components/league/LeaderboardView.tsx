@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Trophy } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 type SquadPlayer = {
   isStarting: boolean
+  playerPoints: number
   player: {
     id: string
     name: string
@@ -29,6 +30,13 @@ const POS_TEXT: Record<string, string> = {
   ATT: 'text-wc-crimson',
 }
 
+const POS_BG: Record<string, string> = {
+  GK: 'bg-wc-purple/10',
+  DEF: 'bg-wc-blue/10',
+  MID: 'bg-wc-gold/10',
+  ATT: 'bg-wc-crimson/10',
+}
+
 export function LeaderboardView({
   rankings,
   currentUserId,
@@ -45,6 +53,15 @@ export function LeaderboardView({
         const isExpanded = expanded === entry.userId
         const isMe = entry.userId === currentUserId
 
+        // Sort squad by points descending for expanded view
+        const startersWithPoints = entry.squad
+          .filter((s) => s.isStarting && s.player)
+          .sort((a, b) => b.playerPoints - a.playerPoints)
+
+        const benchWithPoints = entry.squad
+          .filter((s) => !s.isStarting && s.player)
+          .sort((a, b) => b.playerPoints - a.playerPoints)
+
         return (
           <div key={entry.userId}>
             <button
@@ -55,7 +72,7 @@ export function LeaderboardView({
                 rank === 1
                   ? 'border-wc-gold/40 bg-wc-gold/5'
                   : 'border-border bg-bg-card'
-              } ${isMe ? 'ring-1 ring-wc-teal/30' : ''}`}
+              } ${isMe ? 'ring-1 ring-wc-cyan/30' : ''}`}
             >
               {/* Rank */}
               <div
@@ -79,7 +96,7 @@ export function LeaderboardView({
                     {entry.displayName}
                   </p>
                   {isMe && (
-                    <span className="text-xs text-wc-teal">You</span>
+                    <span className="text-xs text-wc-cyan">You</span>
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{entry.formation}</p>
@@ -105,69 +122,87 @@ export function LeaderboardView({
               )}
             </button>
 
-            {/* Expanded Squad */}
+            {/* Expanded Squad with points breakdown */}
             {isExpanded && entry.squad.length > 0 && (
               <div className="mt-1 rounded-b-lg border border-t-0 border-border bg-bg-primary p-3">
-                <p className="mb-2 text-xs font-medium uppercase tracking-wider text-text-secondary">
+                {/* Starting XI */}
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                   Starting XI
                 </p>
-                <div className="grid grid-cols-2 gap-1">
-                  {entry.squad
-                    .filter((s) => s.isStarting && s.player)
-                    .sort((a, b) => {
-                      const order = ['GK', 'DEF', 'MID', 'ATT']
-                      return (
-                        order.indexOf(a.player!.position) -
-                        order.indexOf(b.player!.position)
-                      )
-                    })
-                    .map((s) => (
-                      <div
-                        key={s.player!.id}
-                        className="flex items-center gap-1.5 rounded bg-bg-card px-2 py-1.5"
+                <div className="space-y-1">
+                  {startersWithPoints.map((s) => (
+                    <div
+                      key={s.player!.id}
+                      className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${POS_BG[s.player!.position] || 'bg-bg-card'}`}
+                    >
+                      {s.player!.nation_flag_url && (
+                        <img
+                          src={s.player!.nation_flag_url}
+                          alt=""
+                          className="h-3.5 w-5 shrink-0 rounded-[1px] object-cover"
+                        />
+                      )}
+                      <span className="flex-1 truncate text-xs font-medium text-white">
+                        {s.player!.name}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold ${POS_TEXT[s.player!.position] || 'text-text-secondary'}`}
                       >
-                        {s.player!.nation_flag_url && (
-                          <img
-                            src={s.player!.nation_flag_url}
-                            alt=""
-                            className="h-3.5 w-5 rounded-sm object-cover"
-                          />
-                        )}
-                        <span className="truncate text-xs text-white">
-                          {s.player!.name.split(' ').pop()}
-                        </span>
-                        <span
-                          className={`ml-auto text-[10px] font-bold ${
-                            POS_TEXT[s.player!.position] || 'text-text-secondary'
-                          }`}
-                        >
-                          {s.player!.position}
-                        </span>
-                      </div>
-                    ))}
+                        {s.player!.position}
+                      </span>
+                      <span
+                        className={`min-w-[28px] text-right text-xs font-bold ${
+                          s.playerPoints > 0
+                            ? 'text-wc-green'
+                            : s.playerPoints < 0
+                            ? 'text-wc-crimson'
+                            : 'text-text-muted'
+                        }`}
+                      >
+                        {s.playerPoints > 0 ? `+${s.playerPoints}` : s.playerPoints}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-                {entry.squad.some((s) => !s.isStarting && s.player) && (
+                {/* Bench */}
+                {benchWithPoints.length > 0 && (
                   <>
-                    <p className="mb-1 mt-3 text-xs font-medium uppercase tracking-wider text-text-muted">
-                      Bench
+                    <p className="mb-1 mt-3 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                      Bench <span className="font-normal">(50% pts)</span>
                     </p>
-                    <div className="grid grid-cols-2 gap-1">
-                      {entry.squad
-                        .filter((s) => !s.isStarting && s.player)
-                        .map((s) => (
-                          <div
-                            key={s.player!.id}
-                            className="flex items-center gap-1.5 rounded bg-bg-card/50 px-2 py-1.5 opacity-60"
+                    <div className="space-y-1">
+                      {benchWithPoints.map((s) => (
+                        <div
+                          key={s.player!.id}
+                          className="flex items-center gap-2 rounded-lg bg-bg-card/40 px-2.5 py-2 opacity-70"
+                        >
+                          {s.player!.nation_flag_url && (
+                            <img
+                              src={s.player!.nation_flag_url}
+                              alt=""
+                              className="h-3.5 w-5 shrink-0 rounded-[1px] object-cover"
+                            />
+                          )}
+                          <span className="flex-1 truncate text-xs text-text-secondary">
+                            {s.player!.name}
+                          </span>
+                          <span className="text-[10px] text-text-muted">
+                            {s.player!.position}
+                          </span>
+                          <span
+                            className={`min-w-[28px] text-right text-xs font-bold ${
+                              s.playerPoints > 0
+                                ? 'text-wc-green/70'
+                                : s.playerPoints < 0
+                                ? 'text-wc-crimson/70'
+                                : 'text-text-muted'
+                            }`}
                           >
-                            <span className="truncate text-xs text-text-secondary">
-                              {s.player!.name.split(' ').pop()}
-                            </span>
-                            <span className="ml-auto text-[10px] text-text-muted">
-                              {s.player!.position}
-                            </span>
-                          </div>
-                        ))}
+                            {s.playerPoints > 0 ? `+${s.playerPoints}` : s.playerPoints}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}

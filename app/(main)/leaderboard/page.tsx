@@ -6,7 +6,6 @@ export default async function LeaderboardPage() {
   const { user, supabase } = await requireUser()
   if (!user) return <LoadingShell />
 
-  // Get user's first league
   const { data: memberships } = await supabase
     .from('league_members')
     .select('league_id')
@@ -26,7 +25,6 @@ export default async function LeaderboardPage() {
 
   const leagueId = memberships[0].league_id
 
-  // Get all members with scores
   const { data: members } = await supabase
     .from('league_members')
     .select('user_id, display_name, formation')
@@ -37,11 +35,28 @@ export default async function LeaderboardPage() {
     .select('user_id, total_points')
     .eq('league_id', leagueId)
 
-  // Get squad slots for expandable view
+  // Get squad slots with player data
   const { data: allSlots } = await supabase
     .from('squad_slots')
-    .select('user_id, is_starting, player:players(id, name, nation, nation_flag_url, position)')
+    .select('user_id, player_id, is_starting, player:players(id, name, nation, nation_flag_url, position)')
     .eq('league_id', leagueId)
+
+  // Get all match event points grouped by player
+  const allPlayerIds = (allSlots || []).map((s) => s.player_id)
+  let playerPointsMap: Record<string, number> = {}
+
+  if (allPlayerIds.length > 0) {
+    const { data: events } = await supabase
+      .from('match_events')
+      .select('player_id, points_awarded')
+      .in('player_id', allPlayerIds)
+
+    if (events) {
+      for (const e of events) {
+        playerPointsMap[e.player_id] = (playerPointsMap[e.player_id] || 0) + e.points_awarded
+      }
+    }
+  }
 
   const scoreMap = new Map((scores || []).map((s) => [s.user_id, s.total_points]))
 
@@ -55,6 +70,7 @@ export default async function LeaderboardPage() {
         .filter((s) => s.user_id === m.user_id)
         .map((s) => ({
           isStarting: s.is_starting,
+          playerPoints: playerPointsMap[s.player_id] || 0,
           player: s.player as unknown as { id: string; name: string; nation: string; nation_flag_url: string | null; position: string } | null,
         })),
     }))
