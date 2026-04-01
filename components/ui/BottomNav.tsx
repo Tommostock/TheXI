@@ -14,7 +14,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/draft', label: 'Draft', icon: ListOrdered },
   { href: '/squad', label: 'Squad', icon: Users },
-  { href: '/leaderboard', label: 'Board', icon: Trophy },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/feed', label: 'Feed', icon: Newspaper },
 ]
 
