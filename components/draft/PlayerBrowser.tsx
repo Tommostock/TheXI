@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X, ChevronDown, ChevronRight } from 'lucide-react'
 import type { Tables } from '@/types/database.types'
 
 type Player = Tables<'players'>
@@ -9,11 +9,25 @@ type Position = 'GK' | 'DEF' | 'MID' | 'ATT'
 
 const POSITIONS: Position[] = ['GK', 'DEF', 'MID', 'ATT']
 
+const POSITION_LABELS: Record<Position, string> = {
+  GK: 'Goalkeepers',
+  DEF: 'Defenders',
+  MID: 'Midfielders',
+  ATT: 'Attackers',
+}
+
 const POSITION_COLORS: Record<Position, string> = {
   GK: 'bg-wc-gold/20 text-wc-gold',
   DEF: 'bg-wc-blue/20 text-wc-blue',
   MID: 'bg-wc-teal/20 text-wc-teal',
   ATT: 'bg-wc-crimson/20 text-wc-crimson',
+}
+
+const POSITION_ACCENT: Record<Position, string> = {
+  GK: 'text-wc-gold',
+  DEF: 'text-wc-blue',
+  MID: 'text-wc-teal',
+  ATT: 'text-wc-crimson',
 }
 
 export function PlayerBrowser({
@@ -31,20 +45,15 @@ export function PlayerBrowser({
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(
     positionFilter ?? null
   )
-  const [selectedNation, setSelectedNation] = useState<string | null>(null)
+  const [expandedCountries, setExpandedCountries] = useState<Set<string>>(new Set())
 
-  const nations = useMemo(() => {
-    const set = new Set(players.map((p) => p.nation))
-    return Array.from(set).sort()
-  }, [players])
-
+  // Filter players
   const filtered = useMemo(() => {
     const excluded = new Set(excludeIds)
     return players.filter((p) => {
       if (excluded.has(p.id)) return false
       if (p.is_eliminated) return false
       if (selectedPosition && p.position !== selectedPosition) return false
-      if (selectedNation && p.nation !== selectedNation) return false
       if (search) {
         const q = search.toLowerCase()
         return (
@@ -54,7 +63,44 @@ export function PlayerBrowser({
       }
       return true
     })
-  }, [players, excludeIds, selectedPosition, selectedNation, search])
+  }, [players, excludeIds, selectedPosition, search])
+
+  // Group by country, then within each country group by position (GK first)
+  const countryGroups = useMemo(() => {
+    const map = new Map<string, { flag: string | null; players: Map<Position, Player[]> }>()
+
+    for (const p of filtered) {
+      if (!map.has(p.nation)) {
+        map.set(p.nation, { flag: p.nation_flag_url, players: new Map() })
+      }
+      const group = map.get(p.nation)!
+      const pos = p.position as Position
+      if (!group.players.has(pos)) {
+        group.players.set(pos, [])
+      }
+      group.players.get(pos)!.push(p)
+    }
+
+    // Sort countries alphabetically
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([nation, data]) => ({ nation, ...data }))
+  }, [filtered])
+
+  function toggleCountry(nation: string) {
+    setExpandedCountries((prev) => {
+      const next = new Set(prev)
+      if (next.has(nation)) {
+        next.delete(nation)
+      } else {
+        next.add(nation)
+      }
+      return next
+    })
+  }
+
+  // When searching, auto-expand all matching countries
+  const isSearching = search.length > 0
 
   return (
     <div className="flex flex-col gap-3">
@@ -69,7 +115,7 @@ export function PlayerBrowser({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search players or nations..."
-          className="w-full rounded-md border border-border bg-bg-card py-2 pl-9 pr-8 text-sm text-white placeholder-text-muted focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
+          className="w-full rounded-lg border border-border bg-bg-card py-2.5 pl-9 pr-8 text-sm text-white placeholder-text-muted focus:border-wc-lime focus:outline-none focus:ring-1 focus:ring-wc-lime"
         />
         {search && (
           <button
@@ -85,9 +131,9 @@ export function PlayerBrowser({
       <div className="flex gap-2">
         <button
           onClick={() => setSelectedPosition(null)}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
             !selectedPosition
-              ? 'bg-wc-teal text-white'
+              ? 'bg-wc-lime text-bg-primary'
               : 'border border-border text-text-secondary hover:border-text-secondary'
           }`}
         >
@@ -99,9 +145,9 @@ export function PlayerBrowser({
             onClick={() =>
               setSelectedPosition(selectedPosition === pos ? null : pos)
             }
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
               selectedPosition === pos
-                ? 'bg-wc-teal text-white'
+                ? 'bg-wc-lime text-bg-primary'
                 : 'border border-border text-text-secondary hover:border-text-secondary'
             }`}
           >
@@ -110,66 +156,94 @@ export function PlayerBrowser({
         ))}
       </div>
 
-      {/* Nation Filter */}
-      <select
-        value={selectedNation || ''}
-        onChange={(e) => setSelectedNation(e.target.value || null)}
-        className="rounded-md border border-border bg-bg-card px-3 py-2 text-sm text-white focus:border-wc-teal focus:outline-none focus:ring-1 focus:ring-wc-teal"
-      >
-        <option value="">All Nations</option>
-        {nations.map((nation) => (
-          <option key={nation} value={nation}>
-            {nation}
-          </option>
-        ))}
-      </select>
-
       {/* Results Count */}
       <p className="text-xs text-text-muted">
-        {filtered.length} player{filtered.length !== 1 ? 's' : ''}
+        {filtered.length} player{filtered.length !== 1 ? 's' : ''} across{' '}
+        {countryGroups.length} nation{countryGroups.length !== 1 ? 's' : ''}
       </p>
 
-      {/* Player List */}
-      <div className="max-h-96 space-y-1 overflow-y-auto scrollbar-hide">
-        {filtered.map((player) => (
-          <button
-            key={player.id}
-            onClick={() => onSelect?.(player)}
-            disabled={!onSelect}
-            className={`flex w-full items-center gap-3 rounded-lg border border-border bg-bg-card px-3 py-2.5 text-left transition-colors ${
-              onSelect
-                ? 'hover:border-wc-teal cursor-pointer'
-                : 'cursor-default'
-            }`}
-          >
-            {/* Flag */}
-            {player.nation_flag_url && (
-              <img
-                src={player.nation_flag_url}
-                alt={player.nation}
-                className="h-5 w-7 rounded-sm object-cover"
-                loading="lazy"
-              />
-            )}
+      {/* Country Groups */}
+      <div className="max-h-[500px] space-y-1 overflow-y-auto scrollbar-hide">
+        {countryGroups.map((group) => {
+          const isOpen = isSearching || expandedCountries.has(group.nation)
+          const playerCount = Array.from(group.players.values()).reduce(
+            (sum, arr) => sum + arr.length,
+            0
+          )
 
-            {/* Player Info */}
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-medium text-white">
-                {player.name}
-              </p>
-              <p className="text-xs text-text-secondary">{player.nation}</p>
+          return (
+            <div key={group.nation}>
+              {/* Country header */}
+              <button
+                onClick={() => toggleCountry(group.nation)}
+                className="flex w-full items-center gap-2 rounded-lg border border-border bg-bg-card px-3 py-2.5 text-left transition-colors hover:border-text-muted"
+              >
+                {group.flag && (
+                  <img
+                    src={group.flag}
+                    alt={group.nation}
+                    className="h-4 w-6 rounded-sm object-cover"
+                  />
+                )}
+                <span className="flex-1 text-sm font-semibold text-white">
+                  {group.nation}
+                </span>
+                <span className="text-xs text-text-muted">{playerCount}</span>
+                {isOpen ? (
+                  <ChevronDown size={14} className="text-text-muted" />
+                ) : (
+                  <ChevronRight size={14} className="text-text-muted" />
+                )}
+              </button>
+
+              {/* Expanded player list grouped by position */}
+              {isOpen && (
+                <div className="ml-2 border-l border-border/50 pl-2 pt-1 pb-1">
+                  {POSITIONS.filter((pos) => group.players.has(pos)).map(
+                    (pos) => (
+                      <div key={pos} className="mb-2">
+                        {/* Position sub-header */}
+                        {!selectedPosition && (
+                          <p
+                            className={`mb-1 text-[10px] font-bold uppercase tracking-wider ${POSITION_ACCENT[pos]}`}
+                          >
+                            {POSITION_LABELS[pos]}
+                          </p>
+                        )}
+                        {/* Players */}
+                        <div className="space-y-0.5">
+                          {group.players.get(pos)!.map((player) => (
+                            <button
+                              key={player.id}
+                              onClick={() => onSelect?.(player)}
+                              disabled={!onSelect}
+                              className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                                onSelect
+                                  ? 'hover:bg-wc-lime/10 cursor-pointer'
+                                  : 'cursor-default'
+                              }`}
+                            >
+                              <span className="flex-1 text-sm text-white truncate">
+                                {player.name}
+                              </span>
+                              <span
+                                className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${POSITION_COLORS[pos]}`}
+                              >
+                                {pos}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
             </div>
+          )
+        })}
 
-            {/* Position Badge */}
-            <span
-              className={`shrink-0 rounded px-2 py-0.5 text-xs font-bold ${POSITION_COLORS[player.position as Position]}`}
-            >
-              {player.position}
-            </span>
-          </button>
-        ))}
-
-        {filtered.length === 0 && (
+        {countryGroups.length === 0 && (
           <p className="py-8 text-center text-sm text-text-muted">
             No players found
           </p>
