@@ -1,37 +1,44 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* FIFA World Cup 2026 Brand Palette */
-  --color-wc-cyan: #00F0C0;
-  --color-wc-blue: #2B44E3;
+  /* Colour Hierarchy */
+  /* Main: Blue — primary buttons, active states, key UI */
+  /* Secondary: Cyan — accents, highlights, success states */
+  /* Tertiary: Purple — GK position, countdown, special elements */
+  /* Accent: Peach — warm touches, links, subtle highlights */
+
+  --color-wc-blue: #4D5BF9;
+  --color-wc-cyan: #50F0C8;
+  --color-wc-purple: #7B00FF;
+  --color-wc-peach: #E89880;
+
+  /* Supporting colours */
   --color-wc-green: #00C853;
   --color-wc-yellow: #E8E000;
-  --color-wc-peach: #F5A68C;
   --color-wc-red: #E8301C;
-  --color-wc-purple: #5B2C86;
 
   /* App foundations — dark mode */
   --color-bg-primary: #0A0A14;
-  --color-bg-card: #12122A;
+  --color-bg-card: #101028;
   --color-bg-surface: #1A1A3E;
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #B8B8CC;
   --color-text-muted: #5A5A72;
-  --color-border: #2A2A40;
+  --color-border: #252545;
 
   /* Semantic mappings */
   --color-wc-crimson: #E8301C;
   --color-wc-gold: #E8E000;
   --color-wc-teal: #00C853;
-  --color-wc-lime: #00F0C0;
-  --color-wc-lavender: #F5A68C;
-  --color-wc-orange: #F5A68C;
+  --color-wc-lime: #50F0C8;
+  --color-wc-lavender: #E89880;
+  --color-wc-orange: #E89880;
 
   /* Legacy compat */
   --color-dark-charcoal: #0A0A14;
-  --color-deep-navy: #12122A;
+  --color-deep-navy: #101028;
   --color-tournament-green: #00C853;
-  --color-tournament-blue: #2B44E3;
+  --color-tournament-blue: #4D5BF9;
   --color-tournament-red: #E8301C;
   --color-trophy-gold: #E8E000;
   --color-light-grey: #B8B8CC;

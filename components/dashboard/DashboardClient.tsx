@@ -65,12 +65,12 @@ function DraftCountdown() {
   const isLive = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.mins === 0 && timeLeft.secs === 0
 
   return (
-    <div className="rounded-xl border border-wc-cyan/30 bg-wc-cyan/5 p-4 text-center">
-      <p className="text-xs font-bold uppercase tracking-wider text-wc-cyan mb-3">
+    <div className="rounded-xl border border-wc-purple/30 bg-wc-purple/5 p-4 text-center">
+      <p className="text-xs font-bold uppercase tracking-wider text-wc-purple mb-3">
         Countdown To Draft Picks
       </p>
       {isLive ? (
-        <p className="text-xl font-black text-wc-cyan">Draft Picks Are Live!</p>
+        <p className="text-xl font-black text-wc-purple">Draft Picks Are Live!</p>
       ) : (
         <div className="flex justify-center gap-3">
           {[
@@ -92,9 +92,9 @@ function DraftCountdown() {
       )}
       <p className="mt-3 text-xs text-text-secondary">May 20th, 2026 — 7:00 PM</p>
       {/* Progress bar */}
-      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-cyan/20 overflow-hidden">
+      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-purple/20 overflow-hidden">
         <div
-          className="h-full rounded-full bg-wc-cyan transition-all duration-1000"
+          className="h-full rounded-full bg-wc-blue transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -266,7 +266,7 @@ export function DashboardClient({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display font-black tracking-tight text-white">
-            THE <span className="text-wc-cyan">XI</span>
+            THE <span className="text-wc-blue">XI</span>
           </h1>
           <p className="text-sm text-text-secondary">Welcome, {displayName}</p>
         </div>
@@ -290,7 +290,7 @@ export function DashboardClient({
               <div
                 key={i}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
-                  entry.isMe ? 'bg-wc-cyan/10' : ''
+                  entry.isMe ? 'bg-wc-blue/10' : ''
                 }`}
               >
                 <span
@@ -322,7 +322,7 @@ export function DashboardClient({
           onClick={() => setActiveTab('fixtures')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             activeTab === 'fixtures'
-              ? 'bg-wc-cyan text-bg-primary'
+              ? 'bg-wc-blue text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -332,7 +332,7 @@ export function DashboardClient({
           onClick={() => setActiveTab('groups')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             activeTab === 'groups'
-              ? 'bg-wc-cyan text-bg-primary'
+              ? 'bg-wc-blue text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >

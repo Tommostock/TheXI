@@ -72,7 +72,7 @@ export function LeaderboardView({
                 rank === 1
                   ? 'border-wc-gold/40 bg-wc-gold/5'
                   : 'border-border bg-bg-card'
-              } ${isMe ? 'ring-1 ring-wc-cyan/30' : ''}`}
+              } ${isMe ? 'ring-1 ring-wc-blue/30' : ''}`}
             >
               {/* Rank */}
               <div

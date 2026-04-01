@@ -169,7 +169,7 @@ export function SquadView({
           onClick={() => setViewMode('pitch')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'pitch'
-              ? 'bg-wc-cyan text-bg-primary'
+              ? 'bg-wc-blue text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -179,7 +179,7 @@ export function SquadView({
           onClick={() => setViewMode('list')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'list'
-              ? 'bg-wc-cyan text-bg-primary'
+              ? 'bg-wc-blue text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
