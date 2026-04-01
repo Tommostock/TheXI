@@ -15,7 +15,7 @@ export default async function FeedPage() {
   if (!memberships?.length) {
     return (
       <div className="p-4">
-        <h1 className="text-2xl font-bold text-white">Activity Feed</h1>
+        <h1 className="text-2xl font-display text-white">Activity Feed</h1>
         <p className="mt-4 text-center text-text-secondary">
           Join a league to see activity.
         </p>
@@ -34,7 +34,7 @@ export default async function FeedPage() {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-2xl font-bold text-white">Activity Feed</h1>
+      <h1 className="mb-4 text-2xl font-display text-white">Activity Feed</h1>
       <ActivityFeed leagueId={leagueId} initialEvents={events || []} />
     </div>
   )

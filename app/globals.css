@@ -37,7 +37,8 @@
   --color-light-grey: #B8B8CC;
   --color-dark-grey: #5A5A72;
 
-  --font-sans: var(--font-jersey);
+  --font-sans: var(--font-roboto);
+  --font-display: var(--font-jersey);
   --spacing-nav-height: 4rem;
   --spacing-safe-bottom: env(safe-area-inset-bottom);
 }
@@ -45,9 +46,14 @@
 body {
   background-color: #0A0A14;
   color: #FFFFFF;
-  font-family: var(--font-jersey), system-ui, sans-serif;
+  font-family: var(--font-roboto), system-ui, sans-serif;
   min-height: 100dvh;
   overscroll-behavior: none;
+}
+
+/* Jersey 25 for page titles only */
+.font-display {
+  font-family: var(--font-jersey), system-ui, sans-serif;
 }
 
 .scrollbar-hide {

@@ -2,7 +2,7 @@ export default function MainLoading() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-black tracking-tight text-white">
+        <h1 className="text-2xl font-display font-black tracking-tight text-white">
           THE <span className="text-wc-cyan">XI</span>
         </h1>
         <div className="mt-4 flex justify-center gap-1">

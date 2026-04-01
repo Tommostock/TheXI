@@ -1,8 +1,13 @@
 import type { Metadata, Viewport } from 'next'
-import { Jersey_25 } from 'next/font/google'
+import { Roboto, Jersey_25 } from 'next/font/google'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import { DevAutoLogin } from '@/components/DevAutoLogin'
 import './globals.css'
+
+const roboto = Roboto({
+  variable: '--font-roboto',
+  subsets: ['latin'],
+})
 
 const jersey = Jersey_25({
   variable: '--font-jersey',
@@ -36,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${jersey.variable} h-full`}>
+    <html lang="en" className={`${roboto.variable} ${jersey.variable} h-full`}>
       <body className="flex min-h-dvh flex-col bg-bg-primary font-sans text-white">
         {/* TODO: Remove DevAutoLogin before deploy */}
         <DevAutoLogin />

@@ -265,7 +265,7 @@ export function DashboardClient({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">
+          <h1 className="text-3xl font-display font-black tracking-tight text-white">
             THE <span className="text-wc-cyan">XI</span>
           </h1>
           <p className="text-sm text-text-secondary">Welcome, {displayName}</p>

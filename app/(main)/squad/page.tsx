@@ -18,7 +18,7 @@ export default async function SquadPage() {
   if (!memberships?.length) {
     return (
       <div className="p-4">
-        <h1 className="text-2xl font-bold text-white">My Squad</h1>
+        <h1 className="text-2xl font-display text-white">My Squad</h1>
         <div className="mt-4 rounded-lg border border-dashed border-border p-8 text-center">
           <p className="text-text-secondary">Join a league to build your squad.</p>
           <Link
@@ -69,7 +69,7 @@ export default async function SquadPage() {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-2xl font-bold text-white">My Squad</h1>
+      <h1 className="mb-4 text-2xl font-display text-white">My Squad</h1>
       <SquadView
         leagueId={leagueId}
         formation={formation}

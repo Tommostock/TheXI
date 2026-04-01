@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg-primary p-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-bg-card p-6">
-        <h1 className="text-center text-3xl font-black tracking-tight text-white">
+        <h1 className="text-center text-3xl font-display font-black tracking-tight text-white">
           THE <span className="text-wc-cyan">XI</span>
         </h1>
         <p className="mt-1 text-center text-sm text-text-secondary">

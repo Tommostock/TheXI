@@ -16,7 +16,7 @@ export default async function LeaderboardPage() {
   if (!memberships?.length) {
     return (
       <div className="p-4">
-        <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
+        <h1 className="text-2xl font-display text-white">Leaderboard</h1>
         <p className="mt-4 text-center text-text-secondary">
           Join a league to see standings.
         </p>
@@ -62,7 +62,7 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-2xl font-bold text-white">Leaderboard</h1>
+      <h1 className="mb-4 text-2xl font-display text-white">Leaderboard</h1>
       <LeaderboardView rankings={rankings} currentUserId={user.id} />
     </div>
   )
