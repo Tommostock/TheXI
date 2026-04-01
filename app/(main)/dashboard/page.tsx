@@ -1,7 +1,7 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import Link from 'next/link'
-import { Plus, LogIn, ChevronRight, Trophy, Calendar, Newspaper } from 'lucide-react'
+import { Trophy, ChevronRight, Calendar } from 'lucide-react'
 import { SignOutButton } from '@/components/ui/SignOutButton'
 
 export default async function DashboardPage() {
@@ -26,8 +26,8 @@ export default async function DashboardPage() {
     return [{ ...l, userDisplayName: m.display_name, formation: m.formation }]
   }) || []
 
-  // Get scores for mini-leaderboard (first league)
-  let miniLeaderboard: Array<{ displayName: string; points: number; isMe: boolean }> = []
+  // Get scores for leaderboard (first league)
+  let leaderboard: Array<{ displayName: string; points: number; isMe: boolean }> = []
   let myRank = 0
   let activeLeagueId: string | null = null
 
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
 
     const scoreMap = new Map((scores || []).map((s) => [s.user_id, s.total_points]))
 
-    miniLeaderboard = (members || [])
+    leaderboard = (members || [])
       .map((m) => ({
         displayName: m.display_name,
         points: scoreMap.get(m.user_id) || 0,
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
       }))
       .sort((a, b) => b.points - a.points)
 
-    myRank = miniLeaderboard.findIndex((e) => e.isMe) + 1
+    myRank = leaderboard.findIndex((e) => e.isMe) + 1
   }
 
   // Check for active draft windows
@@ -97,8 +97,8 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* Mini Leaderboard */}
-      {miniLeaderboard.length > 0 && (
+      {/* Standings */}
+      {leaderboard.length > 0 && (
         <div className="mt-4 rounded-xl border border-border bg-bg-card p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="space-y-1.5">
-            {miniLeaderboard.slice(0, 3).map((entry, i) => (
+            {leaderboard.map((entry, i) => (
               <div
                 key={i}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
@@ -126,6 +126,10 @@ export default async function DashboardPage() {
                   className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                     i === 0
                       ? 'bg-wc-gold text-bg-primary'
+                      : i === 1
+                      ? 'bg-text-secondary text-bg-primary'
+                      : i === 2
+                      ? 'bg-[#CD7F32] text-bg-primary'
                       : 'bg-text-muted/30 text-text-secondary'
                   }`}
                 >
@@ -139,108 +143,38 @@ export default async function DashboardPage() {
                 </span>
               </div>
             ))}
-            {myRank > 3 && (
-              <>
-                <div className="text-center text-xs text-text-muted">...</div>
-                <div className="flex items-center gap-2 rounded-lg bg-wc-lime/10 px-2 py-1.5">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-text-muted/30 text-[10px] font-bold text-text-secondary">
-                    {myRank}
-                  </span>
-                  <span className="flex-1 text-sm font-semibold text-wc-lime">
-                    {miniLeaderboard[myRank - 1]?.displayName}
-                  </span>
-                  <span className="text-sm font-bold text-white">
-                    {miniLeaderboard[myRank - 1]?.points}
-                  </span>
-                </div>
-              </>
-            )}
           </div>
         </div>
       )}
 
-      {/* Quick Links */}
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <Link
-          href="/matches"
-          className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-wc-blue"
-        >
-          <Calendar size={18} className="text-wc-blue" />
-          <span className="text-xs text-text-secondary">Matches</span>
-        </Link>
-        <Link
-          href="/feed"
-          className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-wc-lavender"
-        >
-          <Newspaper size={18} className="text-wc-lavender" />
-          <span className="text-xs text-text-secondary">Feed</span>
-        </Link>
-        <Link
-          href="/leaderboard"
-          className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-bg-card p-3 transition-colors hover:border-wc-gold"
-        >
-          <Trophy size={18} className="text-wc-gold" />
-          <span className="text-xs text-text-secondary">Board</span>
-        </Link>
-      </div>
+      {/* Matches quick link */}
+      <Link
+        href="/matches"
+        className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-bg-card p-4 transition-colors hover:border-wc-blue"
+      >
+        <Calendar size={20} className="text-wc-blue" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-white">Match Centre</p>
+          <p className="text-xs text-text-secondary">Results, events and points</p>
+        </div>
+        <ChevronRight size={16} className="text-text-muted" />
+      </Link>
 
-      {/* League Actions */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <Link
-          href="/league/create"
-          className="flex flex-col items-center gap-2 rounded-xl border border-border bg-bg-card p-4 transition-colors hover:border-wc-lime"
-        >
-          <Plus size={24} className="text-wc-lime" />
-          <span className="text-sm font-semibold text-white">Create League</span>
-        </Link>
-        <Link
-          href="/league/join"
-          className="flex flex-col items-center gap-2 rounded-xl border border-border bg-bg-card p-4 transition-colors hover:border-wc-orange"
-        >
-          <LogIn size={24} className="text-wc-orange" />
-          <span className="text-sm font-semibold text-white">Join League</span>
-        </Link>
-      </div>
-
-      {/* User's Leagues */}
-      <div className="mt-6">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-          Your Leagues
-        </h2>
-
-        {leagues.length === 0 ? (
-          <div className="mt-3 rounded-xl border border-dashed border-border p-6 text-center">
-            <p className="text-text-secondary">No leagues yet.</p>
-            <p className="mt-1 text-sm text-text-muted">
-              Create a league or join one with an invite code.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {leagues.map((league) => (
-              <Link
-                key={league.id}
-                href={`/league/${league.id}`}
-                className="flex items-center justify-between rounded-xl border border-border bg-bg-card p-4 transition-colors hover:border-wc-purple"
-              >
-                <div>
-                  <p className="font-semibold text-white">{league.name}</p>
-                  <p className="mt-0.5 text-xs text-text-secondary">
-                    {league.draft_status === 'pre_draft'
-                      ? 'Pre-Draft'
-                      : league.draft_status === 'in_progress'
-                      ? 'Draft In Progress'
-                      : 'Draft Complete'}
-                    {' | '}
-                    {(league.current_stage || 'pre_tournament').replace(/_/g, ' ')}
-                  </p>
-                </div>
-                <ChevronRight size={16} className="text-text-muted" />
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* League info */}
+      {leagues.length > 0 && (
+        <div className="mt-4 rounded-xl border border-border bg-bg-card p-4">
+          <p className="font-semibold text-white">{leagues[0].name}</p>
+          <p className="mt-0.5 text-xs text-text-secondary">
+            {leagues[0].draft_status === 'pre_draft'
+              ? 'Pre-Draft'
+              : leagues[0].draft_status === 'in_progress'
+              ? 'Draft In Progress'
+              : 'Draft Complete'}
+            {' | '}
+            {(leagues[0].current_stage || 'pre_tournament').replace(/_/g, ' ')}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
