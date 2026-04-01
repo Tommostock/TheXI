@@ -17,16 +17,16 @@ const POSITION_LABELS: Record<Position, string> = {
 }
 
 const POSITION_COLORS: Record<Position, string> = {
-  GK: 'bg-wc-gold/20 text-wc-gold',
+  GK: 'bg-wc-purple/20 text-wc-purple',
   DEF: 'bg-wc-blue/20 text-wc-blue',
-  MID: 'bg-wc-teal/20 text-wc-teal',
+  MID: 'bg-wc-gold/20 text-wc-gold',
   ATT: 'bg-wc-crimson/20 text-wc-crimson',
 }
 
 const POSITION_ACCENT: Record<Position, string> = {
-  GK: 'text-wc-gold',
+  GK: 'text-wc-purple',
   DEF: 'text-wc-blue',
-  MID: 'text-wc-teal',
+  MID: 'text-wc-gold',
   ATT: 'text-wc-crimson',
 }
 

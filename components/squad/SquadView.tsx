@@ -25,16 +25,16 @@ type ViewMode = 'pitch' | 'list'
 const FORMATIONS: Formation[] = ['4-4-2', '4-3-3', '4-5-1']
 
 const POS_COLORS: Record<string, string> = {
-  GK: 'border-wc-gold/40 bg-wc-gold/10',
+  GK: 'border-wc-purple/40 bg-wc-purple/10',
   DEF: 'border-wc-blue/40 bg-wc-blue/10',
-  MID: 'border-wc-teal/40 bg-wc-teal/10',
+  MID: 'border-wc-gold/40 bg-wc-gold/10',
   ATT: 'border-wc-crimson/40 bg-wc-crimson/10',
 }
 
 const POS_TEXT: Record<string, string> = {
-  GK: 'text-wc-gold',
+  GK: 'text-wc-purple',
   DEF: 'text-wc-blue',
-  MID: 'text-wc-teal',
+  MID: 'text-wc-gold',
   ATT: 'text-wc-crimson',
 }
 

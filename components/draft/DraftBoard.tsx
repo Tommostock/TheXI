@@ -20,9 +20,9 @@ type Player = Tables<'players'>
 type LeagueMember = Tables<'league_members'>
 
 const POS_COLORS: Record<string, string> = {
-  GK: 'text-wc-gold',
+  GK: 'text-wc-purple',
   DEF: 'text-wc-blue',
-  MID: 'text-wc-teal',
+  MID: 'text-wc-gold',
   ATT: 'text-wc-crimson',
 }
 

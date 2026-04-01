@@ -23,9 +23,9 @@ type Ranking = {
 }
 
 const POS_TEXT: Record<string, string> = {
-  GK: 'text-wc-gold',
+  GK: 'text-wc-purple',
   DEF: 'text-wc-blue',
-  MID: 'text-wc-teal',
+  MID: 'text-wc-gold',
   ATT: 'text-wc-crimson',
 }
 

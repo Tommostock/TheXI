@@ -40,9 +40,9 @@ const FORMATION_ROWS: Record<Formation, Array<{ position: string; count: number 
 }
 
 const POS_SHIRT: Record<string, string> = {
-  GK: '#FFD100',
+  GK: '#5B2C86',
   DEF: '#0054A0',
-  MID: '#006B3F',
+  MID: '#FFD100',
   ATT: '#B5121B',
 }
 
