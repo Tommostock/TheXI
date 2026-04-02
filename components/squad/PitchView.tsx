@@ -130,11 +130,7 @@ function PitchPlayer({
       {(() => {
         const dp = isCaptain ? points * 2 : points
         return (
-          <div
-            className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
-              dp > 0 ? 'bg-wc-peach' : dp < 0 ? 'bg-wc-crimson' : 'bg-text-muted/60'
-            }`}
-          >
+          <div className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple">
             <p className="text-[9px] font-bold text-white">{dp}</p>
           </div>
         )
@@ -184,15 +180,7 @@ function BenchPlayer({
           )}
         </div>
       </div>
-      <div
-        className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
-          points > 0
-            ? 'bg-wc-peach/70'
-            : points < 0
-            ? 'bg-wc-crimson/70'
-            : 'bg-text-muted/40'
-        }`}
-      >
+      <div className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple/70">
         <p className="text-[9px] font-bold text-white">{points}</p>
       </div>
     </div>
