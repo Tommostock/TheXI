@@ -119,13 +119,23 @@ export async function toggleStarting(
 
   const { data: slots } = await supabase
     .from('squad_slots')
-    .select('*')
+    .select('*, player:players(id, position)')
     .eq('league_id', leagueId)
     .eq('user_id', user.id)
     .in('id', [slotId, swapWithSlotId])
 
   if (!slots || slots.length !== 2) {
     return { error: 'Invalid swap' }
+  }
+
+  // Enforce same position — can only swap like-for-like
+  type SlotWithPlayer = typeof slots[number] & { player: { id: string; position: string } | null }
+  const [slotA, slotB] = slots as SlotWithPlayer[]
+  const posA = slotA.player?.position || slotA.position
+  const posB = slotB.player?.position || slotB.position
+
+  if (posA !== posB) {
+    return { error: `Can only swap players in the same position (${posA} for ${posA})` }
   }
 
   const now = new Date().toISOString()

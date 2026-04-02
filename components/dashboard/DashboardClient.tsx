@@ -330,7 +330,8 @@ export function DashboardClient({
           <h1 className="text-3xl font-display font-black tracking-tight text-white">
             THE <span className="text-wc-purple">XI</span>
           </h1>
-          <p className="text-sm text-text-secondary">Welcome, {displayName}</p>
+          <p className="text-xs text-wc-peach">World Cup 2026 Draft</p>
+          <p className="text-sm text-text-secondary mt-0.5">Welcome, {displayName}</p>
         </div>
         <div className="flex items-center gap-2">
           <HowToPlayButton />
@@ -383,7 +384,7 @@ export function DashboardClient({
 
       {/* Match Centre Tabs */}
       <div className="flex rounded-xl border border-border overflow-hidden">
-        {(['fixtures', 'groups', 'knockouts'] as const).map((tab) => (
+        {(['fixtures', 'knockouts', 'groups'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -455,7 +456,28 @@ export function DashboardClient({
 
       {/* Knockouts Tab */}
       {activeTab === 'knockouts' && (
-        <KnockoutBracket />
+        <div className="flex flex-col gap-3">
+          {Object.entries(
+            upcomingKnockoutFixtures.reduce((acc, fx) => {
+              const label = ROUND_LABELS[fx.group] || fx.group
+              if (!acc[label]) acc[label] = []
+              acc[label].push(fx)
+              return acc
+            }, {} as Record<string, Fixture[]>)
+          ).map(([roundLabel, roundFx]) => (
+            <div key={roundLabel}>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-wc-blue">
+                {roundLabel}
+              </p>
+              <FixtureGroup fixtures={roundFx} eventsByMatch={eventsByMatch} />
+            </div>
+          ))}
+          {upcomingKnockoutFixtures.length === 0 && (
+            <p className="py-8 text-center text-sm text-text-muted">
+              Knockout fixtures will appear once the group stage is complete.
+            </p>
+          )}
+        </div>
       )}
     </div>
   )

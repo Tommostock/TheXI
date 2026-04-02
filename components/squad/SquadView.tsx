@@ -243,7 +243,7 @@ export function SquadView({
           {/* Points */}
           <div className="rounded-xl border border-border bg-bg-card p-4 text-center">
             <p className="text-xs uppercase tracking-wider text-text-secondary">Total Points</p>
-            <p className="mt-1 text-3xl font-bold text-wc-gold">{totalPoints}</p>
+            <p className="mt-1 text-3xl font-bold text-wc-peach">{totalPoints}</p>
           </div>
 
           {/* Starting XI */}

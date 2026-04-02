@@ -232,7 +232,7 @@ export function PitchView({
       {/* Points header */}
       <div className="rounded-xl border border-border bg-bg-card p-3 text-center">
         <p className="text-xs uppercase tracking-wider text-text-secondary">Total Points</p>
-        <p className="text-3xl font-bold text-wc-gold">{totalPoints}</p>
+        <p className="text-3xl font-bold text-wc-peach">{totalPoints}</p>
       </div>
 
       {/* Pitch */}
