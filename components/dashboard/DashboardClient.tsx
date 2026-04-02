@@ -104,6 +104,38 @@ function DraftCountdown() {
   )
 }
 
+function FixtureGroup({
+  fixtures,
+  eventsByMatch,
+}: {
+  fixtures: Fixture[]
+  eventsByMatch: Record<string, EventRow[]>
+}) {
+  // Group by date
+  const byDate = new Map<string, Fixture[]>()
+  for (const fx of fixtures) {
+    if (!byDate.has(fx.date)) byDate.set(fx.date, [])
+    byDate.get(fx.date)!.push(fx)
+  }
+
+  return (
+    <div className="space-y-3">
+      {Array.from(byDate.entries()).map(([date, dateFx]) => (
+        <div key={date}>
+          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+            {date}
+          </p>
+          <div className="space-y-1.5">
+            {dateFx.map((fx) => (
+              <FixtureCard key={fx.id} fixture={fx} events={eventsByMatch[fx.id] || []} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function FixtureCard({
   fixture,
   events,
@@ -131,10 +163,12 @@ function FixtureCard({
       >
         {/* Home */}
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <span className="text-xs font-semibold text-white text-right truncate">
+          <span className={`text-right truncate ${fixture.homeFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
             {fixture.home}
           </span>
-          <img src={fixture.homeFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
+          {fixture.homeFlag && (
+            <img src={fixture.homeFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
+          )}
         </div>
 
         {/* Score / Time */}
@@ -144,16 +178,21 @@ function FixtureCard({
               {fixture.homeScore} - {fixture.awayScore}
             </span>
           ) : (
-            <span className="text-[10px] font-medium text-text-muted">
-              {fixture.time}
-            </span>
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-medium text-text-secondary">
+                {fixture.time}
+              </span>
+              <span className="text-[8px] text-text-muted">BST</span>
+            </div>
           )}
         </div>
 
         {/* Away */}
         <div className="flex items-center gap-1.5 flex-1">
-          <img src={fixture.awayFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
-          <span className="text-xs font-semibold text-white truncate">
+          {fixture.awayFlag && (
+            <img src={fixture.awayFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
+          )}
+          <span className={`truncate ${fixture.awayFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
             {fixture.away}
           </span>
         </div>
@@ -259,8 +298,21 @@ export function DashboardClient({
 }) {
   const [activeTab, setActiveTab] = useState<'fixtures' | 'groups' | 'knockouts'>('fixtures')
 
-  const finishedFixtures = FIXTURES.filter((f) => f.status === 'finished')
-  const upcomingFixtures = FIXTURES.filter((f) => f.status === 'upcoming')
+  const groupStages = ['A','B','C','D','E','F','G','H','I','J','K','L']
+  const knockoutStages = ['R32','R16','QF','SF','3RD','FINAL']
+
+  const finishedFixtures = FIXTURES.filter((fx) => fx.status === 'finished')
+  const upcomingGroupFixtures = FIXTURES.filter((fx) => fx.status === 'upcoming' && groupStages.includes(fx.group))
+  const upcomingKnockoutFixtures = FIXTURES.filter((fx) => fx.status === 'upcoming' && knockoutStages.includes(fx.group))
+
+  const ROUND_LABELS: Record<string, string> = {
+    R32: 'Round of 32',
+    R16: 'Round of 16',
+    QF: 'Quarter-Final',
+    SF: 'Semi-Final',
+    '3RD': 'Third Place Playoff',
+    FINAL: 'Final',
+  }
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -340,40 +392,45 @@ export function DashboardClient({
 
       {/* Fixtures Tab */}
       {activeTab === 'fixtures' && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {/* Results */}
           {finishedFixtures.length > 0 && (
             <div>
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-text-secondary">
                 Results
               </p>
-              <div className="space-y-1.5">
-                {finishedFixtures.map((f) => (
-                  <FixtureCard
-                    key={f.id}
-                    fixture={f}
-                    events={eventsByMatch[f.id] || []}
-                  />
-                ))}
-              </div>
+              <FixtureGroup fixtures={finishedFixtures} eventsByMatch={eventsByMatch} />
             </div>
           )}
 
-          {/* Upcoming */}
-          {upcomingFixtures.length > 0 && (
+          {/* Upcoming Group Stage */}
+          {upcomingGroupFixtures.length > 0 && (
             <div>
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-text-secondary">
-                Upcoming
+                Group Stage
               </p>
-              <div className="space-y-1.5">
-                {upcomingFixtures.map((f) => (
-                  <FixtureCard
-                    key={f.id}
-                    fixture={f}
-                    events={[]}
-                  />
-                ))}
-              </div>
+              <FixtureGroup fixtures={upcomingGroupFixtures} eventsByMatch={eventsByMatch} />
+            </div>
+          )}
+
+          {/* Upcoming Knockouts */}
+          {upcomingKnockoutFixtures.length > 0 && (
+            <div>
+              {Object.entries(
+                upcomingKnockoutFixtures.reduce((acc, fx) => {
+                  const label = ROUND_LABELS[fx.group] || fx.group
+                  if (!acc[label]) acc[label] = []
+                  acc[label].push(fx)
+                  return acc
+                }, {} as Record<string, Fixture[]>)
+              ).map(([roundLabel, roundFx]) => (
+                <div key={roundLabel} className="mb-3">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-wc-blue">
+                    {roundLabel}
+                  </p>
+                  <FixtureGroup fixtures={roundFx} eventsByMatch={eventsByMatch} />
+                </div>
+              ))}
             </div>
           )}
         </div>
