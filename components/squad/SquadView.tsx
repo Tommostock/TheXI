@@ -151,6 +151,7 @@ export function SquadView({
   captainId = null,
   viceCaptainId = null,
   isLocked = false,
+  teamName = '',
 }: {
   leagueId: string
   formation: Formation
@@ -160,6 +161,7 @@ export function SquadView({
   captainId?: string | null
   viceCaptainId?: string | null
   isLocked?: boolean
+  teamName?: string
 }) {
   const [formation, setFormation] = useState<Formation>(initialFormation)
   const [slots, setSlots] = useState<SquadSlot[]>(initialSlots)
@@ -168,9 +170,10 @@ export function SquadView({
   const [viewMode, setViewMode] = useState<ViewMode>('pitch')
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const [showPlayerMenu, setShowPlayerMenu] = useState(false)
-  const [detailPlayer, setDetailPlayer] = useState<SquadSlot['player'] | null>(null)
   const [localCaptainId, setLocalCaptainId] = useState<string | null>(captainId ?? null)
   const [localViceCaptainId, setLocalViceCaptainId] = useState<string | null>(viceCaptainId ?? null)
+  const [localTeamName, setLocalTeamName] = useState(teamName || '')
+  const [editingTeamName, setEditingTeamName] = useState(false)
 
   const starters = useMemo(
     () =>
@@ -234,17 +237,14 @@ export function SquadView({
     }
   }
 
-  // Pitch view: tap a player to select, then choose action
+  // Pitch view: tap to select, tap same-position opposite to swap
   function handlePitchPlayerTap(playerId: string) {
-    if (isLocked || loading) return
+    if (isLocked) return
     if (selectedPlayerId === playerId) {
-      // Tapping same player toggles menu
       setSelectedPlayerId(null)
-      setShowPlayerMenu(false)
       return
     }
 
-    // If we already have a selected player and tap another — attempt swap
     if (selectedPlayerId) {
       const sourceSlot = slots.find((s) => s.player?.id === selectedPlayerId)
       const targetSlot = slots.find((s) => s.player?.id === playerId)
@@ -256,14 +256,12 @@ export function SquadView({
           return
         }
       }
-      // If can't swap, just select the new player
+      // Different position or same side — just reselect
       setSelectedPlayerId(playerId)
-      setShowPlayerMenu(true)
       return
     }
 
     setSelectedPlayerId(playerId)
-    setShowPlayerMenu(true)
   }
 
   async function handlePitchSwap(slotIdA: string, slotIdB: string) {
@@ -419,21 +417,54 @@ export function SquadView({
             </button>
           ))}
         </div>
-        <div className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-center shrink-0">
-          <p className="text-xs font-bold text-white">{totalPoints} <span className="text-[9px] font-normal text-text-muted">pts</span></p>
-        </div>
+      </div>
+
+      {/* Team Name + Points */}
+      <div className="flex items-center justify-between px-1">
+        {editingTeamName ? (
+          <input
+            type="text"
+            value={localTeamName}
+            onChange={(e) => setLocalTeamName(e.target.value)}
+            onBlur={() => setEditingTeamName(false)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setEditingTeamName(false) }}
+            maxLength={25}
+            autoFocus
+            className="bg-transparent text-sm font-medium text-white border-b border-wc-purple outline-none w-40"
+          />
+        ) : (
+          <button
+            onClick={() => !isLocked && setEditingTeamName(true)}
+            className="text-sm font-medium text-white hover:text-wc-peach transition-colors"
+          >
+            {localTeamName || 'Tap to set team name'}
+          </button>
+        )}
+        <p className="text-sm font-bold text-white">{totalPoints} <span className="text-[10px] font-normal text-text-muted">pts</span></p>
       </div>
 
       {/* Pitch View */}
       {viewMode === 'pitch' && (
-        <PitchView
-          formation={formation}
-          slots={slots as Parameters<typeof PitchView>[0]['slots']}
-          totalPoints={totalPoints}
-          playerPoints={playerPoints}
-          captainId={localCaptainId}
-          viceCaptainId={localViceCaptainId}
-        />
+        <>
+          <PitchView
+            formation={formation}
+            slots={slots as Parameters<typeof PitchView>[0]['slots']}
+            totalPoints={totalPoints}
+            playerPoints={playerPoints}
+            captainId={localCaptainId}
+            viceCaptainId={localViceCaptainId}
+            selectedPlayerId={selectedPlayerId}
+            onPlayerTap={handlePitchPlayerTap}
+            isLocked={isLocked}
+          />
+
+          {/* Swap hint */}
+          {selectedPlayerId && (
+            <p className="rounded-lg border border-wc-purple/30 bg-wc-purple/5 p-2 text-center text-[10px] text-wc-purple">
+              Tap a same-position player to swap, or tap again to deselect
+            </p>
+          )}
+        </>
       )}
 
       {/* List View */}

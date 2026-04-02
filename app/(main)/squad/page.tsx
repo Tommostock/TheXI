@@ -9,7 +9,7 @@ export default async function SquadPage() {
 
   const { data: memberships } = await supabase
     .from('league_members')
-    .select('league_id, formation, captain_player_id, vice_captain_player_id')
+    .select('league_id, formation, captain_player_id, vice_captain_player_id, team_name')
     .eq('user_id', user.id)
     .order('joined_at', { ascending: false })
     .limit(1)
@@ -32,6 +32,7 @@ export default async function SquadPage() {
   const formation = (memberships[0].formation || '4-4-2') as '4-4-2' | '4-3-3' | '4-5-1'
   const captainId = memberships[0].captain_player_id || null
   const viceCaptainId = memberships[0].vice_captain_player_id || null
+  const teamName = (memberships[0] as Record<string, unknown>).team_name as string || ''
 
   const { data: league } = await supabase
     .from('leagues')
@@ -82,6 +83,7 @@ export default async function SquadPage() {
         captainId={captainId}
         viceCaptainId={viceCaptainId}
         isLocked={isLocked}
+        teamName={teamName}
       />
     </div>
   )
