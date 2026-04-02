@@ -2,18 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { CircleDot, ArrowLeftRight, LayoutGrid, Zap, UserPlus, Target, Footprints } from 'lucide-react'
 import type { Tables } from '@/types/database.types'
 
 type FeedEvent = Tables<'activity_feed'>
 
-const EVENT_STYLES: Record<string, { icon: typeof CircleDot; bg: string; color: string }> = {
-  scoring_event: { icon: Target, bg: 'bg-wc-gold/20', color: 'text-wc-gold' },
-  draft_pick: { icon: CircleDot, bg: 'bg-wc-blue/20', color: 'text-wc-blue' },
-  transfer: { icon: ArrowLeftRight, bg: 'bg-wc-peach/20', color: 'text-wc-peach' },
-  formation_change: { icon: LayoutGrid, bg: 'bg-text-secondary/20', color: 'text-text-secondary' },
-  auto_pick: { icon: Zap, bg: 'bg-wc-crimson/20', color: 'text-wc-crimson' },
-  league_joined: { icon: UserPlus, bg: 'bg-wc-peach/20', color: 'text-wc-peach' },
+const EVENT_STYLES: Record<string, { char: string; bg: string; color: string }> = {
+  scoring_event: { char: '⚽', bg: 'bg-wc-gold/20', color: '' },
+  draft_pick:    { char: '📋', bg: 'bg-wc-blue/20', color: '' },
+  transfer:      { char: '🔄', bg: 'bg-wc-peach/20', color: '' },
+  formation_change: { char: '📐', bg: 'bg-text-secondary/20', color: '' },
+  auto_pick:     { char: '⚡', bg: 'bg-wc-crimson/20', color: '' },
+  league_joined: { char: '👤', bg: 'bg-wc-peach/20', color: '' },
+}
+
+function getEventChar(event: FeedEvent): string {
+  if (event.event_type === 'scoring_event') {
+    if (event.description.includes('assisted')) return '👟'
+    if (event.description.includes('clean sheet')) return '🧤'
+    if (event.description.includes('yellow')) return '🟨'
+    if (event.description.includes('red')) return '🟥'
+    return '⚽'
+  }
+  return EVENT_STYLES[event.event_type]?.char || '📌'
 }
 
 function timeAgo(dateStr: string): string {
@@ -98,12 +108,8 @@ export function ActivityFeed({
           </div>
           <div className="space-y-1.5 stagger-children">
             {dateEvents.map((event) => {
-              let style = EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
-              // Use boot icon for assists
-              if (event.event_type === 'scoring_event' && event.description.includes('assisted')) {
-                style = { ...style, icon: Footprints }
-              }
-              const IconComp = style.icon
+              const style = EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
+              const char = getEventChar(event)
 
               return (
                 <div
@@ -111,9 +117,9 @@ export function ActivityFeed({
                   className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
                 >
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${style.bg}`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] leading-none ${style.bg}`}
                   >
-                    <IconComp size={13} className={style.color} />
+                    {char}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-white">{event.description}</p>

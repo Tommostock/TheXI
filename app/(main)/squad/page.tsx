@@ -72,6 +72,7 @@ export default async function SquadPage() {
 
   return (
     <div className="px-2 pt-2 pb-0">
+      <h1 className="mb-2 text-2xl font-display text-white px-1">My Squad</h1>
       <SquadView
         leagueId={leagueId}
         formation={formation}
