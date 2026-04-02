@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Trophy, ChevronDown, ChevronRight, Clock } from 'lucide-react'
+import { ChevronDown, ChevronRight, Clock } from 'lucide-react'
 import { GROUPS, FIXTURES, type Fixture } from '@/lib/tournament/groups'
 import { SignOutButton } from '@/components/ui/SignOutButton'
-import { ShareButton } from '@/components/ui/ShareButton'
 import { HowToPlayButton } from './HowToPlay'
 import { KnockoutBracket } from './KnockoutBracket'
 
@@ -304,11 +303,9 @@ function GroupTable({ groupName, teams }: { groupName: string; teams: typeof GRO
 
 export function DashboardClient({
   displayName,
-  leaderboard,
   eventsByMatch,
 }: {
   displayName: string
-  leaderboard: Array<{ displayName: string; points: number; isMe: boolean }>
   eventsByMatch: Record<string, EventRow[]>
 }) {
   const [activeTab, setActiveTab] = useState<'fixtures' | 'groups' | 'knockouts'>('fixtures')
@@ -338,7 +335,6 @@ export function DashboardClient({
             THE <span className="text-wc-purple">XI</span>
           </h1>
           <p className="text-xs text-wc-peach">World Cup 2026 Draft</p>
-          <p className="text-sm text-text-secondary mt-0.5">Welcome, {displayName}</p>
         </div>
         <div className="flex items-center gap-1.5">
           <HowToPlayButton />
@@ -349,46 +345,86 @@ export function DashboardClient({
       {/* Draft Countdown */}
       <DraftCountdown />
 
-      {/* Standings */}
-      {leaderboard.length > 0 && (
-        <div className="rounded-xl border border-border bg-bg-card p-4 animate-fade-in-up">
-          <div className="section-accent flex items-center gap-2 mb-3">
-            <Trophy size={14} className="text-wc-gold" />
-            <p className="flex-1 text-xs font-bold uppercase tracking-wider text-text-secondary">
-              Standings
-            </p>
-            <ShareButton title="The XI Standings" text="Check the standings on The XI - World Cup 2026 Draft!" />
+      {/* Next Match / Live Score */}
+      {(() => {
+        const liveMatches = FIXTURES.filter((f) => f.status === 'live')
+        const nextUpcoming = FIXTURES.filter((f) => f.status === 'upcoming')
+        // Find the earliest upcoming date group (could be multiple simultaneous matches)
+        const nextDate = nextUpcoming.length > 0 ? nextUpcoming[0].date : null
+        const nextTime = nextUpcoming.length > 0 ? nextUpcoming[0].time : null
+        const nextMatches = nextDate
+          ? nextUpcoming.filter((f) => f.date === nextDate && f.time === nextTime)
+          : []
+
+        const matchesToShow = liveMatches.length > 0 ? liveMatches : nextMatches
+
+        if (matchesToShow.length === 0) return null
+
+        const isLive = liveMatches.length > 0
+
+        return (
+          <div className={`rounded-xl border p-3 animate-fade-in ${
+            isLive ? 'border-wc-peach/40 bg-wc-peach/5' : 'border-border bg-bg-card'
+          }`}>
+            <div className="flex items-center gap-2 mb-2">
+              {isLive ? (
+                <>
+                  <div className="h-2 w-2 rounded-full bg-wc-crimson animate-pulse" />
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-wc-crimson">Live</p>
+                </>
+              ) : (
+                <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                  Next Match · {nextDate} · {nextTime} BST
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              {matchesToShow.map((fx) => (
+                <div key={fx.id} className="flex items-center">
+                  <div className="flex items-center gap-1.5 flex-1 justify-end">
+                    <span className="text-xs font-semibold text-white text-right truncate">{fx.home}</span>
+                    {fx.homeFlag && <img src={fx.homeFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />}
+                  </div>
+                  <div className="w-16 text-center shrink-0 mx-1">
+                    {isLive || fx.status === 'finished' ? (
+                      <span className="text-sm font-bold text-white">{fx.homeScore} - {fx.awayScore}</span>
+                    ) : (
+                      <span className="text-xs text-text-muted">vs</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-1">
+                    {fx.awayFlag && <img src={fx.awayFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />}
+                    <span className="text-xs font-semibold text-white truncate">{fx.away}</span>
+                  </div>
+                </div>
+              ))}
+              {/* Live match events — goals and red cards only */}
+              {isLive && liveMatches.map((fx) => {
+                const matchEvents = (eventsByMatch[fx.id] || []).filter(
+                  (e) => e.event_type === 'goal' || e.event_type === 'red'
+                )
+                if (matchEvents.length === 0) return null
+                return (
+                  <div key={`events-${fx.id}`} className="border-t border-border/30 pt-1.5 mt-1">
+                    {matchEvents.map((e, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[10px]">
+                        <span className="text-text-muted w-5 text-right">{e.minute ? `${e.minute}'` : ''}</span>
+                        <span className="text-white">{e.player?.name || 'Unknown'}</span>
+                        <span className={e.event_type === 'goal' ? 'text-wc-peach' : 'text-wc-crimson'}>
+                          {e.event_type === 'goal' ? 'Goal' : 'Red Card'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
+            </div>
+            {!isLive && matchesToShow[0]?.venue && (
+              <p className="mt-1.5 text-center text-[9px] text-text-muted">{matchesToShow[0].venue}</p>
+            )}
           </div>
-          <div className="space-y-1.5">
-            {leaderboard.map((entry, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
-                  entry.isMe ? 'bg-wc-peach/10' : ''
-                }`}
-              >
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                    i === 0
-                      ? 'bg-wc-gold text-bg-primary'
-                      : i === 1
-                      ? 'bg-text-secondary text-bg-primary'
-                      : i === 2
-                      ? 'bg-[#CD7F32] text-bg-primary'
-                      : 'bg-text-muted/30 text-text-secondary'
-                  }`}
-                >
-                  {i + 1}
-                </span>
-                <span className={`flex-1 text-sm ${entry.isMe ? 'text-wc-peach font-semibold' : 'text-white'}`}>
-                  {entry.displayName}
-                </span>
-                <span className="text-sm font-bold text-white">{entry.points}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Match Centre Tabs */}
       <div className="flex rounded-xl border border-border overflow-hidden">

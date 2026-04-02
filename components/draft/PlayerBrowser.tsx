@@ -103,7 +103,7 @@ export function PlayerBrowser({
   const isSearching = search.length > 0
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 flex-1 min-h-0">
       {/* Search */}
       <div className="relative">
         <Search
@@ -163,7 +163,7 @@ export function PlayerBrowser({
       </p>
 
       {/* Country Groups */}
-      <div className="max-h-[500px] space-y-1 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 space-y-1 overflow-y-auto scrollbar-hide">
         {countryGroups.map((group) => {
           const isOpen = isSearching || expandedCountries.has(group.nation)
           const playerCount = Array.from(group.players.values()).reduce(

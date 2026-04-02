@@ -242,13 +242,7 @@ export function PitchView({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Points header — compact */}
-      <div className="rounded-lg border border-border bg-bg-card px-3 py-2 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wider text-text-secondary">Total Points</p>
-        <p className="text-xl font-bold text-white">{totalPoints}</p>
-      </div>
-
+    <div className="flex flex-col gap-1.5">
       {/* Pitch */}
       <div className="relative rounded-xl overflow-hidden">
         <div className="relative bg-[#1a6e34]">

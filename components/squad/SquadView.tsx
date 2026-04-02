@@ -391,52 +391,25 @@ export function SquadView({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-1.5">
       {/* Lock Banner */}
       {isLocked && (
-        <div className="rounded-xl border border-wc-crimson/30 bg-wc-crimson/5 px-4 py-3 text-center">
-          <p className="text-xs font-medium text-wc-crimson">
+        <div className="rounded-lg border border-wc-crimson/30 bg-wc-crimson/5 px-3 py-2 text-center">
+          <p className="text-[10px] font-medium text-wc-crimson">
             Lineup locked — changes allowed at next draft window
           </p>
         </div>
       )}
 
-      {/* View Mode Toggle */}
-      <div className="flex rounded-xl border border-border overflow-hidden">
-        <button
-          onClick={() => setViewMode('pitch')}
-          className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
-            viewMode === 'pitch'
-              ? 'bg-wc-purple text-white'
-              : 'bg-bg-card text-text-secondary'
-          }`}
-        >
-          Pitch View
-        </button>
-        <button
-          onClick={() => setViewMode('list')}
-          className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
-            viewMode === 'list'
-              ? 'bg-wc-purple text-white'
-              : 'bg-bg-card text-text-secondary'
-          }`}
-        >
-          List View
-        </button>
-      </div>
-
-      {/* Formation Selector */}
-      <div>
-        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-text-secondary">
-          Formation
-        </p>
-        <div className="flex gap-2">
+      {/* Top bar: formation + points */}
+      <div className="flex items-center gap-2">
+        <div className="flex gap-1 flex-1">
           {FORMATIONS.map((f) => (
             <button
               key={f}
               onClick={() => handleFormationChange(f)}
               disabled={loading}
-              className={`flex-1 rounded-lg border py-2.5 text-center text-sm font-bold transition-colors ${
+              className={`flex-1 rounded-md border py-1.5 text-center text-[11px] font-bold transition-colors ${
                 formation === f
                   ? 'border-wc-peach bg-wc-peach/10 text-white'
                   : 'border-border text-text-secondary hover:border-text-secondary'
@@ -445,6 +418,9 @@ export function SquadView({
               {f}
             </button>
           ))}
+        </div>
+        <div className="rounded-md border border-border bg-bg-card px-3 py-1.5 text-center shrink-0">
+          <p className="text-xs font-bold text-white">{totalPoints} <span className="text-[9px] font-normal text-text-muted">pts</span></p>
         </div>
       </div>
 

@@ -34,15 +34,12 @@ export default async function DraftPage() {
     .order('name', { ascending: true })
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-display text-white">Draft Board</h1>
-      <p className="mt-1 text-sm text-text-secondary">
+    <div className="p-4 flex flex-col h-[calc(100dvh-4rem-max(env(safe-area-inset-bottom),12px))]">
+      <h1 className="text-2xl font-display text-white shrink-0">Draft Board</h1>
+      <p className="mt-1 mb-3 text-sm text-text-secondary shrink-0">
         Browse all available World Cup 2026 players by nation.
       </p>
-
-      <div className="mt-4">
-        <PlayerBrowser players={players || []} />
-      </div>
+      <PlayerBrowser players={players || []} />
     </div>
   )
 }
