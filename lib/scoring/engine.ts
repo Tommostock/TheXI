@@ -21,6 +21,7 @@ export const POINTS: Record<string, number> = {
   goal: 5,
   assist: 3,
   clean_sheet: 3,
+  penalty_save: 5,
   appearance_full: 2,
   appearance_sub: 1,
   own_goal: -2,

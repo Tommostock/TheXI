@@ -1,5 +1,6 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { SquadView } from '@/components/squad/SquadView'
+import { ShareButton } from '@/components/ui/ShareButton'
 import Link from 'next/link'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 
@@ -119,7 +120,10 @@ export default async function SquadPage() {
         </div>
       )}
 
-      <h1 className="mb-4 text-2xl font-display text-white">My Squad</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-display text-white">My Squad</h1>
+        <ShareButton title="My XI Squad" text="Check out my World Cup 2026 squad on The XI!" />
+      </div>
       <SquadView
         leagueId={leagueId}
         formation={formation}

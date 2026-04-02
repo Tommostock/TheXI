@@ -5,7 +5,6 @@ import { Trophy, ChevronDown, ChevronRight, Clock } from 'lucide-react'
 import { GROUPS, FIXTURES, type Fixture } from '@/lib/tournament/groups'
 import { SignOutButton } from '@/components/ui/SignOutButton'
 import { ShareButton } from '@/components/ui/ShareButton'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { HowToPlayButton } from './HowToPlay'
 import { KnockoutBracket } from './KnockoutBracket'
 
@@ -70,7 +69,7 @@ function DraftCountdown() {
 
   return (
     <div className="rounded-xl border border-wc-purple/30 bg-wc-purple/5 p-5 text-center animate-fade-in">
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-wc-purple mb-4">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-4">
         Countdown To Draft Picks
       </p>
       {isLive ? (
@@ -342,7 +341,6 @@ export function DashboardClient({
           <p className="text-sm text-text-secondary mt-0.5">Welcome, {displayName}</p>
         </div>
         <div className="flex items-center gap-1.5">
-          <ThemeToggle />
           <HowToPlayButton />
           <SignOutButton />
         </div>

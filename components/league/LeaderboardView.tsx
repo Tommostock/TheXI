@@ -56,14 +56,22 @@ export function LeaderboardView({
         const isMe = entry.userId === currentUserId
         const pointsAhead = index > 0 ? rankings[index - 1].totalPoints - entry.totalPoints : 0
 
-        // Sort squad by points descending for expanded view
+        // Sort squad by position (GK first) then points within position
+        const posOrder = ['GK', 'DEF', 'MID', 'ATT']
+        const sortByPos = (a: typeof entry.squad[0], b: typeof entry.squad[0]) => {
+          const posA = posOrder.indexOf(a.player!.position)
+          const posB = posOrder.indexOf(b.player!.position)
+          if (posA !== posB) return posA - posB
+          return b.playerPoints - a.playerPoints
+        }
+
         const startersWithPoints = entry.squad
           .filter((s) => s.isStarting && s.player)
-          .sort((a, b) => b.playerPoints - a.playerPoints)
+          .sort(sortByPos)
 
         const benchWithPoints = entry.squad
           .filter((s) => !s.isStarting && s.player)
-          .sort((a, b) => b.playerPoints - a.playerPoints)
+          .sort(sortByPos)
 
         return (
           <div key={entry.userId}>

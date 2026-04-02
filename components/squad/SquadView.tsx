@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react'
 import { changeFormation, toggleStarting, setCaptain } from '@/lib/squad/actions'
 import { PitchView } from './PitchView'
-import { ArrowUpDown } from 'lucide-react'
+import { PlayerDetailCard } from '@/components/ui/PlayerDetailCard'
+import { ArrowUpDown, Info } from 'lucide-react'
 
 type SquadSlot = {
   id: string
@@ -36,6 +37,7 @@ function PlayerActionMenu({
   onSetCaptain,
   onSetViceCaptain,
   onSwap,
+  onViewInfo,
 }: {
   slots: SquadSlot[]
   selectedPlayerId: string | null
@@ -48,6 +50,7 @@ function PlayerActionMenu({
   onSetCaptain: (id: string) => void
   onSetViceCaptain: (id: string) => void
   onSwap: (a: string, b: string) => void
+  onViewInfo: (player: SquadSlot['player']) => void
 }) {
   if (!showMenu || !selectedPlayerId || isLocked) return null
 
@@ -76,6 +79,12 @@ function PlayerActionMenu({
         </button>
       </div>
       <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => onViewInfo(player)}
+          className="rounded-lg border border-border bg-bg-surface px-3 py-1.5 text-xs text-text-secondary transition-colors hover:text-white"
+        >
+          View Info
+        </button>
         {isStarter && !isCap && (
           <button
             onClick={() => onSetCaptain(player.id)}
@@ -159,6 +168,7 @@ export function SquadView({
   const [viewMode, setViewMode] = useState<ViewMode>('pitch')
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
   const [showPlayerMenu, setShowPlayerMenu] = useState(false)
+  const [detailPlayer, setDetailPlayer] = useState<SquadSlot['player'] | null>(null)
   const [localCaptainId, setLocalCaptainId] = useState<string | null>(captainId ?? null)
   const [localViceCaptainId, setLocalViceCaptainId] = useState<string | null>(viceCaptainId ?? null)
 
@@ -258,6 +268,24 @@ export function SquadView({
     setShowPlayerMenu(false)
     const result = await toggleStarting(leagueId, slotIdA, slotIdB)
     if (!result.error) {
+      // Find which players are being swapped
+      const slotA = slots.find((s) => s.id === slotIdA)
+      const slotB = slots.find((s) => s.id === slotIdB)
+      const playerGoingToBench = slotA?.is_starting ? slotA : slotB
+      const playerGoingToStarting = slotA?.is_starting ? slotB : slotA
+
+      // If captain/VC goes to bench, incoming player inherits the armband
+      if (playerGoingToBench?.player && playerGoingToStarting?.player) {
+        if (playerGoingToBench.player.id === localCaptainId) {
+          setLocalCaptainId(playerGoingToStarting.player.id)
+          setCaptain(leagueId, playerGoingToStarting.player.id, localViceCaptainId || '')
+        }
+        if (playerGoingToBench.player.id === localViceCaptainId) {
+          setLocalViceCaptainId(playerGoingToStarting.player.id)
+          setCaptain(leagueId, localCaptainId || '', playerGoingToStarting.player.id)
+        }
+      }
+
       setSlots((prev) =>
         prev.map((s) => {
           if (s.id === slotIdA || s.id === slotIdB) {
@@ -364,7 +392,7 @@ export function SquadView({
           onClick={() => setViewMode('pitch')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'pitch'
-              ? 'bg-wc-purple text-bg-primary'
+              ? 'bg-wc-purple text-white'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -374,7 +402,7 @@ export function SquadView({
           onClick={() => setViewMode('list')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'list'
-              ? 'bg-wc-purple text-bg-primary'
+              ? 'bg-wc-purple text-white'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -395,7 +423,7 @@ export function SquadView({
               disabled={loading}
               className={`flex-1 rounded-lg border py-2.5 text-center text-sm font-bold transition-colors ${
                 formation === f
-                  ? 'border-wc-peach bg-wc-peach/10 text-wc-peach'
+                  ? 'border-wc-peach bg-wc-peach/10 text-white'
                   : 'border-border text-text-secondary hover:border-text-secondary'
               }`}
             >
@@ -433,8 +461,17 @@ export function SquadView({
             onSetCaptain={handleSetCaptain}
             onSetViceCaptain={handleSetViceCaptain}
             onSwap={handlePitchSwap}
+            onViewInfo={(player) => { setDetailPlayer(player); dismissSelection(); }}
           />
         </>
+      )}
+
+      {/* Player Detail Modal */}
+      {detailPlayer && (
+        <PlayerDetailCard
+          player={detailPlayer as Parameters<typeof PlayerDetailCard>[0]['player']}
+          onClose={() => setDetailPlayer(null)}
+        />
       )}
 
       {/* List View */}
@@ -443,7 +480,7 @@ export function SquadView({
           {/* Points */}
           <div className="rounded-xl border border-border bg-bg-card p-4 text-center">
             <p className="text-xs uppercase tracking-wider text-text-secondary">Total Points</p>
-            <p className="mt-1 text-3xl font-bold text-wc-peach">{totalPoints}</p>
+            <p className="mt-1 text-3xl font-bold text-white">{totalPoints}</p>
           </div>
 
           {/* Starting XI */}

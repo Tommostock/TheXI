@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { CircleDot, ArrowLeftRight, LayoutGrid, Zap, UserPlus, Target } from 'lucide-react'
+import { CircleDot, ArrowLeftRight, LayoutGrid, Zap, UserPlus, Target, Footprints } from 'lucide-react'
 import type { Tables } from '@/types/database.types'
 
 type FeedEvent = Tables<'activity_feed'>
@@ -98,16 +98,20 @@ export function ActivityFeed({
           </div>
           <div className="space-y-1.5 stagger-children">
             {dateEvents.map((event) => {
-              const style = EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
+              let style = EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
+              // Use boot icon for assists
+              if (event.event_type === 'scoring_event' && event.description.includes('assisted')) {
+                style = { ...style, icon: Footprints }
+              }
               const IconComp = style.icon
 
               return (
                 <div
                   key={event.id}
-                  className="flex items-start gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
+                  className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
                 >
                   <div
-                    className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${style.bg}`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${style.bg}`}
                   >
                     <IconComp size={13} className={style.color} />
                   </div>

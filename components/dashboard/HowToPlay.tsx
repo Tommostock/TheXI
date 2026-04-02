@@ -141,6 +141,7 @@ export function HowToPlayButton() {
                   <div className="flex justify-between"><span>Played &lt;60 mins</span><span className="text-wc-peach font-bold">+1</span></div>
                   <div className="flex justify-between"><span>Yellow Card</span><span className="text-wc-crimson font-bold">-1</span></div>
                   <div className="flex justify-between"><span>Red Card</span><span className="text-wc-crimson font-bold">-3</span></div>
+                  <div className="flex justify-between"><span>Penalty Save (GK)</span><span className="text-wc-peach font-bold">+5</span></div>
                   <div className="flex justify-between"><span>Own Goal</span><span className="text-wc-crimson font-bold">-2</span></div>
                   <div className="flex justify-between border-t border-border/30 pt-1 mt-1"><span>Captain bonus</span><span className="text-wc-gold font-bold">x2</span></div>
                   <div className="flex justify-between"><span>Bench multiplier</span><span className="text-text-muted font-bold">x0.5</span></div>
@@ -188,8 +189,9 @@ export function HowToPlayButton() {
               <section>
                 <h3 className="text-white font-medium mb-1.5">Winning</h3>
                 <p>
-                  The person with the most points when the final whistle blows
-                  in the World Cup Final wins. Simple as that.
+                  Points are scored in all matches including the Third Place
+                  Playoff and the Final. The person with the most points when
+                  the final whistle blows wins. Simple as that.
                 </p>
               </section>
 

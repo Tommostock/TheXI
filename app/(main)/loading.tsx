@@ -9,9 +9,14 @@ export default function MainLoading() {
         <h1 className="text-2xl font-display font-black tracking-tight text-white">
           THE <span className="text-wc-purple">XI</span>
         </h1>
-        {/* Shimmer bar */}
+        {/* Animated progress bar */}
         <div className="mt-4 mx-auto h-1 w-32 rounded-full overflow-hidden bg-border">
-          <div className="h-full w-full animate-shimmer" />
+          <div
+            className="h-full w-8 rounded-full bg-wc-purple"
+            style={{
+              animation: 'loading-slide 1.2s ease-in-out infinite',
+            }}
+          />
         </div>
       </div>
     </div>
