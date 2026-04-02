@@ -132,7 +132,7 @@ export function DraftBoard({
       <div className="rounded-lg border border-border bg-bg-card p-4">
         {draftState.isComplete ? (
           <div className="text-center">
-            <Check size={24} className="mx-auto text-wc-teal" />
+            <Check size={24} className="mx-auto text-wc-peach" />
             <p className="mt-2 font-bold text-white">Draft Complete</p>
           </div>
         ) : (
@@ -144,7 +144,7 @@ export function DraftBoard({
                 </p>
                 <p className="mt-1 text-lg font-bold text-white">
                   {isMyTurn ? (
-                    <span className="text-wc-teal">Your Pick</span>
+                    <span className="text-wc-peach">Your Pick</span>
                   ) : (
                     <>
                       {memberMap.get(draftState.currentPickerUserId!)
@@ -222,7 +222,7 @@ export function DraftBoard({
           ) : (
             <button
               onClick={() => setShowPicker(true)}
-              className="w-full rounded-lg bg-wc-teal px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+              className="w-full rounded-lg bg-wc-peach px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
             >
               Make Your Pick
             </button>
@@ -247,7 +247,7 @@ export function DraftBoard({
                     key={userId}
                     className={`border-b border-border p-2 text-center text-xs ${
                       userId === draftState.currentPickerUserId && !draftState.isComplete
-                        ? 'text-wc-teal'
+                        ? 'text-wc-peach'
                         : 'text-text-secondary'
                     }`}
                   >
@@ -280,7 +280,7 @@ export function DraftBoard({
                             key={`${round}-${userId}`}
                             className={`border-b border-border/50 p-1 text-center ${
                               isCurrent
-                                ? 'bg-wc-teal/10'
+                                ? 'bg-wc-peach/10'
                                 : ''
                             }`}
                           >
@@ -304,8 +304,8 @@ export function DraftBoard({
                                 </p>
                               </div>
                             ) : isCurrent ? (
-                              <div className="rounded border border-dashed border-wc-teal px-1 py-2">
-                                <p className="text-[10px] text-wc-teal">
+                              <div className="rounded border border-dashed border-wc-peach px-1 py-2">
+                                <p className="text-[10px] text-wc-peach">
                                   NOW
                                 </p>
                               </div>

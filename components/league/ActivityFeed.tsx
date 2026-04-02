@@ -8,11 +8,11 @@ type FeedEvent = Tables<'activity_feed'>
 
 const EVENT_ICONS: Record<string, string> = {
   draft_pick: 'bg-wc-blue/20 text-wc-blue',
-  transfer: 'bg-wc-teal/20 text-wc-teal',
+  transfer: 'bg-wc-peach/20 text-wc-peach',
   formation_change: 'bg-text-secondary/20 text-text-secondary',
   scoring_event: 'bg-wc-gold/20 text-wc-gold',
   auto_pick: 'bg-wc-crimson/20 text-wc-crimson',
-  league_joined: 'bg-wc-teal/20 text-wc-teal',
+  league_joined: 'bg-wc-peach/20 text-wc-peach',
 }
 
 function timeAgo(dateStr: string): string {

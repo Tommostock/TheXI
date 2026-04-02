@@ -25,8 +25,8 @@ const EVENT_LABELS: Record<string, string> = {
 }
 
 const EVENT_COLORS: Record<string, string> = {
-  goal: 'text-wc-teal',
-  assist: 'text-wc-teal',
+  goal: 'text-wc-peach',
+  assist: 'text-wc-peach',
   clean_sheet: 'text-wc-blue',
   own_goal: 'text-wc-crimson',
   yellow: 'text-wc-gold',
@@ -271,7 +271,7 @@ function GroupTable({ groupName, teams }: { groupName: string; teams: typeof GRO
           {sorted.map((team, i) => (
             <tr
               key={team.nation}
-              className={`border-t border-border/30 ${i < 2 ? 'bg-wc-teal/5' : ''}`}
+              className={`border-t border-border/30 ${i < 2 ? 'bg-wc-peach/5' : ''}`}
             >
               <td className="py-1.5 pl-3">
                 <div className="flex items-center gap-1.5">
@@ -328,7 +328,7 @@ export function DashboardClient({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-display font-black tracking-tight text-white">
-            THE <span className="text-wc-blue">XI</span>
+            THE <span className="text-wc-purple">XI</span>
           </h1>
           <p className="text-sm text-text-secondary">Welcome, {displayName}</p>
         </div>
@@ -355,7 +355,7 @@ export function DashboardClient({
               <div
                 key={i}
                 className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
-                  entry.isMe ? 'bg-wc-blue/10' : ''
+                  entry.isMe ? 'bg-wc-peach/10' : ''
                 }`}
               >
                 <span
@@ -371,7 +371,7 @@ export function DashboardClient({
                 >
                   {i + 1}
                 </span>
-                <span className={`flex-1 text-sm ${entry.isMe ? 'text-wc-cyan font-semibold' : 'text-white'}`}>
+                <span className={`flex-1 text-sm ${entry.isMe ? 'text-wc-peach font-semibold' : 'text-white'}`}>
                   {entry.displayName}
                 </span>
                 <span className="text-sm font-bold text-white">{entry.points}</span>
@@ -389,7 +389,7 @@ export function DashboardClient({
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2.5 text-center text-xs font-semibold transition-colors ${
               activeTab === tab
-                ? 'bg-wc-blue text-white'
+                ? 'bg-wc-purple text-white'
                 : 'bg-bg-card text-text-secondary'
             }`}
           >

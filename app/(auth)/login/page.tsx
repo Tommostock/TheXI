@@ -37,7 +37,7 @@ export default function LoginPage() {
     <div className="flex min-h-dvh items-center justify-center bg-bg-primary p-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-bg-card p-6">
         <h1 className="text-center text-3xl font-display font-black tracking-tight text-white">
-          THE <span className="text-wc-blue">XI</span>
+          THE <span className="text-wc-purple">XI</span>
         </h1>
         <p className="mt-1 text-center text-sm text-text-secondary">
           World Cup 2026 Draft
@@ -54,7 +54,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-blue focus:outline-none focus:ring-1 focus:ring-wc-cyan"
+              className="mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-purple focus:outline-none focus:ring-1 focus:ring-wc-purple"
               placeholder="you@example.com"
             />
           </div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-blue focus:outline-none focus:ring-1 focus:ring-wc-cyan"
+              className="mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-purple focus:outline-none focus:ring-1 focus:ring-wc-purple"
               placeholder="Your password"
             />
           </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-wc-blue px-4 py-2.5 font-bold text-bg-primary transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-lg bg-wc-purple px-4 py-2.5 font-bold text-bg-primary transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

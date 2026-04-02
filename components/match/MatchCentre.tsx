@@ -37,8 +37,8 @@ const EVENT_LABELS: Record<string, string> = {
 }
 
 const EVENT_COLORS: Record<string, string> = {
-  goal: 'text-wc-teal',
-  assist: 'text-wc-teal',
+  goal: 'text-wc-peach',
+  assist: 'text-wc-peach',
   clean_sheet: 'text-wc-blue',
   own_goal: 'text-wc-crimson',
   yellow: 'text-wc-gold',
@@ -97,7 +97,7 @@ export function MatchCentre({
               }
               className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
                 hasMyPlayers
-                  ? 'border-wc-teal/30 bg-wc-teal/5'
+                  ? 'border-wc-peach/30 bg-wc-peach/5'
                   : 'border-border bg-bg-card'
               }`}
             >
@@ -113,7 +113,7 @@ export function MatchCentre({
                 </p>
               </div>
               {hasMyPlayers && (
-                <Circle size={6} className="fill-wc-teal text-wc-teal" />
+                <Circle size={6} className="fill-wc-peach text-wc-peach" />
               )}
               <span className="text-sm font-bold text-white">
                 {goals} goal{goals !== 1 ? 's' : ''}
@@ -143,7 +143,7 @@ export function MatchCentre({
                         <div
                           key={event.id}
                           className={`flex items-center gap-2 rounded px-2 py-1.5 ${
-                            isMine ? 'bg-wc-teal/10' : 'bg-bg-card/50'
+                            isMine ? 'bg-wc-peach/10' : 'bg-bg-card/50'
                           }`}
                         >
                           {event.player?.nation_flag_url && (
@@ -155,7 +155,7 @@ export function MatchCentre({
                           )}
                           <span
                             className={`text-xs font-medium ${
-                              isMine ? 'text-wc-teal' : 'text-white'
+                              isMine ? 'text-wc-peach' : 'text-white'
                             }`}
                           >
                             {event.player?.name || 'Unknown'}
@@ -173,7 +173,7 @@ export function MatchCentre({
                           <span
                             className={`text-xs font-bold ${
                               event.points_awarded > 0
-                                ? 'text-wc-teal'
+                                ? 'text-wc-peach'
                                 : event.points_awarded < 0
                                 ? 'text-wc-crimson'
                                 : 'text-text-muted'

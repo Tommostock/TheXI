@@ -10,7 +10,7 @@ export function HowToPlayButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:border-wc-blue hover:text-wc-blue"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary transition-colors hover:border-wc-purple hover:text-wc-purple"
         title="How To Play"
       >
         <HelpCircle size={16} />
@@ -134,11 +134,11 @@ export function HowToPlayButton() {
               <section>
                 <h3 className="text-white font-medium mb-1.5">Scoring</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mt-2">
-                  <div className="flex justify-between"><span>Goal</span><span className="text-wc-green font-bold">+5</span></div>
-                  <div className="flex justify-between"><span>Assist</span><span className="text-wc-green font-bold">+3</span></div>
-                  <div className="flex justify-between"><span>Clean Sheet</span><span className="text-wc-green font-bold">+3</span></div>
-                  <div className="flex justify-between"><span>Played 60+ mins</span><span className="text-wc-green font-bold">+2</span></div>
-                  <div className="flex justify-between"><span>Played &lt;60 mins</span><span className="text-wc-green font-bold">+1</span></div>
+                  <div className="flex justify-between"><span>Goal</span><span className="text-wc-peach font-bold">+5</span></div>
+                  <div className="flex justify-between"><span>Assist</span><span className="text-wc-peach font-bold">+3</span></div>
+                  <div className="flex justify-between"><span>Clean Sheet</span><span className="text-wc-peach font-bold">+3</span></div>
+                  <div className="flex justify-between"><span>Played 60+ mins</span><span className="text-wc-peach font-bold">+2</span></div>
+                  <div className="flex justify-between"><span>Played &lt;60 mins</span><span className="text-wc-peach font-bold">+1</span></div>
                   <div className="flex justify-between"><span>Yellow Card</span><span className="text-wc-crimson font-bold">-1</span></div>
                   <div className="flex justify-between"><span>Red Card</span><span className="text-wc-crimson font-bold">-3</span></div>
                   <div className="flex justify-between"><span>Own Goal</span><span className="text-wc-crimson font-bold">-2</span></div>

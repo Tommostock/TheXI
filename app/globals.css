@@ -1,23 +1,26 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Colour Hierarchy */
-  /* Main: Blue — primary buttons, active states, key UI */
-  /* Secondary: Cyan — accents, highlights, success states */
-  /* Tertiary: Purple — GK position, countdown, special elements */
-  /* Accent: Peach — warm touches, links, subtle highlights */
-
+  /* Brand Palette */
+  --color-wc-purple: #6200EE;
   --color-wc-blue: #4D5BF9;
   --color-wc-cyan: #50F0C8;
-  --color-wc-purple: #7B00FF;
   --color-wc-peach: #E89880;
 
-  /* Supporting colours */
-  --color-wc-green: #00C853;
-  --color-wc-yellow: #E8E000;
+  /* Red kept minimal — negative events only */
   --color-wc-red: #E8301C;
+  --color-wc-crimson: #E8301C;
 
-  /* App foundations — dark mode */
+  /* Semantic — peach replaces green/yellow in UI */
+  --color-wc-green: #E89880;
+  --color-wc-gold: #FFD700;
+  --color-wc-yellow: #E89880;
+  --color-wc-teal: #50F0C8;
+  --color-wc-lime: #50F0C8;
+  --color-wc-lavender: #E89880;
+  --color-wc-orange: #E89880;
+
+  /* App foundations */
   --color-bg-primary: #0A0A14;
   --color-bg-card: #101028;
   --color-bg-surface: #1A1A3E;
@@ -26,21 +29,13 @@
   --color-text-muted: #5A5A72;
   --color-border: #252545;
 
-  /* Semantic mappings */
-  --color-wc-crimson: #E8301C;
-  --color-wc-gold: #E8E000;
-  --color-wc-teal: #00C853;
-  --color-wc-lime: #50F0C8;
-  --color-wc-lavender: #E89880;
-  --color-wc-orange: #E89880;
-
   /* Legacy compat */
   --color-dark-charcoal: #0A0A14;
   --color-deep-navy: #101028;
-  --color-tournament-green: #00C853;
+  --color-tournament-green: #E89880;
   --color-tournament-blue: #4D5BF9;
   --color-tournament-red: #E8301C;
-  --color-trophy-gold: #E8E000;
+  --color-trophy-gold: #FFD700;
   --color-light-grey: #B8B8CC;
   --color-dark-grey: #5A5A72;
 
@@ -58,7 +53,6 @@ body {
   overscroll-behavior: none;
 }
 
-/* Jersey 25 for page titles only */
 .font-display {
   font-family: var(--font-jersey), system-ui, sans-serif;
 }

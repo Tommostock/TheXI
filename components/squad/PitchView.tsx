@@ -132,7 +132,7 @@ function PitchPlayer({
         return (
           <div
             className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
-              dp > 0 ? 'bg-wc-teal' : dp < 0 ? 'bg-wc-crimson' : 'bg-text-muted/60'
+              dp > 0 ? 'bg-wc-peach' : dp < 0 ? 'bg-wc-crimson' : 'bg-text-muted/60'
             }`}
           >
             <p className="text-[9px] font-bold text-white">{dp}</p>
@@ -187,7 +187,7 @@ function BenchPlayer({
       <div
         className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
           points > 0
-            ? 'bg-wc-teal/70'
+            ? 'bg-wc-peach/70'
             : points < 0
             ? 'bg-wc-crimson/70'
             : 'bg-text-muted/40'

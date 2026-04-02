@@ -133,9 +133,9 @@ export function SquadView({
         onClick={() => handleSwap(slot.id)}
         className={`flex w-full items-center gap-2 rounded-lg border p-3 text-left transition-all ${
           isSelected
-            ? 'border-wc-teal bg-wc-teal/10'
+            ? 'border-wc-peach bg-wc-peach/10'
             : isSwapTarget && swapSource
-            ? 'border-dashed border-wc-teal/50 hover:border-wc-teal'
+            ? 'border-dashed border-wc-peach/50 hover:border-wc-peach'
             : POS_COLORS[slot.position]
         } ${isEliminated ? 'opacity-40' : ''}`}
       >
@@ -161,7 +161,7 @@ export function SquadView({
           {slot.position}
         </span>
         {isSelected && (
-          <ArrowUpDown size={14} className="shrink-0 text-wc-teal" />
+          <ArrowUpDown size={14} className="shrink-0 text-wc-peach" />
         )}
       </button>
     )
@@ -184,7 +184,7 @@ export function SquadView({
           onClick={() => setViewMode('pitch')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'pitch'
-              ? 'bg-wc-blue text-bg-primary'
+              ? 'bg-wc-purple text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -194,7 +194,7 @@ export function SquadView({
           onClick={() => setViewMode('list')}
           className={`flex-1 py-2.5 text-center text-sm font-semibold transition-colors ${
             viewMode === 'list'
-              ? 'bg-wc-blue text-bg-primary'
+              ? 'bg-wc-purple text-bg-primary'
               : 'bg-bg-card text-text-secondary'
           }`}
         >
@@ -215,7 +215,7 @@ export function SquadView({
               disabled={loading}
               className={`flex-1 rounded-lg border py-2.5 text-center text-sm font-bold transition-colors ${
                 formation === f
-                  ? 'border-wc-teal bg-wc-teal/10 text-wc-teal'
+                  ? 'border-wc-peach bg-wc-peach/10 text-wc-peach'
                   : 'border-border text-text-secondary hover:border-text-secondary'
               }`}
             >
@@ -260,7 +260,7 @@ export function SquadView({
 
           {/* Swap Hint */}
           {swapSource && (
-            <p className="rounded border border-wc-teal/30 bg-wc-teal/5 p-2 text-center text-xs text-wc-teal">
+            <p className="rounded border border-wc-peach/30 bg-wc-peach/5 p-2 text-center text-xs text-wc-peach">
               Tap a player to swap with
             </p>
           )}

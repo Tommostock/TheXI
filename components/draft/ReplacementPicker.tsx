@@ -62,8 +62,8 @@ export function ReplacementPicker({
 
   if (remaining.length === 0 && eliminatedSlots.length > 0) {
     return (
-      <div className="rounded-lg border border-wc-teal/30 bg-wc-teal/10 p-4 text-center">
-        <p className="font-medium text-wc-teal">
+      <div className="rounded-lg border border-wc-peach/30 bg-wc-peach/10 p-4 text-center">
+        <p className="font-medium text-wc-peach">
           All replacements confirmed
         </p>
       </div>

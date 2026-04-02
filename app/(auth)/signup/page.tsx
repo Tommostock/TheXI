@@ -51,13 +51,13 @@ export default function SignupPage() {
   }
 
   const inputClass =
-    'mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-blue focus:outline-none focus:ring-1 focus:ring-wc-cyan'
+    'mt-1 block w-full rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-white placeholder-text-muted focus:border-wc-purple focus:outline-none focus:ring-1 focus:ring-wc-purple'
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg-primary p-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-bg-card p-6">
         <h1 className="text-center text-3xl font-display font-black tracking-tight text-white">
-          THE <span className="text-wc-blue">XI</span>
+          THE <span className="text-wc-purple">XI</span>
         </h1>
         <p className="mt-1 text-center text-sm text-text-secondary">
           Create your account
@@ -73,7 +73,7 @@ export default function SignupPage() {
             </p>
             <Link
               href="/login"
-              className="mt-4 inline-block rounded-lg bg-wc-blue px-4 py-2 text-sm font-bold text-bg-primary transition-opacity hover:opacity-90"
+              className="mt-4 inline-block rounded-lg bg-wc-purple px-4 py-2 text-sm font-bold text-bg-primary transition-opacity hover:opacity-90"
             >
               Go to Login
             </Link>
@@ -107,7 +107,7 @@ export default function SignupPage() {
               </div>
               {error && <p className="text-sm text-wc-crimson">{error}</p>}
               <button type="submit" disabled={loading}
-                className="w-full rounded-lg bg-wc-blue px-4 py-2.5 font-bold text-bg-primary transition-opacity hover:opacity-90 disabled:opacity-50">
+                className="w-full rounded-lg bg-wc-purple px-4 py-2.5 font-bold text-bg-primary transition-opacity hover:opacity-90 disabled:opacity-50">
                 {loading ? 'Creating account...' : 'Create Account'}
               </button>
             </form>

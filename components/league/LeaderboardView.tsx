@@ -74,7 +74,7 @@ export function LeaderboardView({
                 rank === 1
                   ? 'border-wc-gold/40 bg-wc-gold/5'
                   : 'border-border bg-bg-card'
-              } ${isMe ? 'ring-1 ring-wc-blue/30' : ''}`}
+              } ${isMe ? 'ring-1 ring-wc-purple/30' : ''}`}
             >
               {/* Rank */}
               <div
@@ -98,7 +98,7 @@ export function LeaderboardView({
                     {entry.displayName}
                   </p>
                   {isMe && (
-                    <span className="text-xs text-wc-cyan">You</span>
+                    <span className="text-xs text-wc-peach">You</span>
                   )}
                 </div>
                 <p className="text-xs text-text-secondary">{entry.formation}</p>
@@ -166,7 +166,7 @@ export function LeaderboardView({
                         <span
                           className={`min-w-[28px] text-right text-xs font-bold ${
                             displayPts > 0
-                              ? 'text-wc-green'
+                              ? 'text-wc-peach'
                               : displayPts < 0
                               ? 'text-wc-crimson'
                               : 'text-text-muted'
@@ -207,7 +207,7 @@ export function LeaderboardView({
                           <span
                             className={`min-w-[28px] text-right text-xs font-bold ${
                               s.playerPoints > 0
-                                ? 'text-wc-green/70'
+                                ? 'text-wc-peach/70'
                                 : s.playerPoints < 0
                                 ? 'text-wc-crimson/70'
                                 : 'text-text-muted'

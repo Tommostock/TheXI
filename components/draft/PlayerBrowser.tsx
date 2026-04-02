@@ -115,7 +115,7 @@ export function PlayerBrowser({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search players or nations..."
-          className="w-full rounded-lg border border-border bg-bg-card py-2.5 pl-9 pr-8 text-sm text-white placeholder-text-muted focus:border-wc-blue focus:outline-none focus:ring-1 focus:ring-wc-cyan"
+          className="w-full rounded-lg border border-border bg-bg-card py-2.5 pl-9 pr-8 text-sm text-white placeholder-text-muted focus:border-wc-purple focus:outline-none focus:ring-1 focus:ring-wc-purple"
         />
         {search && (
           <button
@@ -133,7 +133,7 @@ export function PlayerBrowser({
           onClick={() => setSelectedPosition(null)}
           className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
             !selectedPosition
-              ? 'bg-wc-blue text-bg-primary'
+              ? 'bg-wc-purple text-bg-primary'
               : 'border border-border text-text-secondary hover:border-text-secondary'
           }`}
         >
@@ -147,7 +147,7 @@ export function PlayerBrowser({
             }
             className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
               selectedPosition === pos
-                ? 'bg-wc-blue text-bg-primary'
+                ? 'bg-wc-purple text-bg-primary'
                 : 'border border-border text-text-secondary hover:border-text-secondary'
             }`}
           >

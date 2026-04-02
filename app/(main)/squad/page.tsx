@@ -23,7 +23,7 @@ export default async function SquadPage() {
           <p className="text-text-secondary">Join a league to build your squad.</p>
           <Link
             href="/dashboard"
-            className="mt-3 inline-block rounded-md bg-wc-blue px-4 py-2 text-sm font-semibold text-white"
+            className="mt-3 inline-block rounded-md bg-wc-purple px-4 py-2 text-sm font-semibold text-white"
           >
             Go to Dashboard
           </Link>
