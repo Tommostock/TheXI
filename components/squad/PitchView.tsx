@@ -84,12 +84,12 @@ function PitchPlayer({
   return (
     <button
       onClick={onTap}
-      className={`flex flex-col items-center w-[72px] transition-all ${
-        isSelected ? 'scale-110 brightness-125' : ''
-      } ${onTap ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`flex flex-col items-center w-[72px] transition-all duration-200 ease-out ${
+        isSelected ? 'scale-110 brightness-125 -translate-y-1' : ''
+      } ${onTap ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}
     >
       {/* Shirt */}
-      <div className={`relative ${isSelected ? 'ring-2 ring-wc-purple rounded-lg' : ''}`}>
+      <div className={`relative transition-all duration-200 ${isSelected ? 'ring-2 ring-wc-purple rounded-lg shadow-lg shadow-wc-purple/30' : ''}`}>
         <PlayerShirt position={shirtPosition} />
         {/* Captain badge — white bg, black text */}
         {isCaptain && (
@@ -174,9 +174,9 @@ function BenchPlayer({
   return (
     <button
       onClick={onTap}
-      className={`flex flex-col items-center w-[68px] transition-all ${
-        isSelected ? 'scale-110 brightness-125' : ''
-      } ${onTap ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`flex flex-col items-center w-[68px] transition-all duration-200 ease-out ${
+        isSelected ? 'scale-110 brightness-125 -translate-y-1' : ''
+      } ${onTap ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}
     >
       <div className={`relative ${isSelected ? 'ring-2 ring-wc-purple rounded-lg' : ''}`}>
         <PlayerShirt position={shirtPosition} />

@@ -17,10 +17,12 @@ const EVENT_STYLES: Record<string, { char: string; bg: string; color: string }> 
 
 function getEventChar(event: FeedEvent): string {
   if (event.event_type === 'scoring_event') {
-    if (event.description.includes('assisted')) return '👟'
-    if (event.description.includes('clean sheet')) return '🧤'
-    if (event.description.includes('yellow')) return '🟨'
-    if (event.description.includes('red')) return '🟥'
+    const desc = event.description.toLowerCase()
+    if (desc.includes('assisted')) return '👟'
+    if (desc.includes('clean sheet')) return '🧤'
+    if (desc.includes('yellow card') || desc.includes('yellow —')) return '🟨'
+    if (desc.includes('red card') || desc.includes('red —')) return '🟥'
+    if (desc.includes('scored')) return '⚽'
     return '⚽'
   }
   return EVENT_STYLES[event.event_type]?.char || '📌'

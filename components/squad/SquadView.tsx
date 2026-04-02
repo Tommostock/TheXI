@@ -198,12 +198,15 @@ export function SquadView({
   )
 
   async function handleFormationChange(newFormation: Formation) {
-    if (newFormation === formation || loading) return
-    setLoading(true)
+    if (newFormation === formation) return
+    // Optimistic — change formation instantly
+    const prevFormation = formation
+    setFormation(newFormation)
+
+    // Background server call
     const result = await changeFormation(leagueId, newFormation)
-    if (!result.error) {
-      setFormation(newFormation)
-      window.location.reload()
+    if (result.error) {
+      setFormation(prevFormation) // revert
     }
     setLoading(false)
   }
@@ -399,28 +402,45 @@ export function SquadView({
         </div>
       )}
 
-      {/* Top bar: formation + points */}
-      <div className="flex items-center gap-2">
-        <div className="flex gap-1 flex-1">
-          {FORMATIONS.map((f) => (
-            <button
-              key={f}
-              onClick={() => handleFormationChange(f)}
-              disabled={loading}
-              className={`flex-1 rounded-md border py-1.5 text-center text-[11px] font-bold transition-colors ${
-                formation === f
-                  ? 'border-wc-peach bg-wc-peach/10 text-white'
-                  : 'border-border text-text-secondary hover:border-text-secondary'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+      {/* View Mode Toggle */}
+      <div className="flex rounded-lg border border-border overflow-hidden">
+        <button
+          onClick={() => setViewMode('pitch')}
+          className={`flex-1 py-1.5 text-center text-xs font-semibold transition-colors ${
+            viewMode === 'pitch' ? 'bg-wc-purple text-white' : 'bg-bg-card text-text-secondary'
+          }`}
+        >
+          Pitch View
+        </button>
+        <button
+          onClick={() => setViewMode('list')}
+          className={`flex-1 py-1.5 text-center text-xs font-semibold transition-colors ${
+            viewMode === 'list' ? 'bg-wc-purple text-white' : 'bg-bg-card text-text-secondary'
+          }`}
+        >
+          List View
+        </button>
       </div>
 
-      {/* Team Name + Points */}
-      <div className="flex items-center justify-between px-1">
+      {/* Formation selector */}
+      <div className="flex gap-1">
+        {FORMATIONS.map((f) => (
+          <button
+            key={f}
+            onClick={() => handleFormationChange(f)}
+            className={`flex-1 rounded-md border py-1.5 text-center text-[11px] font-bold transition-colors ${
+              formation === f
+                ? 'border-wc-purple bg-wc-purple/15 text-white'
+                : 'border-border text-text-secondary hover:border-text-secondary'
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Team Name + Points — centred */}
+      <div className="text-center py-1">
         {editingTeamName ? (
           <input
             type="text"
@@ -430,17 +450,17 @@ export function SquadView({
             onKeyDown={(e) => { if (e.key === 'Enter') setEditingTeamName(false) }}
             maxLength={25}
             autoFocus
-            className="bg-transparent text-sm font-medium text-white border-b border-wc-purple outline-none w-40"
+            className="bg-transparent text-base font-semibold text-white border-b border-wc-purple outline-none text-center w-48"
           />
         ) : (
           <button
             onClick={() => !isLocked && setEditingTeamName(true)}
-            className="text-sm font-medium text-white hover:text-wc-peach transition-colors"
+            className="text-base font-semibold text-white hover:text-wc-peach transition-colors"
           >
             {localTeamName || 'Tap to set team name'}
           </button>
         )}
-        <p className="text-sm font-bold text-white">{totalPoints} <span className="text-[10px] font-normal text-text-muted">pts</span></p>
+        <p className="text-lg font-bold text-white mt-0.5">{totalPoints} <span className="text-xs font-normal text-text-muted">pts</span></p>
       </div>
 
       {/* Pitch View */}
