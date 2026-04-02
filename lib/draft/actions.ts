@@ -4,6 +4,7 @@ import { getActionUser } from '@/lib/supabase/auth'
 import {
   getCurrentDraftState,
   canDraftPosition,
+  canDraftFromNation,
   TOTAL_ROUNDS,
   type DraftPick,
 } from './logic'
@@ -141,6 +142,13 @@ export async function makePick(leagueId: string, playerId: string) {
   // Check position limit
   if (!canDraftPosition(user.id, player.position, picks)) {
     return { error: `You have already filled all ${player.position} slots` }
+  }
+
+  // Check nation limit
+  const isSharedPool = league.shared_pool || false
+  if (!canDraftFromNation(user.id, player.nation, picks, isSharedPool)) {
+    const limit = isSharedPool ? 7 : 3
+    return { error: `You already have ${limit} players from ${player.nation}` }
   }
 
   // Insert the pick

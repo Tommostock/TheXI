@@ -5,9 +5,13 @@
  * Round 1: 1,2,3,4  Round 2: 4,3,2,1  Round 3: 1,2,3,4 ...
  *
  * 15 rounds total. Positional limits: 2 GK, 5 DEF, 5 MID, 3 ATT.
+ * Nation limits: 3 per nation (exclusive), 7 per nation (shared pool).
+ * Captain gets double points. Vice Captain takes over if Captain doesn't play.
  */
 
 export const TOTAL_ROUNDS = 15
+export const NATION_LIMIT_EXCLUSIVE = 3
+export const NATION_LIMIT_SHARED = 7
 
 export const POSITION_LIMITS: Record<string, number> = {
   GK: 2,
@@ -193,4 +197,52 @@ export function buildDraftGrid(
   }
 
   return grid
+}
+
+/**
+ * Count how many players a user has from each nation.
+ */
+export function getUserNationCounts(
+  userId: string,
+  picks: DraftPick[]
+): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const pick of picks) {
+    if (pick.user_id === userId && pick.player?.nation) {
+      counts[pick.player.nation] = (counts[pick.player.nation] || 0) + 1
+    }
+  }
+  return counts
+}
+
+/**
+ * Check if a user can draft a player from a given nation.
+ * Respects the nation limit (3 exclusive, 7 shared).
+ */
+export function canDraftFromNation(
+  userId: string,
+  nation: string,
+  picks: DraftPick[],
+  isSharedPool: boolean
+): boolean {
+  const limit = isSharedPool ? NATION_LIMIT_SHARED : NATION_LIMIT_EXCLUSIVE
+  const counts = getUserNationCounts(userId, picks)
+  return (counts[nation] || 0) < limit
+}
+
+/**
+ * Get nations that are at their limit for a user.
+ */
+export function getFullNations(
+  userId: string,
+  picks: DraftPick[],
+  isSharedPool: boolean
+): Set<string> {
+  const limit = isSharedPool ? NATION_LIMIT_SHARED : NATION_LIMIT_EXCLUSIVE
+  const counts = getUserNationCounts(userId, picks)
+  const full = new Set<string>()
+  for (const [nation, count] of Object.entries(counts)) {
+    if (count >= limit) full.add(nation)
+  }
+  return full
 }

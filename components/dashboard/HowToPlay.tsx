@@ -68,6 +68,22 @@ export function HowToPlayButton() {
                 </p>
               </section>
 
+              {/* Nation Limit */}
+              <section>
+                <h3 className="text-white font-medium mb-1.5">Nation Limit</h3>
+                <p>
+                  You can pick a maximum of
+                  <span className="text-white font-medium"> 3 players from any single nation</span>.
+                  This forces squad diversity and stops anyone loading up on one
+                  strong team.
+                </p>
+                <p className="mt-1.5 text-xs text-text-muted">
+                  Later in the tournament, if the player pool becomes too small
+                  for everyone to have unique squads, a shared pool activates and
+                  the nation limit increases to 7.
+                </p>
+              </section>
+
               {/* Your Squad */}
               <section>
                 <h3 className="text-white font-medium mb-1.5">Your Squad</h3>
@@ -78,6 +94,39 @@ export function HowToPlayButton() {
                 <p className="mt-1.5">
                   Starting players earn full points. Bench players earn
                   <span className="text-white font-medium"> 50% points</span> (rounded down).
+                </p>
+              </section>
+
+              {/* Captain */}
+              <section>
+                <h3 className="text-white font-medium mb-1.5">Captain & Vice Captain</h3>
+                <p>
+                  Choose one of your Starting XI as
+                  <span className="text-wc-gold font-medium"> Captain (C)</span> — they earn
+                  <span className="text-white font-medium"> double points</span>.
+                </p>
+                <p className="mt-1.5">
+                  Pick a <span className="text-wc-gold font-medium">Vice Captain (V)</span> as
+                  backup. If your Captain doesn't play in a match, the Vice Captain
+                  gets the double points instead.
+                </p>
+                <p className="mt-1.5 text-xs text-text-muted">
+                  Both must be in your Starting XI — they can't be on the bench.
+                </p>
+              </section>
+
+              {/* Lineup Lock */}
+              <section>
+                <h3 className="text-white font-medium mb-1.5">Lineup Lock</h3>
+                <p>
+                  Your lineup and formation are
+                  <span className="text-wc-crimson font-medium"> locked once matches begin</span>.
+                  You cannot change your Starting XI, bench, formation, captain,
+                  or vice captain during a matchday.
+                </p>
+                <p className="mt-1.5">
+                  Changes are only allowed during official draft/replacement windows
+                  between tournament stages.
                 </p>
               </section>
 
@@ -93,6 +142,8 @@ export function HowToPlayButton() {
                   <div className="flex justify-between"><span>Yellow Card</span><span className="text-wc-crimson font-bold">-1</span></div>
                   <div className="flex justify-between"><span>Red Card</span><span className="text-wc-crimson font-bold">-3</span></div>
                   <div className="flex justify-between"><span>Own Goal</span><span className="text-wc-crimson font-bold">-2</span></div>
+                  <div className="flex justify-between border-t border-border/30 pt-1 mt-1"><span>Captain bonus</span><span className="text-wc-gold font-bold">x2</span></div>
+                  <div className="flex justify-between"><span>Bench multiplier</span><span className="text-text-muted font-bold">x0.5</span></div>
                 </div>
                 <p className="mt-2 text-xs text-text-muted">
                   Clean sheets only count for GK and DEF who play 60+ minutes.
@@ -111,6 +162,25 @@ export function HowToPlayButton() {
                 <p className="mt-1.5">
                   Pick order for replacements goes by reverse standings — the
                   person in last place picks first.
+                </p>
+                <p className="mt-1.5">
+                  During each draft window you can also change your formation,
+                  lineup, captain, and vice captain.
+                </p>
+              </section>
+
+              {/* Shared Pool */}
+              <section>
+                <h3 className="text-white font-medium mb-1.5">Shared Pool</h3>
+                <p>
+                  As more nations get eliminated, the player pool shrinks. When
+                  there aren't enough unique players for everyone, the pool becomes
+                  <span className="text-white font-medium"> shared</span> — multiple
+                  users can now pick the same player.
+                </p>
+                <p className="mt-1.5 text-xs text-text-muted">
+                  The nation limit increases to 7 per nation during shared pool.
+                  This usually kicks in after the Quarter-Finals.
                 </p>
               </section>
 

@@ -64,9 +64,13 @@ function PlayerShirt({ color }: { color: string }) {
 function PitchPlayer({
   slot,
   points,
+  isCaptain = false,
+  isViceCaptain = false,
 }: {
   slot: SquadSlot
   points: number
+  isCaptain?: boolean
+  isViceCaptain?: boolean
 }) {
   const player = slot.player
   if (!player) return null
@@ -85,6 +89,12 @@ function PitchPlayer({
       {/* Shirt */}
       <div className="relative">
         <PlayerShirt color={shirtColor} />
+        {/* Captain / Vice Captain badge */}
+        {(isCaptain || isViceCaptain) && (
+          <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-wc-gold text-[8px] font-bold text-bg-primary shadow">
+            {isCaptain ? 'C' : 'V'}
+          </div>
+        )}
         {player.is_eliminated && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="h-5 w-5 rounded-full bg-wc-crimson/80 flex items-center justify-center">
@@ -194,11 +204,15 @@ export function PitchView({
   slots,
   totalPoints,
   playerPoints = {},
+  captainId = null,
+  viceCaptainId = null,
 }: {
   formation: Formation
   slots: SquadSlot[]
   totalPoints: number
   playerPoints?: Record<string, number>
+  captainId?: string | null
+  viceCaptainId?: string | null
 }) {
   const rows = FORMATION_ROWS[formation] || FORMATION_ROWS['4-4-2']
   const starters = slots.filter((s) => s.is_starting)
@@ -256,6 +270,8 @@ export function PitchView({
                       key={slot.id}
                       slot={slot}
                       points={playerPoints[slot.player?.id || ''] ?? 0}
+                      isCaptain={slot.player?.id === captainId}
+                      isViceCaptain={slot.player?.id === viceCaptainId}
                     />
                   ))}
                   {Array.from({ length: Math.max(0, row.count - rowSlots.length) }).map((_, i) => (

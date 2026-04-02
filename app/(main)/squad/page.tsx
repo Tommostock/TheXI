@@ -7,10 +7,10 @@ export default async function SquadPage() {
   const { user, supabase } = await requireUser()
   if (!user) return <LoadingShell />
 
-  // Find user's league membership
+  // Find user's league membership with captain data
   const { data: memberships } = await supabase
     .from('league_members')
-    .select('league_id, formation')
+    .select('league_id, formation, captain_player_id, vice_captain_player_id')
     .eq('user_id', user.id)
     .order('joined_at', { ascending: false })
     .limit(1)
@@ -23,7 +23,7 @@ export default async function SquadPage() {
           <p className="text-text-secondary">Join a league to build your squad.</p>
           <Link
             href="/dashboard"
-            className="mt-3 inline-block rounded-md bg-wc-teal px-4 py-2 text-sm font-semibold text-white"
+            className="mt-3 inline-block rounded-md bg-wc-blue px-4 py-2 text-sm font-semibold text-white"
           >
             Go to Dashboard
           </Link>
@@ -34,6 +34,17 @@ export default async function SquadPage() {
 
   const leagueId = memberships[0].league_id
   const formation = (memberships[0].formation || '4-4-2') as '4-4-2' | '4-3-3' | '4-5-1'
+  const captainId = memberships[0].captain_player_id || null
+  const viceCaptainId = memberships[0].vice_captain_player_id || null
+
+  // Get league lock status
+  const { data: league } = await supabase
+    .from('leagues')
+    .select('lineup_locked')
+    .eq('id', leagueId)
+    .single()
+
+  const isLocked = league?.lineup_locked || false
 
   // Get squad slots with player data
   const { data: slots } = await supabase
@@ -50,7 +61,7 @@ export default async function SquadPage() {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  // Get per-player match points (sum from match_events)
+  // Get per-player match points
   const playerIds = (slots || []).map((s) => s.player_id)
   let playerPoints: Record<string, number> = {}
 
@@ -76,6 +87,9 @@ export default async function SquadPage() {
         slots={(slots || []) as Parameters<typeof SquadView>[0]['slots']}
         totalPoints={score?.total_points || 0}
         playerPoints={playerPoints}
+        captainId={captainId}
+        viceCaptainId={viceCaptainId}
+        isLocked={isLocked}
       />
     </div>
   )

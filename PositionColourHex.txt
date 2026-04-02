@@ -1,0 +1,5 @@
+Position	Colour	Hex
+GK	Purple	#7B00FF
+DEF	Blue	#4D5BF9
+MID	Yellow	#E8E000
+ATT	Red	#E8301C

@@ -44,12 +44,18 @@ export function SquadView({
   slots: initialSlots,
   totalPoints,
   playerPoints = {},
+  captainId = null,
+  viceCaptainId = null,
+  isLocked = false,
 }: {
   leagueId: string
   formation: Formation
   slots: SquadSlot[]
   totalPoints: number
   playerPoints?: Record<string, number>
+  captainId?: string | null
+  viceCaptainId?: string | null
+  isLocked?: boolean
 }) {
   const [formation, setFormation] = useState<Formation>(initialFormation)
   const [slots, setSlots] = useState<SquadSlot[]>(initialSlots)
@@ -163,6 +169,15 @@ export function SquadView({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Lock Banner */}
+      {isLocked && (
+        <div className="rounded-xl border border-wc-crimson/30 bg-wc-crimson/5 px-4 py-3 text-center">
+          <p className="text-xs font-medium text-wc-crimson">
+            Lineup locked — changes allowed at next draft window
+          </p>
+        </div>
+      )}
+
       {/* View Mode Toggle */}
       <div className="flex rounded-xl border border-border overflow-hidden">
         <button
@@ -217,6 +232,8 @@ export function SquadView({
           slots={slots as Parameters<typeof PitchView>[0]['slots']}
           totalPoints={totalPoints}
           playerPoints={playerPoints}
+          captainId={captainId}
+          viceCaptainId={viceCaptainId}
         />
       )}
 
