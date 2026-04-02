@@ -37,12 +37,7 @@ export default async function DraftPage() {
     <div className="p-4">
       <h1 className="text-2xl font-display text-white">Draft Board</h1>
       <p className="mt-1 text-sm text-text-secondary">
-        No active drafts. Browse available players below, or start a draft from
-        your{' '}
-        <Link href="/dashboard" className="text-wc-teal hover:underline">
-          league lobby
-        </Link>
-        .
+        Browse all available World Cup 2026 players by nation.
       </p>
 
       <div className="mt-4">

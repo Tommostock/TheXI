@@ -176,7 +176,7 @@ export function PlayerBrowser({
               {/* Country header */}
               <button
                 onClick={() => toggleCountry(group.nation)}
-                className="flex w-full items-center gap-2 rounded-lg border border-border bg-bg-card px-3 py-2.5 text-left transition-colors hover:border-text-muted"
+                className="flex w-full items-center gap-2 rounded-lg border border-border bg-bg-card px-3 py-2.5 text-left card-hover"
               >
                 {group.flag && (
                   <img
@@ -198,7 +198,7 @@ export function PlayerBrowser({
 
               {/* Expanded player list grouped by position */}
               {isOpen && (
-                <div className="ml-2 border-l border-border/50 pl-2 pt-1 pb-1">
+                <div className="ml-2 border-l border-wc-purple/30 pl-2 pt-1 pb-1 animate-fade-in">
                   {POSITIONS.filter((pos) => group.players.has(pos)).map(
                     (pos) => (
                       <div key={pos} className="mb-2">

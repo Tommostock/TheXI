@@ -67,36 +67,39 @@ function DraftCountdown() {
   const isLive = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.mins === 0 && timeLeft.secs === 0
 
   return (
-    <div className="rounded-xl border border-wc-purple/30 bg-wc-purple/5 p-4 text-center">
-      <p className="text-xs font-bold uppercase tracking-wider text-wc-purple mb-3">
+    <div className="rounded-xl border border-wc-purple/30 bg-wc-purple/5 p-5 text-center animate-fade-in">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-wc-purple mb-4">
         Countdown To Draft Picks
       </p>
       {isLive ? (
-        <p className="text-xl font-black text-wc-purple">Draft Picks Are Live!</p>
+        <p className="text-xl font-black text-wc-purple animate-pulse-glow">Draft Picks Are Live!</p>
       ) : (
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-2.5">
           {[
             { value: timeLeft.days, label: 'Days' },
-            { value: timeLeft.hours, label: 'Hours' },
-            { value: timeLeft.mins, label: 'Mins' },
-            { value: timeLeft.secs, label: 'Secs' },
-          ].map((unit) => (
+            { value: timeLeft.hours, label: 'Hrs' },
+            { value: timeLeft.mins, label: 'Min' },
+            { value: timeLeft.secs, label: 'Sec' },
+          ].map((unit, i) => (
             <div key={unit.label} className="flex flex-col items-center">
-              <span className="text-2xl font-black text-white tabular-nums w-10 text-center">
-                {String(unit.value).padStart(2, '0')}
-              </span>
-              <span className="text-[9px] uppercase tracking-wider text-text-muted mt-0.5">
+              <div className={`flex h-14 w-14 items-center justify-center rounded-lg border border-wc-purple/30 bg-bg-card ${
+                i === 3 ? 'animate-count-pulse' : ''
+              }`}>
+                <span className="text-2xl font-black text-white tabular-nums">
+                  {String(unit.value).padStart(2, '0')}
+                </span>
+              </div>
+              <span className="text-[8px] uppercase tracking-wider text-text-muted mt-1.5">
                 {unit.label}
               </span>
             </div>
           ))}
         </div>
       )}
-      <p className="mt-3 text-xs text-text-secondary">May 20th, 2026 — 7:00 PM</p>
-      {/* Progress bar */}
-      <div className="mt-2 h-1.5 w-full rounded-full bg-wc-purple/20 overflow-hidden">
+      <p className="mt-4 text-[10px] text-text-secondary">May 20th, 2026 — 7:00 PM</p>
+      <div className="mt-2.5 h-1 w-full rounded-full bg-wc-purple/20 overflow-hidden">
         <div
-          className="h-full rounded-full bg-wc-blue transition-all duration-1000"
+          className="h-full rounded-full bg-wc-purple transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -119,13 +122,15 @@ function FixtureGroup({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {Array.from(byDate.entries()).map(([date, dateFx]) => (
-        <div key={date}>
-          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-text-muted">
-            {date}
-          </p>
-          <div className="space-y-1.5">
+        <div key={date} className="animate-fade-in">
+          <div className="section-accent mb-2">
+            <p className="text-xs font-semibold text-text-secondary">
+              {date}
+            </p>
+          </div>
+          <div className="space-y-1.5 stagger-children">
             {dateFx.map((fx) => (
               <FixtureCard key={fx.id} fixture={fx} events={eventsByMatch[fx.id] || []} />
             ))}
@@ -155,9 +160,9 @@ function FixtureCard({
     <div>
       <button
         onClick={() => isFinished && keyEvents.length > 0 && setExpanded(!expanded)}
-        className={`relative flex w-full flex-col rounded-lg border px-3 py-2.5 text-left transition-colors ${
+        className={`relative flex w-full flex-col rounded-lg border px-3 py-2.5 text-left card-hover ${
           isFinished
-            ? 'border-border bg-bg-card hover:border-text-muted'
+            ? 'border-border bg-bg-card'
             : 'border-border/50 bg-bg-card/50'
         }`}
       >
@@ -201,7 +206,8 @@ function FixtureCard({
         </div>
 
         {/* Venue line */}
-        <p className="mt-1 text-center text-[9px] text-text-muted w-full">
+        <p className="mt-1.5 text-center text-[9px] text-text-muted w-full flex items-center justify-center gap-1">
+          <svg width="8" height="8" viewBox="0 0 16 16" fill="currentColor" className="opacity-50"><path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14.4c-3.5 0-6.4-2.9-6.4-6.4S4.5 1.6 8 1.6s6.4 2.9 6.4 6.4-2.9 6.4-6.4 6.4zM4 6h8v1H4zm-1 3h10v1H3z"/></svg>
           {fixture.venue}
         </p>
 
@@ -344,8 +350,8 @@ export function DashboardClient({
 
       {/* Standings */}
       {leaderboard.length > 0 && (
-        <div className="rounded-xl border border-border bg-bg-card p-4">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="rounded-xl border border-border bg-bg-card p-4 animate-fade-in-up">
+          <div className="section-accent flex items-center gap-2 mb-3">
             <Trophy size={14} className="text-wc-gold" />
             <p className="text-xs font-bold uppercase tracking-wider text-text-secondary">
               Standings

@@ -22,7 +22,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-nav-height items-center justify-around border-t border-border bg-bg-card pb-safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-nav-height items-center justify-around border-t border-border bg-bg-card/95 backdrop-blur-sm pb-safe-bottom">
       {navItems.map((item) => {
         const isActive = pathname.startsWith(item.href)
         const Icon = item.icon
@@ -31,12 +31,18 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors ${
-              isActive ? 'text-wc-peach' : 'text-text-muted'
+            className={`flex flex-1 flex-col items-center gap-0.5 py-2 transition-all duration-150 ${
+              isActive ? 'text-wc-peach' : 'text-text-muted hover:text-text-secondary'
             }`}
           >
-            <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-            <span className="text-[10px] font-medium">{item.label}</span>
+            <div className={`transition-transform duration-150 ${isActive ? 'scale-110' : ''}`}>
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
+            </div>
+            <span className="text-[9px] font-medium">{item.label}</span>
+            {/* Active dot indicator */}
+            <div className={`h-1 w-1 rounded-full transition-all duration-150 ${
+              isActive ? 'bg-wc-peach scale-100' : 'bg-transparent scale-0'
+            }`} />
           </Link>
         )
       })}

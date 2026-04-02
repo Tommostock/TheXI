@@ -49,11 +49,12 @@ export function LeaderboardView({
   const [expanded, setExpanded] = useState<string | null>(null)
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 stagger-children">
       {rankings.map((entry, index) => {
         const rank = index + 1
         const isExpanded = expanded === entry.userId
         const isMe = entry.userId === currentUserId
+        const pointsAhead = index > 0 ? rankings[index - 1].totalPoints - entry.totalPoints : 0
 
         // Sort squad by points descending for expanded view
         const startersWithPoints = entry.squad
@@ -70,9 +71,9 @@ export function LeaderboardView({
               onClick={() =>
                 setExpanded(isExpanded ? null : entry.userId)
               }
-              className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left card-hover ${
                 rank === 1
-                  ? 'border-wc-gold/40 bg-wc-gold/5'
+                  ? 'border-wc-gold/40 bg-gradient-to-r from-wc-gold/10 to-transparent'
                   : 'border-border bg-bg-card'
               } ${isMe ? 'ring-1 ring-wc-purple/30' : ''}`}
             >
@@ -101,7 +102,12 @@ export function LeaderboardView({
                     <span className="text-xs text-wc-peach">You</span>
                   )}
                 </div>
-                <p className="text-xs text-text-secondary">{entry.formation}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-text-secondary">{entry.formation}</p>
+                  {pointsAhead > 0 && (
+                    <span className="text-[9px] text-text-muted">-{pointsAhead} pts</span>
+                  )}
+                </div>
               </div>
 
               {/* Points */}
