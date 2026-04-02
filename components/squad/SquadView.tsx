@@ -214,20 +214,24 @@ export function SquadView({
       setSwapSource(null)
       return
     }
-    setLoading(true)
-    const result = await toggleStarting(leagueId, swapSource, slotId)
-    if (!result.error) {
-      setSlots((prev) =>
-        prev.map((s) => {
-          if (s.id === swapSource || s.id === slotId) {
-            return { ...s, is_starting: !s.is_starting }
-          }
-          return s
-        })
-      )
-    }
+    // Optimistic update for list view swap
+    const prevSlots = slots
+    const sourceId = swapSource
+    setSlots((prev) =>
+      prev.map((s) => {
+        if (s.id === sourceId || s.id === slotId) {
+          return { ...s, is_starting: !s.is_starting }
+        }
+        return s
+      })
+    )
     setSwapSource(null)
-    setLoading(false)
+
+    // Background server call
+    const result = await toggleStarting(leagueId, sourceId, slotId)
+    if (result.error) {
+      setSlots(prevSlots) // revert
+    }
   }
 
   // Pitch view: tap a player to select, then choose action
@@ -263,65 +267,76 @@ export function SquadView({
   }
 
   async function handlePitchSwap(slotIdA: string, slotIdB: string) {
-    setLoading(true)
+    // Optimistic update — swap UI instantly
     setSelectedPlayerId(null)
     setShowPlayerMenu(false)
-    const result = await toggleStarting(leagueId, slotIdA, slotIdB)
-    if (!result.error) {
-      // Find which players are being swapped
-      const slotA = slots.find((s) => s.id === slotIdA)
-      const slotB = slots.find((s) => s.id === slotIdB)
-      const playerGoingToBench = slotA?.is_starting ? slotA : slotB
-      const playerGoingToStarting = slotA?.is_starting ? slotB : slotA
 
-      // If captain/VC goes to bench, incoming player inherits the armband
-      if (playerGoingToBench?.player && playerGoingToStarting?.player) {
-        if (playerGoingToBench.player.id === localCaptainId) {
-          setLocalCaptainId(playerGoingToStarting.player.id)
-          setCaptain(leagueId, playerGoingToStarting.player.id, localViceCaptainId || '')
+    const slotA = slots.find((s) => s.id === slotIdA)
+    const slotB = slots.find((s) => s.id === slotIdB)
+    const prevSlots = slots
+
+    // Swap immediately in state
+    setSlots((prev) =>
+      prev.map((s) => {
+        if (s.id === slotIdA || s.id === slotIdB) {
+          return { ...s, is_starting: !s.is_starting }
         }
-        if (playerGoingToBench.player.id === localViceCaptainId) {
-          setLocalViceCaptainId(playerGoingToStarting.player.id)
-          setCaptain(leagueId, localCaptainId || '', playerGoingToStarting.player.id)
-        }
+        return s
+      })
+    )
+
+    // Captain/VC inheritance — update immediately
+    const playerGoingToBench = slotA?.is_starting ? slotA : slotB
+    const playerGoingToStarting = slotA?.is_starting ? slotB : slotA
+
+    if (playerGoingToBench?.player && playerGoingToStarting?.player) {
+      if (playerGoingToBench.player.id === localCaptainId) {
+        setLocalCaptainId(playerGoingToStarting.player.id)
+        // Fire captain update in background
+        setCaptain(leagueId, playerGoingToStarting.player.id, localViceCaptainId || '')
       }
-
-      setSlots((prev) =>
-        prev.map((s) => {
-          if (s.id === slotIdA || s.id === slotIdB) {
-            return { ...s, is_starting: !s.is_starting }
-          }
-          return s
-        })
-      )
+      if (playerGoingToBench.player.id === localViceCaptainId) {
+        setLocalViceCaptainId(playerGoingToStarting.player.id)
+        setCaptain(leagueId, localCaptainId || '', playerGoingToStarting.player.id)
+      }
     }
-    setLoading(false)
+
+    // Fire server call in background — revert on failure
+    const result = await toggleStarting(leagueId, slotIdA, slotIdB)
+    if (result.error) {
+      // Revert optimistic update
+      setSlots(prevSlots)
+    }
   }
 
   async function handleSetCaptain(playerId: string) {
-    if (isLocked || loading) return
-    setLoading(true)
-    const vcId = localViceCaptainId === playerId ? localCaptainId! : localViceCaptainId!
-    const result = await setCaptain(leagueId, playerId, vcId || '')
-    if (!result.error) {
-      setLocalCaptainId(playerId)
-    }
+    if (isLocked) return
+    // Optimistic
+    const prevCap = localCaptainId
+    setLocalCaptainId(playerId)
     setSelectedPlayerId(null)
     setShowPlayerMenu(false)
-    setLoading(false)
+
+    const vcId = localViceCaptainId === playerId ? prevCap! : localViceCaptainId!
+    const result = await setCaptain(leagueId, playerId, vcId || '')
+    if (result.error) {
+      setLocalCaptainId(prevCap) // revert
+    }
   }
 
   async function handleSetViceCaptain(playerId: string) {
-    if (isLocked || loading) return
-    setLoading(true)
-    const capId = localCaptainId === playerId ? localViceCaptainId! : localCaptainId!
-    const result = await setCaptain(leagueId, capId || '', playerId)
-    if (!result.error) {
-      setLocalViceCaptainId(playerId)
-    }
+    if (isLocked) return
+    // Optimistic
+    const prevVC = localViceCaptainId
+    setLocalViceCaptainId(playerId)
     setSelectedPlayerId(null)
     setShowPlayerMenu(false)
-    setLoading(false)
+
+    const capId = localCaptainId === playerId ? prevVC! : localCaptainId!
+    const result = await setCaptain(leagueId, capId || '', playerId)
+    if (result.error) {
+      setLocalViceCaptainId(prevVC) // revert
+    }
   }
 
   function dismissSelection() {
