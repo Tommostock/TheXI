@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { changeFormation, toggleStarting } from '@/lib/squad/actions'
+import { changeFormation, toggleStarting, setCaptain } from '@/lib/squad/actions'
 import { PitchView } from './PitchView'
 import { ArrowUpDown } from 'lucide-react'
 
@@ -23,6 +23,101 @@ type Formation = '4-4-2' | '4-3-3' | '4-5-1'
 type ViewMode = 'pitch' | 'list'
 
 const FORMATIONS: Formation[] = ['4-4-2', '4-3-3', '4-5-1']
+
+function PlayerActionMenu({
+  slots,
+  selectedPlayerId,
+  showMenu,
+  isLocked,
+  localCaptainId,
+  localViceCaptainId,
+  loading,
+  onDismiss,
+  onSetCaptain,
+  onSetViceCaptain,
+  onSwap,
+}: {
+  slots: SquadSlot[]
+  selectedPlayerId: string | null
+  showMenu: boolean
+  isLocked?: boolean
+  localCaptainId: string | null
+  localViceCaptainId: string | null
+  loading: boolean
+  onDismiss: () => void
+  onSetCaptain: (id: string) => void
+  onSetViceCaptain: (id: string) => void
+  onSwap: (a: string, b: string) => void
+}) {
+  if (!showMenu || !selectedPlayerId || isLocked) return null
+
+  const selectedSlot = slots.find((s) => s.player?.id === selectedPlayerId)
+  if (!selectedSlot?.player) return null
+
+  const player = selectedSlot.player
+  const isStarter = selectedSlot.is_starting
+  const isCap = player.id === localCaptainId
+  const isVC = player.id === localViceCaptainId
+
+  const swapCandidates = slots.filter(
+    (s) =>
+      s.player &&
+      s.player.id !== selectedPlayerId &&
+      s.player.position === player.position &&
+      s.is_starting !== isStarter
+  )
+
+  return (
+    <div className="rounded-xl border border-wc-purple/40 bg-bg-card p-3">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-medium text-white">{player.name}</p>
+        <button onClick={onDismiss} className="text-xs text-text-muted hover:text-white">
+          Cancel
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {isStarter && !isCap && (
+          <button
+            onClick={() => onSetCaptain(player.id)}
+            disabled={loading}
+            className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-bold text-black transition-colors hover:bg-white/90 disabled:opacity-50"
+          >
+            Make Captain
+          </button>
+        )}
+        {isStarter && !isVC && !isCap && (
+          <button
+            onClick={() => onSetViceCaptain(player.id)}
+            disabled={loading}
+            className="rounded-lg border border-white/30 bg-black px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-black/80 disabled:opacity-50"
+          >
+            Make Vice Captain
+          </button>
+        )}
+        {swapCandidates.length > 0 && (
+          <>
+            <p className="w-full text-[10px] text-text-muted mt-1">
+              Swap with {isStarter ? 'bench' : 'starter'}:
+            </p>
+            {swapCandidates.map((candidate) => (
+              <button
+                key={candidate.id}
+                onClick={() => onSwap(selectedSlot.id, candidate.id)}
+                disabled={loading}
+                className="rounded-lg border border-border bg-bg-surface px-3 py-1.5 text-xs text-white transition-colors hover:border-wc-purple disabled:opacity-50"
+              >
+                {candidate.player?.name.split(' ').pop()}
+              </button>
+            ))}
+          </>
+        )}
+        {swapCandidates.length === 0 && (
+          <p className="text-[10px] text-text-muted">No same-position players to swap with</p>
+        )}
+      </div>
+    </div>
+  )
+}
 
 const POS_COLORS: Record<string, string> = {
   GK: 'border-wc-purple/40 bg-wc-purple/10',
@@ -62,6 +157,10 @@ export function SquadView({
   const [loading, setLoading] = useState(false)
   const [swapSource, setSwapSource] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('pitch')
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const [showPlayerMenu, setShowPlayerMenu] = useState(false)
+  const [localCaptainId, setLocalCaptainId] = useState<string | null>(captainId ?? null)
+  const [localViceCaptainId, setLocalViceCaptainId] = useState<string | null>(viceCaptainId ?? null)
 
   const starters = useMemo(
     () =>
@@ -119,6 +218,87 @@ export function SquadView({
     }
     setSwapSource(null)
     setLoading(false)
+  }
+
+  // Pitch view: tap a player to select, then choose action
+  function handlePitchPlayerTap(playerId: string) {
+    if (isLocked || loading) return
+    if (selectedPlayerId === playerId) {
+      // Tapping same player toggles menu
+      setSelectedPlayerId(null)
+      setShowPlayerMenu(false)
+      return
+    }
+
+    // If we already have a selected player and tap another — attempt swap
+    if (selectedPlayerId) {
+      const sourceSlot = slots.find((s) => s.player?.id === selectedPlayerId)
+      const targetSlot = slots.find((s) => s.player?.id === playerId)
+      if (sourceSlot && targetSlot) {
+        const sourcePos = sourceSlot.player?.position || sourceSlot.position
+        const targetPos = targetSlot.player?.position || targetSlot.position
+        if (sourcePos === targetPos && sourceSlot.is_starting !== targetSlot.is_starting) {
+          handlePitchSwap(sourceSlot.id, targetSlot.id)
+          return
+        }
+      }
+      // If can't swap, just select the new player
+      setSelectedPlayerId(playerId)
+      setShowPlayerMenu(true)
+      return
+    }
+
+    setSelectedPlayerId(playerId)
+    setShowPlayerMenu(true)
+  }
+
+  async function handlePitchSwap(slotIdA: string, slotIdB: string) {
+    setLoading(true)
+    setSelectedPlayerId(null)
+    setShowPlayerMenu(false)
+    const result = await toggleStarting(leagueId, slotIdA, slotIdB)
+    if (!result.error) {
+      setSlots((prev) =>
+        prev.map((s) => {
+          if (s.id === slotIdA || s.id === slotIdB) {
+            return { ...s, is_starting: !s.is_starting }
+          }
+          return s
+        })
+      )
+    }
+    setLoading(false)
+  }
+
+  async function handleSetCaptain(playerId: string) {
+    if (isLocked || loading) return
+    setLoading(true)
+    const vcId = localViceCaptainId === playerId ? localCaptainId! : localViceCaptainId!
+    const result = await setCaptain(leagueId, playerId, vcId || '')
+    if (!result.error) {
+      setLocalCaptainId(playerId)
+    }
+    setSelectedPlayerId(null)
+    setShowPlayerMenu(false)
+    setLoading(false)
+  }
+
+  async function handleSetViceCaptain(playerId: string) {
+    if (isLocked || loading) return
+    setLoading(true)
+    const capId = localCaptainId === playerId ? localViceCaptainId! : localCaptainId!
+    const result = await setCaptain(leagueId, capId || '', playerId)
+    if (!result.error) {
+      setLocalViceCaptainId(playerId)
+    }
+    setSelectedPlayerId(null)
+    setShowPlayerMenu(false)
+    setLoading(false)
+  }
+
+  function dismissSelection() {
+    setSelectedPlayerId(null)
+    setShowPlayerMenu(false)
   }
 
   function PlayerCard({ slot, isSwapTarget }: { slot: SquadSlot; isSwapTarget: boolean }) {
@@ -227,14 +407,34 @@ export function SquadView({
 
       {/* Pitch View */}
       {viewMode === 'pitch' && (
-        <PitchView
-          formation={formation}
-          slots={slots as Parameters<typeof PitchView>[0]['slots']}
-          totalPoints={totalPoints}
-          playerPoints={playerPoints}
-          captainId={captainId}
-          viceCaptainId={viceCaptainId}
-        />
+        <>
+          <PitchView
+            formation={formation}
+            slots={slots as Parameters<typeof PitchView>[0]['slots']}
+            totalPoints={totalPoints}
+            playerPoints={playerPoints}
+            captainId={localCaptainId}
+            viceCaptainId={localViceCaptainId}
+            selectedPlayerId={selectedPlayerId}
+            onPlayerTap={handlePitchPlayerTap}
+            isLocked={isLocked}
+          />
+
+          {/* Player action menu */}
+          <PlayerActionMenu
+            slots={slots}
+            selectedPlayerId={selectedPlayerId}
+            showMenu={showPlayerMenu}
+            isLocked={isLocked}
+            localCaptainId={localCaptainId}
+            localViceCaptainId={localViceCaptainId}
+            loading={loading}
+            onDismiss={dismissSelection}
+            onSetCaptain={handleSetCaptain}
+            onSetViceCaptain={handleSetViceCaptain}
+            onSwap={handlePitchSwap}
+          />
+        </>
       )}
 
       {/* List View */}

@@ -59,11 +59,15 @@ function PitchPlayer({
   points,
   isCaptain = false,
   isViceCaptain = false,
+  isSelected = false,
+  onTap,
 }: {
   slot: SquadSlot
   points: number
   isCaptain?: boolean
   isViceCaptain?: boolean
+  isSelected?: boolean
+  onTap?: () => void
 }) {
   const player = slot.player
   if (!player) return null
@@ -78,9 +82,14 @@ function PitchPlayer({
   const nextOpp = getNextOpponent(player.nation)
 
   return (
-    <div className="flex flex-col items-center w-[72px]">
+    <button
+      onClick={onTap}
+      className={`flex flex-col items-center w-[72px] transition-all ${
+        isSelected ? 'scale-110 brightness-125' : ''
+      } ${onTap ? 'cursor-pointer' : 'cursor-default'}`}
+    >
       {/* Shirt */}
-      <div className="relative">
+      <div className={`relative ${isSelected ? 'ring-2 ring-wc-purple rounded-lg' : ''}`}>
         <PlayerShirt position={shirtPosition} />
         {/* Captain badge — white bg, black text */}
         {isCaptain && (
@@ -135,16 +144,20 @@ function PitchPlayer({
           </div>
         )
       })()}
-    </div>
+    </button>
   )
 }
 
 function BenchPlayer({
   slot,
   points,
+  isSelected = false,
+  onTap,
 }: {
   slot: SquadSlot
   points: number
+  isSelected?: boolean
+  onTap?: () => void
 }) {
   const player = slot.player
   if (!player) return null
@@ -159,8 +172,15 @@ function BenchPlayer({
   const nextOpp = getNextOpponent(player.nation)
 
   return (
-    <div className="flex flex-col items-center w-[68px]">
-      <PlayerShirt position={shirtPosition} />
+    <button
+      onClick={onTap}
+      className={`flex flex-col items-center w-[68px] transition-all ${
+        isSelected ? 'scale-110 brightness-125' : ''
+      } ${onTap ? 'cursor-pointer' : 'cursor-default'}`}
+    >
+      <div className={`relative ${isSelected ? 'ring-2 ring-wc-purple rounded-lg' : ''}`}>
+        <PlayerShirt position={shirtPosition} />
+      </div>
       <div className="rounded-md bg-bg-primary/90 w-full px-1 py-1 text-center -mt-0.5">
         <p className="text-[9px] font-semibold text-white leading-tight truncate">
           {truncatedName}
@@ -183,7 +203,7 @@ function BenchPlayer({
       <div className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple/70">
         <p className="text-[9px] font-bold text-white">{points}</p>
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -194,6 +214,9 @@ export function PitchView({
   playerPoints = {},
   captainId = null,
   viceCaptainId = null,
+  selectedPlayerId = null,
+  onPlayerTap,
+  isLocked = false,
 }: {
   formation: Formation
   slots: SquadSlot[]
@@ -201,6 +224,9 @@ export function PitchView({
   playerPoints?: Record<string, number>
   captainId?: string | null
   viceCaptainId?: string | null
+  selectedPlayerId?: string | null
+  onPlayerTap?: (playerId: string) => void
+  isLocked?: boolean
 }) {
   const rows = FORMATION_ROWS[formation] || FORMATION_ROWS['4-4-2']
   const starters = slots.filter((s) => s.is_starting)
@@ -260,6 +286,8 @@ export function PitchView({
                       points={playerPoints[slot.player?.id || ''] ?? 0}
                       isCaptain={slot.player?.id === captainId}
                       isViceCaptain={slot.player?.id === viceCaptainId}
+                      isSelected={slot.player?.id === selectedPlayerId}
+                      onTap={onPlayerTap && slot.player ? () => onPlayerTap(slot.player!.id) : undefined}
                     />
                   ))}
                   {Array.from({ length: Math.max(0, row.count - rowSlots.length) }).map((_, i) => (
@@ -292,6 +320,8 @@ export function PitchView({
                     key={slot.id}
                     slot={slot}
                     points={playerPoints[slot.player?.id || ''] ?? 0}
+                    isSelected={slot.player?.id === selectedPlayerId}
+                    onTap={onPlayerTap && slot.player ? () => onPlayerTap(slot.player!.id) : undefined}
                   />
                 ))}
             </div>
