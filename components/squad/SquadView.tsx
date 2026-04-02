@@ -336,31 +336,53 @@ export function SquadView({
 
   async function handleSetCaptain(playerId: string) {
     if (isLocked) return
-    // Optimistic
     const prevCap = localCaptainId
+    const prevVC = localViceCaptainId
     setLocalCaptainId(playerId)
-    setSelectedPlayerId(null)
-    setShowPlayerMenu(false)
 
-    const vcId = localViceCaptainId === playerId ? prevCap! : localViceCaptainId!
-    const result = await setCaptain(leagueId, playerId, vcId || '')
-    if (result.error) {
-      setLocalCaptainId(prevCap) // revert
+    // If no VC set, or VC is same as new captain, pick a different starter as VC
+    let vcId = localViceCaptainId
+    if (!vcId || vcId === playerId) {
+      const otherStarter = slots.find(
+        (s) => s.is_starting && s.player && s.player.id !== playerId
+      )
+      vcId = otherStarter?.player?.id || null
+      if (vcId) setLocalViceCaptainId(vcId)
+    }
+
+    setSelectedPlayerId(null)
+    if (vcId) {
+      const result = await setCaptain(leagueId, playerId, vcId)
+      if (result.error) {
+        setLocalCaptainId(prevCap)
+        setLocalViceCaptainId(prevVC)
+      }
     }
   }
 
   async function handleSetViceCaptain(playerId: string) {
     if (isLocked) return
-    // Optimistic
+    const prevCap = localCaptainId
     const prevVC = localViceCaptainId
     setLocalViceCaptainId(playerId)
-    setSelectedPlayerId(null)
-    setShowPlayerMenu(false)
 
-    const capId = localCaptainId === playerId ? prevVC! : localCaptainId!
-    const result = await setCaptain(leagueId, capId || '', playerId)
-    if (result.error) {
-      setLocalViceCaptainId(prevVC) // revert
+    // If no captain set, or captain is same as new VC, pick a different starter as captain
+    let capId = localCaptainId
+    if (!capId || capId === playerId) {
+      const otherStarter = slots.find(
+        (s) => s.is_starting && s.player && s.player.id !== playerId
+      )
+      capId = otherStarter?.player?.id || null
+      if (capId) setLocalCaptainId(capId)
+    }
+
+    setSelectedPlayerId(null)
+    if (capId) {
+      const result = await setCaptain(leagueId, capId, playerId)
+      if (result.error) {
+        setLocalCaptainId(prevCap)
+        setLocalViceCaptainId(prevVC)
+      }
     }
   }
 
@@ -479,10 +501,10 @@ export function SquadView({
         ) : (
           <button
             onClick={() => !isLocked && setEditingTeamName(true)}
-            className="inline-flex items-center gap-1.5 text-xl font-team text-white hover:text-wc-peach transition-colors"
+            className="relative text-xl font-team text-white hover:text-wc-peach transition-colors"
           >
             {localTeamName || 'Tap to set team name'}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute -right-4 top-1 opacity-30"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </button>
         )}
         <p className="text-2xl font-display text-wc-peach mt-1">

@@ -6,21 +6,22 @@ import type { Tables } from '@/types/database.types'
 
 type FeedEvent = Tables<'activity_feed'>
 
-function getEmoji(event: FeedEvent): string {
+function getEventIcon(event: FeedEvent): { text: string; color: string } {
   if (event.event_type === 'scoring_event') {
     const desc = event.description.toLowerCase()
-    if (desc.includes('assisted')) return '\u{1F45F}' // 👟 sneaker
-    if (desc.includes('clean sheet')) return '\u{1F9E4}' // 🧤 gloves
-    if (desc.includes('yellow card') || desc.includes('yellow —')) return '\u{1F7E8}' // 🟨
-    if (desc.includes('red card') || desc.includes('red —')) return '\u{1F7E5}' // 🟥
-    return '\u{26BD}' // ⚽ football
+    if (desc.includes('assisted')) return { text: '👟', color: '' }
+    if (desc.includes('clean sheet')) return { text: '🧤', color: '' }
+    if (desc.includes('yellow')) return { text: '🟨', color: '' }
+    if (desc.includes('red card')) return { text: '🟥', color: '' }
+    if (desc.includes('scored')) return { text: '⚽', color: '' }
+    return { text: '⚽', color: '' }
   }
-  if (event.event_type === 'draft_pick') return '\u{1F504}' // 🔄
-  if (event.event_type === 'transfer') return '\u{1F504}' // 🔄
-  if (event.event_type === 'formation_change') return '\u{1F4CB}' // 📋
-  if (event.event_type === 'auto_pick') return '\u{26A1}' // ⚡
-  if (event.event_type === 'league_joined') return '\u{1F44B}' // 👋
-  return '\u{1F4CC}' // 📌
+  if (event.event_type === 'draft_pick') return { text: '🔄', color: '' }
+  if (event.event_type === 'transfer') return { text: '🔄', color: '' }
+  if (event.event_type === 'formation_change') return { text: '📋', color: '' }
+  if (event.event_type === 'auto_pick') return { text: '⚡', color: '' }
+  if (event.event_type === 'league_joined') return { text: '👋', color: '' }
+  return { text: '📌', color: '' }
 }
 
 function formatPoints(desc: string): React.ReactNode {
@@ -120,7 +121,7 @@ export function ActivityFeed({
                 key={event.id}
                 className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
               >
-                <span className="text-lg shrink-0 leading-none">{getEmoji(event)}</span>
+                <span className="text-lg shrink-0 leading-none">{getEventIcon(event).text}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-white">{formatPoints(event.description)}</p>
                   <p className="mt-0.5 text-[10px] text-text-muted">
