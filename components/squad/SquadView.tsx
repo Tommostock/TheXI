@@ -197,18 +197,42 @@ export function SquadView({
     [slots]
   )
 
+  const FORMATION_SLOTS: Record<string, Record<string, number>> = {
+    '4-4-2': { GK: 1, DEF: 4, MID: 4, ATT: 2 },
+    '4-3-3': { GK: 1, DEF: 4, MID: 3, ATT: 3 },
+    '4-5-1': { GK: 1, DEF: 4, MID: 5, ATT: 1 },
+  }
+
   async function handleFormationChange(newFormation: Formation) {
     if (newFormation === formation) return
-    // Optimistic — change formation instantly
     const prevFormation = formation
+    const prevSlots = slots
+
+    // Optimistic — change formation AND reassign starters client-side
     setFormation(newFormation)
+    const needed = FORMATION_SLOTS[newFormation]
+    if (needed) {
+      const byPos: Record<string, typeof slots> = { GK: [], DEF: [], MID: [], ATT: [] }
+      for (const s of slots) {
+        const pos = s.player?.position || s.position
+        if (byPos[pos]) byPos[pos].push(s)
+      }
+      const updatedSlots = slots.map((s) => {
+        const pos = s.player?.position || s.position
+        const posSlots = byPos[pos] || []
+        const idx = posSlots.indexOf(s)
+        const limit = needed[pos] || 0
+        return { ...s, is_starting: idx < limit }
+      })
+      setSlots(updatedSlots)
+    }
 
     // Background server call
     const result = await changeFormation(leagueId, newFormation)
     if (result.error) {
-      setFormation(prevFormation) // revert
+      setFormation(prevFormation)
+      setSlots(prevSlots)
     }
-    setLoading(false)
   }
 
   async function handleSwap(slotId: string) {
@@ -450,17 +474,18 @@ export function SquadView({
             onKeyDown={(e) => { if (e.key === 'Enter') setEditingTeamName(false) }}
             maxLength={25}
             autoFocus
-            className="bg-transparent text-base font-semibold text-white border-b border-wc-purple outline-none text-center w-48"
+            className="bg-transparent text-xl font-team text-white border-b border-wc-purple outline-none text-center w-56"
           />
         ) : (
           <button
             onClick={() => !isLocked && setEditingTeamName(true)}
-            className="text-base font-semibold text-white hover:text-wc-peach transition-colors"
+            className="inline-flex items-center gap-1.5 text-xl font-team text-white hover:text-wc-peach transition-colors"
           >
             {localTeamName || 'Tap to set team name'}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </button>
         )}
-        <p className="text-lg font-bold text-white mt-0.5">{totalPoints} <span className="text-xs font-normal text-text-muted">pts</span></p>
+        <p className="text-2xl font-display text-white mt-1">{totalPoints} <span className="text-sm font-normal text-text-muted">pts</span></p>
       </div>
 
       {/* Pitch View */}

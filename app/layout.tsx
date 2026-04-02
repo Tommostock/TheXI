@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Poppins, Jersey_25 } from 'next/font/google'
+import { Poppins, Jersey_25, Permanent_Marker } from 'next/font/google'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import { DevAutoLogin } from '@/components/DevAutoLogin'
 import './globals.css'
@@ -12,6 +12,12 @@ const poppins = Poppins({
 
 const jersey = Jersey_25({
   variable: '--font-jersey',
+  weight: '400',
+  subsets: ['latin'],
+})
+
+const marker = Permanent_Marker({
+  variable: '--font-marker',
   weight: '400',
   subsets: ['latin'],
 })
@@ -46,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} ${jersey.variable} h-full`}>
+    <html lang="en" className={`${poppins.variable} ${jersey.variable} ${marker.variable} h-full`}>
       <body className="flex min-h-dvh flex-col bg-bg-primary font-sans text-white">
         {/* TODO: Remove DevAutoLogin before deploy */}
         <DevAutoLogin />

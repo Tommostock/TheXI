@@ -57,6 +57,10 @@ body {
   font-family: var(--font-jersey), system-ui, sans-serif;
 }
 
+.font-team {
+  font-family: var(--font-marker), system-ui, sans-serif;
+}
+
 
 .scrollbar-hide {
   -ms-overflow-style: none;
