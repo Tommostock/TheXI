@@ -40,24 +40,17 @@ const FORMATION_ROWS: Record<Formation, Array<{ position: string; count: number 
   ],
 }
 
-const POS_SHIRT: Record<string, string> = {
-  GK: '#5B2C86',
-  DEF: '#0054A0',
-  MID: '#FFD100',
-  ATT: '#B5121B',
+const POS_SHIRT_SRC: Record<string, string> = {
+  GK: '/shirts/goalkeeper.svg',
+  DEF: '/shirts/defender.svg',
+  MID: '/shirts/midfielder.svg',
+  ATT: '/shirts/attacker.svg',
 }
 
-function PlayerShirt({ color }: { color: string }) {
+function PlayerShirt({ position }: { position: string }) {
+  const src = POS_SHIRT_SRC[position] || POS_SHIRT_SRC.MID
   return (
-    <svg viewBox="0 0 40 44" width="36" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M8 14 L4 10 L0 14 L0 20 L8 18 L8 42 L32 42 L32 18 L40 20 L40 14 L36 10 L32 14 L28 8 L12 8 L8 14Z"
-        fill={color}
-        stroke="rgba(255,255,255,0.3)"
-        strokeWidth="0.5"
-      />
-      <path d="M16 8 L20 12 L24 8" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-    </svg>
+    <img src={src} alt={position} width={40} height={44} className="drop-shadow-md" />
   )
 }
 
@@ -75,7 +68,7 @@ function PitchPlayer({
   const player = slot.player
   if (!player) return null
 
-  const shirtColor = POS_SHIRT[player.position] || POS_SHIRT.MID
+  const shirtPosition = player.position
 
   const displayName = getShortName(player.name)
   const truncatedName = displayName.length > 10
@@ -88,7 +81,7 @@ function PitchPlayer({
     <div className="flex flex-col items-center w-[72px]">
       {/* Shirt */}
       <div className="relative">
-        <PlayerShirt color={shirtColor} />
+        <PlayerShirt position={shirtPosition} />
         {/* Captain / Vice Captain badge */}
         {(isCaptain || isViceCaptain) && (
           <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-wc-gold text-[8px] font-bold text-bg-primary shadow">
@@ -153,7 +146,7 @@ function BenchPlayer({
   const player = slot.player
   if (!player) return null
 
-  const shirtColor = POS_SHIRT[player.position] || POS_SHIRT.MID
+  const shirtPosition = player.position
 
   const displayName = getShortName(player.name)
   const truncatedName = displayName.length > 9
@@ -164,7 +157,7 @@ function BenchPlayer({
 
   return (
     <div className="flex flex-col items-center w-[68px]">
-      <PlayerShirt color={shirtColor} />
+      <PlayerShirt position={shirtPosition} />
       <div className="rounded-md bg-bg-primary/90 w-full px-1 py-1 text-center -mt-0.5">
         <p className="text-[9px] font-semibold text-white leading-tight truncate">
           {truncatedName}
