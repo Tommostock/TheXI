@@ -6,26 +6,25 @@ import type { Tables } from '@/types/database.types'
 
 type FeedEvent = Tables<'activity_feed'>
 
-const EVENT_STYLES: Record<string, { char: string; bg: string; color: string }> = {
-  scoring_event: { char: '⚽', bg: 'bg-wc-gold/20', color: '' },
-  draft_pick:    { char: '📋', bg: 'bg-wc-blue/20', color: '' },
-  transfer:      { char: '🔄', bg: 'bg-wc-peach/20', color: '' },
-  formation_change: { char: '📐', bg: 'bg-text-secondary/20', color: '' },
-  auto_pick:     { char: '⚡', bg: 'bg-wc-crimson/20', color: '' },
-  league_joined: { char: '👤', bg: 'bg-wc-peach/20', color: '' },
+const EVENT_STYLES: Record<string, { char: string; bg: string; textColor: string }> = {
+  scoring_event: { char: 'G', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' },
+  draft_pick:    { char: 'D', bg: 'bg-wc-blue/20', textColor: 'text-wc-blue' },
+  transfer:      { char: 'T', bg: 'bg-wc-purple/20', textColor: 'text-wc-purple' },
+  formation_change: { char: 'F', bg: 'bg-text-secondary/20', textColor: 'text-text-secondary' },
+  auto_pick:     { char: 'A', bg: 'bg-wc-crimson/20', textColor: 'text-wc-crimson' },
+  league_joined: { char: 'J', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' },
 }
 
-function getEventChar(event: FeedEvent): string {
+function getEventStyle(event: FeedEvent): { char: string; bg: string; textColor: string } {
   if (event.event_type === 'scoring_event') {
     const desc = event.description.toLowerCase()
-    if (desc.includes('assisted')) return '👟'
-    if (desc.includes('clean sheet')) return '🧤'
-    if (desc.includes('yellow card') || desc.includes('yellow —')) return '🟨'
-    if (desc.includes('red card') || desc.includes('red —')) return '🟥'
-    if (desc.includes('scored')) return '⚽'
-    return '⚽'
+    if (desc.includes('assisted')) return { char: 'A', bg: 'bg-wc-blue/20', textColor: 'text-wc-blue' }
+    if (desc.includes('clean sheet')) return { char: 'CS', bg: 'bg-wc-purple/20', textColor: 'text-wc-purple' }
+    if (desc.includes('yellow card') || desc.includes('yellow —')) return { char: 'Y', bg: 'bg-wc-gold/20', textColor: 'text-wc-gold' }
+    if (desc.includes('red card') || desc.includes('red —')) return { char: 'R', bg: 'bg-wc-crimson/20', textColor: 'text-wc-crimson' }
+    return { char: 'G', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' }
   }
-  return EVENT_STYLES[event.event_type]?.char || '📌'
+  return EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
 }
 
 function timeAgo(dateStr: string): string {
@@ -110,8 +109,7 @@ export function ActivityFeed({
           </div>
           <div className="space-y-1.5 stagger-children">
             {dateEvents.map((event) => {
-              const style = EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
-              const char = getEventChar(event)
+              const style = getEventStyle(event)
 
               return (
                 <div
@@ -119,9 +117,9 @@ export function ActivityFeed({
                   className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
                 >
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] leading-none ${style.bg}`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold leading-none ${style.bg} ${style.textColor}`}
                   >
-                    {char}
+                    {style.char}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-white">{event.description}</p>
