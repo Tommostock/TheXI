@@ -57,6 +57,22 @@ body {
   font-family: var(--font-jersey), system-ui, sans-serif;
 }
 
+/* ===== LIGHT THEME ===== */
+[data-theme="light"] body,
+[data-theme="light"] {
+  --color-bg-primary: #F5F5FA;
+  --color-bg-card: #FFFFFF;
+  --color-bg-surface: #EEEEF4;
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #5A5A72;
+  --color-text-muted: #9A9AB0;
+  --color-border: #D8D8E8;
+}
+[data-theme="light"] body {
+  background-color: #F5F5FA;
+  color: #1A1A2E;
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

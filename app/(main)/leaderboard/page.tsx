@@ -78,6 +78,13 @@ export default async function LeaderboardPage() {
     }))
     .sort((a, b) => b.totalPoints - a.totalPoints)
 
+  // Calculate achievement stats for current user
+  const myRanking = rankings.find((r) => r.userId === user.id)
+  const myRank = rankings.findIndex((r) => r.userId === user.id) + 1
+  const myGoals = myRanking?.squad
+    .filter((s) => s.isStarting)
+    .reduce((sum, s) => sum + (s.playerPoints > 0 ? 1 : 0), 0) || 0
+
   return (
     <div className="p-4">
       <h1 className="mb-4 text-2xl font-display text-white">Leaderboard</h1>

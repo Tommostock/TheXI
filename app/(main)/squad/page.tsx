@@ -78,8 +78,47 @@ export default async function SquadPage() {
     }
   }
 
+  // Get league standings for mini position card
+  const { data: allScores } = await supabase
+    .from('scores')
+    .select('user_id, total_points')
+    .eq('league_id', leagueId)
+    .order('total_points', { ascending: false })
+
+  const { data: allMembers } = await supabase
+    .from('league_members')
+    .select('user_id')
+    .eq('league_id', leagueId)
+
+  const memberCount = allMembers?.length || 0
+  const myRank = (allScores || []).findIndex((s) => s.user_id === user.id) + 1
+  const leaderPoints = allScores?.[0]?.total_points || 0
+  const myPoints = score?.total_points || 0
+  const pointsBehind = myRank > 1 ? leaderPoints - myPoints : 0
+
   return (
     <div className="p-4">
+      {/* Mini league position */}
+      {myRank > 0 && (
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-bg-card p-3 animate-fade-in">
+          <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
+            myRank === 1 ? 'bg-wc-gold text-bg-primary' : 'bg-wc-purple text-white'
+          }`}>
+            {myRank}
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white">
+              {myRank === 1 ? 'You\'re in the lead!' : `${myRank}${myRank === 2 ? 'nd' : myRank === 3 ? 'rd' : 'th'} place`}
+            </p>
+            <p className="text-[10px] text-text-muted">
+              {pointsBehind > 0 ? `${pointsBehind} pts behind 1st` : `${myPoints} pts`}
+              {' · '}{memberCount} player{memberCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <p className="text-lg font-bold text-wc-peach">{myPoints}</p>
+        </div>
+      )}
+
       <h1 className="mb-4 text-2xl font-display text-white">My Squad</h1>
       <SquadView
         leagueId={leagueId}

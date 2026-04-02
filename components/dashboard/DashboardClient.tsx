@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { Trophy, ChevronDown, ChevronRight, Clock } from 'lucide-react'
 import { GROUPS, FIXTURES, type Fixture } from '@/lib/tournament/groups'
 import { SignOutButton } from '@/components/ui/SignOutButton'
+import { ShareButton } from '@/components/ui/ShareButton'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { HowToPlayButton } from './HowToPlay'
 import { KnockoutBracket } from './KnockoutBracket'
 
@@ -339,7 +341,8 @@ export function DashboardClient({
           <p className="text-xs text-wc-peach">World Cup 2026 Draft</p>
           <p className="text-sm text-text-secondary mt-0.5">Welcome, {displayName}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
           <HowToPlayButton />
           <SignOutButton />
         </div>
@@ -353,9 +356,10 @@ export function DashboardClient({
         <div className="rounded-xl border border-border bg-bg-card p-4 animate-fade-in-up">
           <div className="section-accent flex items-center gap-2 mb-3">
             <Trophy size={14} className="text-wc-gold" />
-            <p className="text-xs font-bold uppercase tracking-wider text-text-secondary">
+            <p className="flex-1 text-xs font-bold uppercase tracking-wider text-text-secondary">
               Standings
             </p>
+            <ShareButton title="The XI Standings" text="Check the standings on The XI - World Cup 2026 Draft!" />
           </div>
           <div className="space-y-1.5">
             {leaderboard.map((entry, i) => (
