@@ -27,7 +27,7 @@ export default async function LeaderboardPage() {
 
   const { data: members } = await supabase
     .from('league_members')
-    .select('user_id, display_name, formation')
+    .select('user_id, display_name, formation, captain_player_id, vice_captain_player_id')
     .eq('league_id', leagueId)
 
   const { data: scores } = await supabase
@@ -66,6 +66,8 @@ export default async function LeaderboardPage() {
       displayName: m.display_name,
       formation: m.formation,
       totalPoints: scoreMap.get(m.user_id) || 0,
+      captainPlayerId: m.captain_player_id || null,
+      viceCaptainPlayerId: m.vice_captain_player_id || null,
       squad: (allSlots || [])
         .filter((s) => s.user_id === m.user_id)
         .map((s) => ({

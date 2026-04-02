@@ -82,10 +82,16 @@ function PitchPlayer({
       {/* Shirt */}
       <div className="relative">
         <PlayerShirt position={shirtPosition} />
-        {/* Captain / Vice Captain badge */}
-        {(isCaptain || isViceCaptain) && (
-          <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-wc-gold text-[8px] font-bold text-bg-primary shadow">
-            {isCaptain ? 'C' : 'V'}
+        {/* Captain badge — white bg, black text */}
+        {isCaptain && (
+          <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-bold text-black shadow">
+            C
+          </div>
+        )}
+        {/* Vice Captain badge — black bg, white text */}
+        {isViceCaptain && (
+          <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[8px] font-bold text-white shadow border border-white/30">
+            V
           </div>
         )}
         {player.is_eliminated && (
@@ -120,18 +126,19 @@ function PitchPlayer({
         </div>
       </div>
 
-      {/* Points pill */}
-      <div
-        className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
-          points > 0
-            ? 'bg-wc-teal'
-            : points < 0
-            ? 'bg-wc-crimson'
-            : 'bg-text-muted/60'
-        }`}
-      >
-        <p className="text-[9px] font-bold text-white">{points}</p>
-      </div>
+      {/* Points pill — captain gets double */}
+      {(() => {
+        const dp = isCaptain ? points * 2 : points
+        return (
+          <div
+            className={`rounded-b-md w-full text-center py-0.5 -mt-px ${
+              dp > 0 ? 'bg-wc-teal' : dp < 0 ? 'bg-wc-crimson' : 'bg-text-muted/60'
+            }`}
+          >
+            <p className="text-[9px] font-bold text-white">{dp}</p>
+          </div>
+        )
+      })()}
     </div>
   )
 }

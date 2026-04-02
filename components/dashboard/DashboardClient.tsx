@@ -155,51 +155,59 @@ function FixtureCard({
     <div>
       <button
         onClick={() => isFinished && keyEvents.length > 0 && setExpanded(!expanded)}
-        className={`relative flex w-full items-center rounded-lg border p-3 text-left transition-colors ${
+        className={`relative flex w-full flex-col rounded-lg border px-3 py-2.5 text-left transition-colors ${
           isFinished
             ? 'border-border bg-bg-card hover:border-text-muted'
             : 'border-border/50 bg-bg-card/50'
         }`}
       >
-        {/* Home */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <span className={`text-right truncate ${fixture.homeFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
-            {fixture.home}
-          </span>
-          {fixture.homeFlag && (
-            <img src={fixture.homeFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
-          )}
-        </div>
-
-        {/* Score / Time */}
-        <div className="w-16 text-center shrink-0 mx-1">
-          {isFinished ? (
-            <span className="text-sm font-bold text-white">
-              {fixture.homeScore} - {fixture.awayScore}
+        {/* Teams row */}
+        <div className="flex w-full items-center">
+          {/* Home */}
+          <div className="flex items-center gap-1.5 flex-1 justify-end">
+            <span className={`text-right truncate ${fixture.homeFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
+              {fixture.home}
             </span>
-          ) : (
-            <div className="flex flex-col items-center">
-              <span className="text-[10px] font-medium text-text-secondary">
-                {fixture.time}
+            {fixture.homeFlag && (
+              <img src={fixture.homeFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
+            )}
+          </div>
+
+          {/* Score / Time */}
+          <div className="w-16 text-center shrink-0 mx-1">
+            {isFinished ? (
+              <span className="text-sm font-bold text-white">
+                {fixture.homeScore} - {fixture.awayScore}
               </span>
-              <span className="text-[8px] text-text-muted">BST</span>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-medium text-text-secondary">
+                  {fixture.time}
+                </span>
+                <span className="text-[8px] text-text-muted">BST</span>
+              </div>
+            )}
+          </div>
+
+          {/* Away */}
+          <div className="flex items-center gap-1.5 flex-1">
+            {fixture.awayFlag && (
+              <img src={fixture.awayFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
+            )}
+            <span className={`truncate ${fixture.awayFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
+              {fixture.away}
+            </span>
+          </div>
         </div>
 
-        {/* Away */}
-        <div className="flex items-center gap-1.5 flex-1">
-          {fixture.awayFlag && (
-            <img src={fixture.awayFlag} alt="" className="h-4 w-6 rounded-sm object-cover shrink-0" />
-          )}
-          <span className={`truncate ${fixture.awayFlag ? 'text-xs font-semibold text-white' : 'text-[9px] text-text-secondary'}`}>
-            {fixture.away}
-          </span>
-        </div>
+        {/* Venue line */}
+        <p className="mt-1 text-center text-[9px] text-text-muted w-full">
+          {fixture.venue}
+        </p>
 
-        {/* Expand indicator — absolute so it doesn't shift layout */}
+        {/* Expand indicator */}
         {isFinished && keyEvents.length > 0 && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2">
+          <span className="absolute right-2 top-3">
             {expanded ? (
               <ChevronDown size={12} className="text-text-muted" />
             ) : (

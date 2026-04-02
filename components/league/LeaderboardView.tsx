@@ -20,6 +20,8 @@ type Ranking = {
   displayName: string
   formation: string
   totalPoints: number
+  captainPlayerId?: string | null
+  viceCaptainPlayerId?: string | null
   squad: SquadPlayer[]
 }
 
@@ -130,39 +132,51 @@ export function LeaderboardView({
                   Starting XI
                 </p>
                 <div className="space-y-1">
-                  {startersWithPoints.map((s) => (
-                    <div
-                      key={s.player!.id}
-                      className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${POS_BG[s.player!.position] || 'bg-bg-card'}`}
-                    >
-                      {s.player!.nation_flag_url && (
-                        <img
-                          src={s.player!.nation_flag_url}
-                          alt=""
-                          className="h-3.5 w-5 shrink-0 rounded-[1px] object-cover"
-                        />
-                      )}
-                      <span className="flex-1 truncate text-xs font-medium text-white">
-                        {s.player!.name}
-                      </span>
-                      <span
-                        className={`text-[10px] font-bold ${POS_TEXT[s.player!.position] || 'text-text-secondary'}`}
+                  {startersWithPoints.map((s) => {
+                    const isCap = s.player!.id === entry.captainPlayerId
+                    const isVC = s.player!.id === entry.viceCaptainPlayerId
+                    const displayPts = isCap ? s.playerPoints * 2 : s.playerPoints
+                    return (
+                      <div
+                        key={s.player!.id}
+                        className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${POS_BG[s.player!.position] || 'bg-bg-card'}`}
                       >
-                        {s.player!.position}
-                      </span>
-                      <span
-                        className={`min-w-[28px] text-right text-xs font-bold ${
-                          s.playerPoints > 0
-                            ? 'text-wc-green'
-                            : s.playerPoints < 0
-                            ? 'text-wc-crimson'
-                            : 'text-text-muted'
-                        }`}
-                      >
-                        {s.playerPoints > 0 ? `+${s.playerPoints}` : s.playerPoints}
-                      </span>
-                    </div>
-                  ))}
+                        {s.player!.nation_flag_url && (
+                          <img
+                            src={s.player!.nation_flag_url}
+                            alt=""
+                            className="h-3.5 w-5 shrink-0 rounded-[1px] object-cover"
+                          />
+                        )}
+                        <span className="flex-1 truncate text-xs font-medium text-white">
+                          {s.player!.name}
+                        </span>
+                        {/* Captain / VC badge */}
+                        {isCap && (
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[7px] font-bold text-black">C</span>
+                        )}
+                        {isVC && (
+                          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-black text-[7px] font-bold text-white border border-white/30">V</span>
+                        )}
+                        <span
+                          className={`text-[10px] font-bold ${POS_TEXT[s.player!.position] || 'text-text-secondary'}`}
+                        >
+                          {s.player!.position}
+                        </span>
+                        <span
+                          className={`min-w-[28px] text-right text-xs font-bold ${
+                            displayPts > 0
+                              ? 'text-wc-green'
+                              : displayPts < 0
+                              ? 'text-wc-crimson'
+                              : 'text-text-muted'
+                          }`}
+                        >
+                          {displayPts > 0 ? `+${displayPts}` : displayPts}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
 
                 {/* Bench */}
