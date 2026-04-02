@@ -485,7 +485,9 @@ export function SquadView({
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </button>
         )}
-        <p className="text-2xl font-display text-white mt-1">{totalPoints} <span className="text-sm font-normal text-text-muted">pts</span></p>
+        <p className="text-2xl font-display text-wc-peach mt-1">
+          <span className="text-text-muted">&mdash;</span> <span className="underline underline-offset-4 decoration-wc-peach/40">{totalPoints}</span> <span className="text-text-muted">&mdash;</span>
+        </p>
       </div>
 
       {/* Pitch View */}
@@ -503,12 +505,41 @@ export function SquadView({
             isLocked={isLocked}
           />
 
-          {/* Swap hint */}
-          {selectedPlayerId && (
-            <p className="rounded-lg border border-wc-purple/30 bg-wc-purple/5 p-2 text-center text-[10px] text-wc-purple">
-              Tap a same-position player to swap, or tap again to deselect
-            </p>
-          )}
+          {/* Captain/VC toggle + swap hint */}
+          {selectedPlayerId && (() => {
+            const selectedSlot = slots.find((s) => s.player?.id === selectedPlayerId)
+            const isStarter = selectedSlot?.is_starting
+            const isCap = selectedPlayerId === localCaptainId
+            const isVC = selectedPlayerId === localViceCaptainId
+            return (
+              <div className="flex flex-col gap-1.5">
+                {/* Captain/VC buttons — only for starters */}
+                {isStarter && (
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={() => { handleSetCaptain(selectedPlayerId); setSelectedPlayerId(null) }}
+                      className={`rounded-md px-3 py-1.5 text-[10px] font-bold transition-colors ${
+                        isCap ? 'bg-white text-black' : 'border border-white/40 text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {isCap ? 'Captain' : 'Make Captain'}
+                    </button>
+                    <button
+                      onClick={() => { handleSetViceCaptain(selectedPlayerId); setSelectedPlayerId(null) }}
+                      className={`rounded-md px-3 py-1.5 text-[10px] font-bold transition-colors ${
+                        isVC ? 'bg-black text-white border border-white/30' : 'border border-white/40 text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {isVC ? 'Vice Captain' : 'Make Vice Captain'}
+                    </button>
+                  </div>
+                )}
+                <p className="rounded-lg border border-white/20 p-1.5 text-center text-[10px] text-white">
+                  Tap a same-position player to swap, or tap again to deselect
+                </p>
+              </div>
+            )
+          })()}
         </>
       )}
 

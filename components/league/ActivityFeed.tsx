@@ -1,30 +1,38 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
 
 type FeedEvent = Tables<'activity_feed'>
 
-const EVENT_STYLES: Record<string, { char: string; bg: string; textColor: string }> = {
-  scoring_event: { char: 'G', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' },
-  draft_pick:    { char: 'D', bg: 'bg-wc-blue/20', textColor: 'text-wc-blue' },
-  transfer:      { char: 'T', bg: 'bg-wc-purple/20', textColor: 'text-wc-purple' },
-  formation_change: { char: 'F', bg: 'bg-text-secondary/20', textColor: 'text-text-secondary' },
-  auto_pick:     { char: 'A', bg: 'bg-wc-crimson/20', textColor: 'text-wc-crimson' },
-  league_joined: { char: 'J', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' },
-}
-
-function getEventStyle(event: FeedEvent): { char: string; bg: string; textColor: string } {
+function getEmoji(event: FeedEvent): string {
   if (event.event_type === 'scoring_event') {
     const desc = event.description.toLowerCase()
-    if (desc.includes('assisted')) return { char: 'A', bg: 'bg-wc-blue/20', textColor: 'text-wc-blue' }
-    if (desc.includes('clean sheet')) return { char: 'CS', bg: 'bg-wc-purple/20', textColor: 'text-wc-purple' }
-    if (desc.includes('yellow card') || desc.includes('yellow —')) return { char: 'Y', bg: 'bg-wc-gold/20', textColor: 'text-wc-gold' }
-    if (desc.includes('red card') || desc.includes('red —')) return { char: 'R', bg: 'bg-wc-crimson/20', textColor: 'text-wc-crimson' }
-    return { char: 'G', bg: 'bg-wc-peach/20', textColor: 'text-wc-peach' }
+    if (desc.includes('assisted')) return '\u{1F45F}' // 👟 sneaker
+    if (desc.includes('clean sheet')) return '\u{1F9E4}' // 🧤 gloves
+    if (desc.includes('yellow card') || desc.includes('yellow —')) return '\u{1F7E8}' // 🟨
+    if (desc.includes('red card') || desc.includes('red —')) return '\u{1F7E5}' // 🟥
+    return '\u{26BD}' // ⚽ football
   }
-  return EVENT_STYLES[event.event_type] || EVENT_STYLES.draft_pick
+  if (event.event_type === 'draft_pick') return '\u{1F504}' // 🔄
+  if (event.event_type === 'transfer') return '\u{1F504}' // 🔄
+  if (event.event_type === 'formation_change') return '\u{1F4CB}' // 📋
+  if (event.event_type === 'auto_pick') return '\u{26A1}' // ⚡
+  if (event.event_type === 'league_joined') return '\u{1F44B}' // 👋
+  return '\u{1F4CC}' // 📌
+}
+
+function formatPoints(desc: string): React.ReactNode {
+  // Find patterns like "+5 pts" or "-2 pts" or "— +5 pts" or "— -3 pts"
+  const match = desc.match(/(.*?)([+-]\d+)\s*pts(.*)/)
+  if (!match) return <>{desc}</>
+
+  const [, before, points, after] = match
+  const num = parseInt(points)
+  const color = num > 0 ? 'text-wc-peach' : 'text-wc-crimson'
+
+  return <>{before}<span className={`font-semibold ${color}`}>{points} pts</span>{after}</>
 }
 
 function timeAgo(dateStr: string): string {
@@ -92,7 +100,6 @@ export function ActivityFeed({
     )
   }
 
-  // Group events by date
   const byDate = new Map<string, FeedEvent[]>()
   for (const event of events) {
     const dateKey = formatDate(event.created_at)
@@ -108,28 +115,20 @@ export function ActivityFeed({
             <p className="text-xs font-semibold text-text-secondary">{dateLabel}</p>
           </div>
           <div className="space-y-1.5 stagger-children">
-            {dateEvents.map((event) => {
-              const style = getEventStyle(event)
-
-              return (
-                <div
-                  key={event.id}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
-                >
-                  <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold leading-none ${style.bg} ${style.textColor}`}
-                  >
-                    {style.char}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm text-white">{event.description}</p>
-                    <p className="mt-0.5 text-[10px] text-text-muted">
-                      {timeAgo(event.created_at)}
-                    </p>
-                  </div>
+            {dateEvents.map((event) => (
+              <div
+                key={event.id}
+                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card p-3 card-hover"
+              >
+                <span className="text-lg shrink-0 leading-none">{getEmoji(event)}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-white">{formatPoints(event.description)}</p>
+                  <p className="mt-0.5 text-[10px] text-text-muted">
+                    {timeAgo(event.created_at)}
+                  </p>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       ))}

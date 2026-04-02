@@ -34,7 +34,7 @@ const EVENT_COLORS: Record<string, string> = {
 }
 
 // Draft countdown target
-const DRAFT_DATE = new Date('2026-05-20T19:00:00Z')
+const DRAFT_DATE = new Date('2026-05-31T08:00:00Z') // May 31st 9am BST
 const DRAFT_TOTAL_MS = DRAFT_DATE.getTime() - new Date('2026-04-01T00:00:00Z').getTime()
 
 function DraftCountdown() {
@@ -96,7 +96,7 @@ function DraftCountdown() {
           ))}
         </div>
       )}
-      <p className="mt-4 text-[10px] text-text-secondary">May 20th, 2026 — 7:00 PM</p>
+      <p className="mt-4 text-[10px] text-text-secondary">Sunday May 31st, 2026 — 9:00 AM</p>
       <div className="mt-2.5 h-1 w-full rounded-full bg-wc-purple/20 overflow-hidden">
         <div
           className="h-full rounded-full bg-wc-purple transition-all duration-1000"

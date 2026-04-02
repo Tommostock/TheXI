@@ -87,7 +87,14 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-2xl font-display text-white">Leaderboard</h1>
+      <h1 className="mb-3 text-2xl font-display text-white">Leaderboard</h1>
+
+      {/* Prize Pool */}
+      <div className="mb-4 rounded-xl border border-wc-gold/30 bg-gradient-to-b from-wc-gold/10 to-transparent p-5 text-center animate-fade-in">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-wc-gold mb-2">Prize Pool</p>
+        <p className="text-5xl font-display text-wc-gold">£60</p>
+        <p className="mt-2 text-xs text-text-secondary">Winner takes all</p>
+      </div>
       <LeaderboardView rankings={rankings} currentUserId={user.id} />
     </div>
   )
