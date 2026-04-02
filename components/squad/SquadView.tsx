@@ -426,42 +426,13 @@ export function SquadView({
 
       {/* Pitch View */}
       {viewMode === 'pitch' && (
-        <>
-          <PitchView
-            formation={formation}
-            slots={slots as Parameters<typeof PitchView>[0]['slots']}
-            totalPoints={totalPoints}
-            playerPoints={playerPoints}
-            captainId={localCaptainId}
-            viceCaptainId={localViceCaptainId}
-            selectedPlayerId={selectedPlayerId}
-            onPlayerTap={handlePitchPlayerTap}
-            isLocked={isLocked}
-          />
-
-          {/* Player action menu */}
-          <PlayerActionMenu
-            slots={slots}
-            selectedPlayerId={selectedPlayerId}
-            showMenu={showPlayerMenu}
-            isLocked={isLocked}
-            localCaptainId={localCaptainId}
-            localViceCaptainId={localViceCaptainId}
-            loading={loading}
-            onDismiss={dismissSelection}
-            onSetCaptain={handleSetCaptain}
-            onSetViceCaptain={handleSetViceCaptain}
-            onSwap={handlePitchSwap}
-            onViewInfo={(player) => { setDetailPlayer(player); dismissSelection(); }}
-          />
-        </>
-      )}
-
-      {/* Player Detail Modal */}
-      {detailPlayer && (
-        <PlayerDetailCard
-          player={detailPlayer as Parameters<typeof PlayerDetailCard>[0]['player']}
-          onClose={() => setDetailPlayer(null)}
+        <PitchView
+          formation={formation}
+          slots={slots as Parameters<typeof PitchView>[0]['slots']}
+          totalPoints={totalPoints}
+          playerPoints={playerPoints}
+          captainId={localCaptainId}
+          viceCaptainId={localViceCaptainId}
         />
       )}
 
