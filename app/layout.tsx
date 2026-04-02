@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description:
     'Draft real World Cup 2026 players and compete with your mates',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/icons/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
