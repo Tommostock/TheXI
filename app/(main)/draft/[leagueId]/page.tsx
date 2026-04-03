@@ -33,7 +33,7 @@ export default async function DraftLeaguePage({
   if (!membership) redirect('/dashboard')
 
   if (league.draft_status === 'pre_draft') {
-    redirect(`/league/${leagueId}`)
+    redirect('/draft')
   }
 
   const draftOrder = (league.draft_order as string[]) || []

@@ -1,32 +1,48 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { PlayerBrowser } from '@/components/draft/PlayerBrowser'
 import { LoadingShell } from '@/components/ui/LoadingShell'
+import { StartDraftButton } from '@/components/draft/StartDraftButton'
 
 export default async function DraftPage() {
   const { user, supabase } = await requireUser()
   if (!user) return <LoadingShell />
 
-  // Find user's leagues that have an active draft
+  // Find user's leagues
   const { data: memberships } = await supabase
     .from('league_members')
-    .select('league_id, leagues(id, name, draft_status)')
+    .select('league_id, leagues(id, name, draft_status, created_by)')
     .eq('user_id', user.id)
 
-  type LeagueJoin = { id: string; name: string; draft_status: string }
-  const activeLeagues = memberships?.flatMap((m) => {
+  type LeagueJoin = { id: string; name: string; draft_status: string; created_by: string }
+
+  const allLeagues = memberships?.flatMap((m) => {
     const l = m.leagues as unknown as LeagueJoin | null
-    if (!l || l.draft_status !== 'in_progress') return []
+    if (!l) return []
     return [l]
   }) || []
 
-  if (activeLeagues.length > 0) {
-    // Redirect to the first active draft
-    redirect(`/draft/${activeLeagues[0].id}`)
+  // Redirect to active draft if one exists
+  const activeDraft = allLeagues.find((l) => l.draft_status === 'in_progress')
+  if (activeDraft) {
+    redirect(`/draft/${activeDraft.id}`)
   }
 
-  // No active draft — show player browser
+  // Check for pre-draft league where user is creator
+  const preDraftLeague = allLeagues.find(
+    (l) => l.draft_status === 'pre_draft' && l.created_by === user.id
+  )
+
+  // Get member count for the pre-draft league
+  let memberCount = 0
+  if (preDraftLeague) {
+    const { count } = await supabase
+      .from('league_members')
+      .select('id', { count: 'exact', head: true })
+      .eq('league_id', preDraftLeague.id)
+    memberCount = count || 0
+  }
+
   const { data: players } = await supabase
     .from('players')
     .select('*')
@@ -39,6 +55,18 @@ export default async function DraftPage() {
       <p className="mt-1 mb-3 text-sm text-text-secondary shrink-0">
         Browse all available World Cup 2026 players by nation.
       </p>
+
+      {/* Start Draft button — shows when there's a pre-draft league */}
+      {preDraftLeague && memberCount >= 2 && (
+        <div className="mb-3 shrink-0">
+          <StartDraftButton
+            leagueId={preDraftLeague.id}
+            leagueName={preDraftLeague.name}
+            memberCount={memberCount}
+          />
+        </div>
+      )}
+
       <PlayerBrowser players={players || []} />
     </div>
   )
