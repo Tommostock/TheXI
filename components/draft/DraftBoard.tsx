@@ -82,6 +82,28 @@ export function DraftBoard({
     [currentUserId, picks]
   )
 
+  // Client-side auto-pick: when deadline expires, trigger auto-pick API
+  useEffect(() => {
+    if (!currentDeadline || draftState.isComplete) return
+
+    const checkExpiry = () => {
+      if (new Date(currentDeadline).getTime() <= Date.now()) {
+        fetch('/api/draft/auto-pick', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leagueId }),
+        }).catch(() => {})
+      }
+    }
+
+    // Check immediately on load (in case deadline already passed)
+    checkExpiry()
+
+    // Then check every 30 seconds
+    const interval = setInterval(checkExpiry, 30000)
+    return () => clearInterval(interval)
+  }, [currentDeadline, leagueId, draftState.isComplete])
+
   // Realtime subscriptions for picks and deadline updates
   useEffect(() => {
     const supabase = createClient()
