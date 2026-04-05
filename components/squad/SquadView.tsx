@@ -149,6 +149,7 @@ export function SquadView({
   slots: initialSlots,
   totalPoints,
   playerPoints = {},
+  playerEvents = {},
   captainId = null,
   viceCaptainId = null,
   isLocked = false,
@@ -159,6 +160,7 @@ export function SquadView({
   slots: SquadSlot[]
   totalPoints: number
   playerPoints?: Record<string, number>
+  playerEvents?: Record<string, Array<{ event_type: string; points_awarded: number }>>
   captainId?: string | null
   viceCaptainId?: string | null
   isLocked?: boolean
@@ -532,6 +534,7 @@ export function SquadView({
             slots={slots as Parameters<typeof PitchView>[0]['slots']}
             totalPoints={totalPoints}
             playerPoints={playerPoints}
+            playerEvents={playerEvents}
             captainId={localCaptainId}
             viceCaptainId={localViceCaptainId}
             selectedPlayerId={selectedPlayerId}

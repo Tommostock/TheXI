@@ -244,10 +244,25 @@ export async function POST(request: Request) {
     })
   }
 
-  // Lock lineups after matchday
+  // Calculate player of the round
+  const playerTotals = new Map<string, number>()
+  for (const event of matchEvents) {
+    playerTotals.set(event.player_id, (playerTotals.get(event.player_id) || 0) + event.points_awarded)
+  }
+  let bestPlayerId: string | null = null
+  let bestPoints = 0
+  for (const [pid, pts] of playerTotals) {
+    if (pts > bestPoints) { bestPoints = pts; bestPlayerId = pid }
+  }
+
+  // Lock lineups after matchday + set player of round
   await supabase
     .from('leagues')
-    .update({ lineup_locked: true, current_stage: 'group_stage' })
+    .update({
+      lineup_locked: true,
+      current_stage: 'group_stage',
+      ...(bestPlayerId ? { player_of_round_id: bestPlayerId } : {}),
+    } as Record<string, unknown>)
     .eq('id', TEST_LEAGUE_ID)
 
   return NextResponse.json({

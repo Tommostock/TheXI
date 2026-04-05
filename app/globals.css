@@ -169,6 +169,46 @@ body {
   transform: translateY(0);
 }
 
+/* Confetti burst for #1 on leaderboard */
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
+}
+.confetti-container {
+  position: relative;
+  overflow: hidden;
+}
+.confetti-container::before,
+.confetti-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  animation: confetti-fall 1.5s ease-out forwards;
+  pointer-events: none;
+}
+.confetti-container::before {
+  left: 20%;
+  background: #FFD700;
+  animation-delay: 0.1s;
+}
+.confetti-container::after {
+  right: 25%;
+  background: #6200EE;
+  animation-delay: 0.3s;
+}
+
+/* Points score shake */
+@keyframes score-bump {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.animate-score-bump {
+  animation: score-bump 0.4s ease-out;
+}
+
 /* Section accent bar */
 .section-accent {
   position: relative;

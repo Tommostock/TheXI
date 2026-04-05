@@ -1,7 +1,9 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { LeaderboardView } from '@/components/league/LeaderboardView'
+import { Trophy } from 'lucide-react'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import { OnboardingTip } from '@/components/ui/OnboardingTip'
+import { PullToRefresh } from '@/components/ui/PullToRefresh'
 
 export default async function LeaderboardPage() {
   const { user, supabase } = await requireUser()
@@ -17,14 +19,24 @@ export default async function LeaderboardPage() {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-display text-white">Leaderboard</h1>
-        <p className="mt-4 text-center text-text-secondary">
-          Join a league to see standings.
-        </p>
+        <div className="mt-4 rounded-xl border border-dashed border-border p-10 text-center">
+          <Trophy size={40} className="mx-auto text-wc-gold/40 mb-3" />
+          <p className="text-white font-medium">No standings yet</p>
+          <p className="mt-1 text-sm text-text-secondary">Join a league to see how you rank against your mates.</p>
+        </div>
       </div>
     )
   }
 
   const leagueId = memberships[0].league_id
+
+  const { data: leagueData } = await supabase
+    .from('leagues')
+    .select('player_of_round_id')
+    .eq('id', leagueId)
+    .single()
+
+  const playerOfRoundId = (leagueData as Record<string, unknown>)?.player_of_round_id as string | null
 
   const { data: members } = await supabase
     .from('league_members')
@@ -87,6 +99,7 @@ export default async function LeaderboardPage() {
     .reduce((sum, s) => sum + (s.playerPoints > 0 ? 1 : 0), 0) || 0
 
   return (
+    <PullToRefresh>
     <div className="p-4">
       <h1 className="mb-3 text-2xl font-display text-white">Leaderboard</h1>
 
@@ -104,7 +117,8 @@ export default async function LeaderboardPage() {
         <p className="text-5xl font-display text-wc-gold">£60</p>
         <p className="mt-2 text-xs text-text-secondary">Winner takes all</p>
       </div>
-      <LeaderboardView rankings={rankings} currentUserId={user.id} />
+      <LeaderboardView rankings={rankings} currentUserId={user.id} playerOfRoundId={playerOfRoundId} />
     </div>
+    </PullToRefresh>
   )
 }

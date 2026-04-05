@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Crown } from 'lucide-react'
 
 type SquadPlayer = {
   isStarting: boolean
@@ -42,9 +42,11 @@ const POS_BG: Record<string, string> = {
 export function LeaderboardView({
   rankings,
   currentUserId,
+  playerOfRoundId = null,
 }: {
   rankings: Ranking[]
   currentUserId: string
+  playerOfRoundId?: string | null
 }) {
   const [expanded, setExpanded] = useState<string | null>(null)
 
@@ -81,7 +83,7 @@ export function LeaderboardView({
               }
               className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left card-hover ${
                 rank === 1
-                  ? 'border-wc-gold/40 bg-gradient-to-r from-wc-gold/10 to-transparent'
+                  ? 'border-wc-gold/40 bg-gradient-to-r from-wc-gold/10 to-transparent confetti-container'
                   : 'border-border bg-bg-card'
               } ${isMe ? 'ring-1 ring-wc-purple/30' : ''}`}
             >
@@ -165,6 +167,10 @@ export function LeaderboardView({
                         <span className="flex-1 truncate text-xs font-medium text-white">
                           {s.player!.name}
                         </span>
+                        {/* Player of the Round crown */}
+                        {s.player!.id === playerOfRoundId && (
+                          <Crown size={12} className="text-wc-gold shrink-0" />
+                        )}
                         {/* Captain / VC badge */}
                         {isCap && (
                           <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-[7px] font-bold text-black">C</span>

@@ -1,7 +1,9 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { ActivityFeed } from '@/components/league/ActivityFeed'
 import { LoadingShell } from '@/components/ui/LoadingShell'
+import { Newspaper } from 'lucide-react'
 import { OnboardingTip } from '@/components/ui/OnboardingTip'
+import { PullToRefresh } from '@/components/ui/PullToRefresh'
 
 export default async function FeedPage() {
   const { user, supabase } = await requireUser()
@@ -17,9 +19,11 @@ export default async function FeedPage() {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-display text-white">Activity Feed</h1>
-        <p className="mt-4 text-center text-text-secondary">
-          Join a league to see activity.
-        </p>
+        <div className="mt-4 rounded-xl border border-dashed border-border p-10 text-center">
+          <Newspaper size={40} className="mx-auto text-wc-peach/40 mb-3" />
+          <p className="text-white font-medium">No activity yet</p>
+          <p className="mt-1 text-sm text-text-secondary">Join a league to see draft picks, goals, and score updates.</p>
+        </div>
       </div>
     )
   }
@@ -34,6 +38,7 @@ export default async function FeedPage() {
     .limit(50)
 
   return (
+    <PullToRefresh>
     <div className="p-4">
       <h1 className="mb-4 text-2xl font-display text-white">Activity Feed</h1>
       <div className="mb-3">
@@ -45,5 +50,6 @@ export default async function FeedPage() {
       </div>
       <ActivityFeed leagueId={leagueId} initialEvents={events || []} />
     </div>
+    </PullToRefresh>
   )
 }

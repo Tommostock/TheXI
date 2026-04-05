@@ -18,6 +18,7 @@ import type { Tables } from '@/types/database.types'
 import { Clock, Check, Zap } from 'lucide-react'
 import { showToast } from '@/components/ui/Toast'
 import { DraftTimer } from './DraftTimer'
+import { DraftOrderReveal } from './DraftOrderReveal'
 
 type Player = Tables<'players'>
 type LeagueMember = Tables<'league_members'>
@@ -52,6 +53,10 @@ export function DraftBoard({
   const [error, setError] = useState('')
   const [showPicker, setShowPicker] = useState(false)
   const [pendingPlayer, setPendingPlayer] = useState<Player | null>(null)
+  const [showReveal, setShowReveal] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return !localStorage.getItem(`draft-reveal-${leagueId}`) && initialPicks.length === 0
+  })
 
   const memberMap = useMemo(() => {
     const map = new Map<string, LeagueMember>()
@@ -160,6 +165,21 @@ export function DraftBoard({
 
   function cancelPick() {
     setPendingPlayer(null)
+  }
+
+  if (showReveal) {
+    const nameMap: Record<string, string> = {}
+    members.forEach((m) => { nameMap[m.user_id] = m.display_name })
+    return (
+      <DraftOrderReveal
+        draftOrder={draftOrder}
+        memberNames={nameMap}
+        onComplete={() => {
+          localStorage.setItem(`draft-reveal-${leagueId}`, '1')
+          setShowReveal(false)
+        }}
+      />
+    )
   }
 
   return (

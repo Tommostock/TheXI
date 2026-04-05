@@ -1,7 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { getNextOpponent } from '@/lib/tournament/schedule'
 import { getShortName } from '@/lib/utils/names'
+
+const EVENT_LABELS: Record<string, string> = {
+  goal: 'Goal', assist: 'Assist', clean_sheet: 'Clean Sheet',
+  appearance_full: 'Played 60+', appearance_sub: 'Played <60',
+  yellow: 'Yellow Card', red: 'Red Card', own_goal: 'Own Goal',
+  penalty_save: 'Pen Save',
+}
 
 type SquadSlot = {
   id: string
@@ -12,6 +20,7 @@ type SquadSlot = {
     name: string
     nation: string
     nation_flag_url: string | null
+    photo_url?: string | null
     position: string
     is_eliminated: boolean
   } | null
@@ -61,6 +70,9 @@ function PitchPlayer({
   isViceCaptain = false,
   isSelected = false,
   onTap,
+  events = [],
+  showTooltip = false,
+  onPointsTap,
 }: {
   slot: SquadSlot
   points: number
@@ -68,6 +80,9 @@ function PitchPlayer({
   isViceCaptain?: boolean
   isSelected?: boolean
   onTap?: () => void
+  events?: Array<{ event_type: string; points_awarded: number }>
+  showTooltip?: boolean
+  onPointsTap?: () => void
 }) {
   const player = slot.player
   if (!player) return null
@@ -88,9 +103,13 @@ function PitchPlayer({
         isSelected ? 'scale-110 brightness-125 -translate-y-1' : ''
       } ${onTap ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}
     >
-      {/* Shirt */}
+      {/* Shirt + optional photo */}
       <div className={`relative transition-all duration-200 ${isSelected ? 'ring-2 ring-wc-purple rounded-lg shadow-lg shadow-wc-purple/30' : ''}`}>
-        <PlayerShirt position={shirtPosition} />
+        {player.photo_url ? (
+          <img src={player.photo_url} alt="" className="h-10 w-10 rounded-full object-cover border-2 border-white/30" />
+        ) : (
+          <PlayerShirt position={shirtPosition} />
+        )}
         {/* Captain badge — white bg, black text */}
         {isCaptain && (
           <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-bold text-black shadow">
@@ -139,8 +158,26 @@ function PitchPlayer({
       {(() => {
         const dp = isCaptain ? points * 2 : points
         return (
-          <div className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple">
-            <p className="text-[9px] font-bold text-white">{dp}</p>
+          <div className="relative">
+            <div
+              className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); onPointsTap?.() }}
+            >
+              <p className="text-[9px] font-bold text-white">{dp}</p>
+            </div>
+            {showTooltip && events.length > 0 && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 w-36 rounded-lg border border-border bg-bg-card p-2 shadow-xl animate-fade-in">
+                {events.map((ev, i) => (
+                  <div key={i} className="flex justify-between text-[9px]">
+                    <span className="text-text-secondary">{EVENT_LABELS[ev.event_type] || ev.event_type}</span>
+                    <span className={ev.points_awarded >= 0 ? 'text-wc-peach font-bold' : 'text-wc-crimson font-bold'}>
+                      {ev.points_awarded > 0 ? '+' : ''}{ev.points_awarded}
+                    </span>
+                  </div>
+                ))}
+                {isCaptain && <div className="flex justify-between text-[9px] border-t border-border/30 mt-1 pt-1"><span className="text-wc-gold">Captain x2</span><span className="text-wc-gold font-bold">{dp}</span></div>}
+              </div>
+            )}
           </div>
         )
       })()}
@@ -212,6 +249,7 @@ export function PitchView({
   slots,
   totalPoints,
   playerPoints = {},
+  playerEvents = {},
   captainId = null,
   viceCaptainId = null,
   selectedPlayerId = null,
@@ -222,12 +260,14 @@ export function PitchView({
   slots: SquadSlot[]
   totalPoints: number
   playerPoints?: Record<string, number>
+  playerEvents?: Record<string, Array<{ event_type: string; points_awarded: number }>>
   captainId?: string | null
   viceCaptainId?: string | null
   selectedPlayerId?: string | null
   onPlayerTap?: (playerId: string) => void
   isLocked?: boolean
 }) {
+  const [tooltipPlayerId, setTooltipPlayerId] = useState<string | null>(null)
   const rows = FORMATION_ROWS[formation] || FORMATION_ROWS['4-4-2']
   const starters = slots.filter((s) => s.is_starting)
   const bench = slots.filter((s) => !s.is_starting)
@@ -282,6 +322,9 @@ export function PitchView({
                       isViceCaptain={slot.player?.id === viceCaptainId}
                       isSelected={slot.player?.id === selectedPlayerId}
                       onTap={onPlayerTap && slot.player ? () => onPlayerTap(slot.player!.id) : undefined}
+                      events={playerEvents[slot.player?.id || ''] || []}
+                      showTooltip={tooltipPlayerId === slot.player?.id}
+                      onPointsTap={() => setTooltipPlayerId(tooltipPlayerId === slot.player?.id ? null : slot.player?.id || null)}
                     />
                   ))}
                   {Array.from({ length: Math.max(0, row.count - rowSlots.length) }).map((_, i) => (
