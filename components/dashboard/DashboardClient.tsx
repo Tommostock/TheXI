@@ -6,6 +6,7 @@ import { GROUPS, FIXTURES, type Fixture } from '@/lib/tournament/groups'
 import { SignOutButton } from '@/components/ui/SignOutButton'
 import { HowToPlayButton } from './HowToPlay'
 import { KnockoutBracket } from './KnockoutBracket'
+import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
 type EventRow = {
   match_id: string
@@ -341,6 +342,12 @@ export function DashboardClient({
           <SignOutButton />
         </div>
       </div>
+
+      <OnboardingTip
+        storageKey="dashboard"
+        title="Welcome to The XI!"
+        message="This is your home base. You'll see the countdown to the draft, upcoming World Cup fixtures, group standings, and knockout brackets. Tap the ? icon anytime for the full rules."
+      />
 
       {/* Draft Countdown */}
       <DraftCountdown />

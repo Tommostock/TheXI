@@ -1,6 +1,7 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { LeaderboardView } from '@/components/league/LeaderboardView'
 import { LoadingShell } from '@/components/ui/LoadingShell'
+import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
 export default async function LeaderboardPage() {
   const { user, supabase } = await requireUser()
@@ -88,6 +89,14 @@ export default async function LeaderboardPage() {
   return (
     <div className="p-4">
       <h1 className="mb-3 text-2xl font-display text-white">Leaderboard</h1>
+
+      <div className="mb-3">
+        <OnboardingTip
+          storageKey="leaderboard"
+          title="This is the leaderboard"
+          message="See how you stack up against your mates. Tap any player to see their full squad breakdown. Points update live during matches."
+        />
+      </div>
 
       {/* Prize Pool */}
       <div className="mb-4 rounded-xl border border-wc-gold/30 bg-gradient-to-b from-wc-gold/10 to-transparent p-5 text-center animate-fade-in">

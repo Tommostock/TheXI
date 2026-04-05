@@ -1,6 +1,7 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { ActivityFeed } from '@/components/league/ActivityFeed'
 import { LoadingShell } from '@/components/ui/LoadingShell'
+import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
 export default async function FeedPage() {
   const { user, supabase } = await requireUser()
@@ -35,6 +36,13 @@ export default async function FeedPage() {
   return (
     <div className="p-4">
       <h1 className="mb-4 text-2xl font-display text-white">Activity Feed</h1>
+      <div className="mb-3">
+        <OnboardingTip
+          storageKey="feed"
+          title="This is the activity feed"
+          message="Every draft pick, goal, assist, card and score update appears here in real time. Stay on top of what's happening in your league."
+        />
+      </div>
       <ActivityFeed leagueId={leagueId} initialEvents={events || []} />
     </div>
   )

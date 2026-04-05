@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { PlayerBrowser } from '@/components/draft/PlayerBrowser'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import { StartDraftButton } from '@/components/draft/StartDraftButton'
+import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
 export default async function DraftPage() {
   const { user, supabase } = await requireUser()
@@ -60,6 +61,14 @@ export default async function DraftPage() {
       <p className="mt-1 mb-3 text-sm text-text-secondary shrink-0">
         Browse all available World Cup 2026 players by nation.
       </p>
+
+      <div className="mb-3 shrink-0">
+        <OnboardingTip
+          storageKey="draft"
+          title="This is the Draft Board"
+          message="When the draft begins, you'll take turns picking real World Cup 2026 players for your squad. 15 rounds, snake order. You'll get a notification when it's your turn."
+        />
+      </div>
 
       {/* Start Draft button — shows when there's a pre-draft league */}
       {preDraftLeague && memberCount >= 2 && (

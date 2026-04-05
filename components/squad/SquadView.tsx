@@ -5,6 +5,7 @@ import { changeFormation, toggleStarting, setCaptain, saveTeamName } from '@/lib
 import { PitchView } from './PitchView'
 import { PlayerDetailCard } from '@/components/ui/PlayerDetailCard'
 import { ArrowUpDown, Info } from 'lucide-react'
+import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
 type SquadSlot = {
   id: string
@@ -439,6 +440,12 @@ export function SquadView({
 
   return (
     <div className="flex flex-col gap-1.5">
+      <OnboardingTip
+        storageKey="squad"
+        title="This is your squad"
+        message="Choose your formation, set your Starting XI and bench, then pick a Captain (x2 points) and Vice Captain. Tap a player to swap or assign roles."
+      />
+
       {/* Lock Banner */}
       {isLocked && (
         <div className="rounded-lg border border-wc-crimson/30 bg-wc-crimson/5 px-3 py-3 text-center">
