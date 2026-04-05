@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import webpush from 'web-push'
 import {
   getCurrentDraftState,
   canDraftPosition,
@@ -208,6 +209,35 @@ export async function POST(request: Request) {
   }
 
   const finalState = getCurrentDraftState(draftOrder, currentPicks)
+
+  // Notify Tom if it's his turn now
+  if (botPicksMade > 0 && finalState.currentPickerUserId === TOM_ID && !finalState.isComplete) {
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    const privateKey = process.env.VAPID_PRIVATE_KEY
+    if (publicKey && privateKey) {
+      webpush.setVapidDetails('mailto:hello@thexi.app', publicKey, privateKey)
+      const { data: subs } = await supabase
+        .from('push_subscriptions')
+        .select('id, endpoint, p256dh, auth')
+        .eq('user_id', TOM_ID)
+
+      if (subs?.length) {
+        const payload = JSON.stringify({
+          title: 'The XI — Your Pick!',
+          body: `It's your turn to pick! (Round ${finalState.currentRound})`,
+          url: `/draft/${TEST_LEAGUE_ID}`,
+        })
+        await Promise.allSettled(
+          subs.map((sub) =>
+            webpush.sendNotification(
+              { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+              payload
+            )
+          )
+        )
+      }
+    }
+  }
 
   return NextResponse.json({
     message: botPicksMade > 0 ? `Bots made ${botPicksMade} pick(s)` : "It's your turn to pick",
