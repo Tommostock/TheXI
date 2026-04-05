@@ -146,6 +146,7 @@ export type Database = {
       draft_windows: {
         Row: {
           closes_at: string | null
+          current_pick_deadline: string | null
           id: string
           league_id: string
           opens_at: string | null
@@ -154,6 +155,7 @@ export type Database = {
         }
         Insert: {
           closes_at?: string | null
+          current_pick_deadline?: string | null
           id?: string
           league_id: string
           opens_at?: string | null
@@ -162,6 +164,7 @@ export type Database = {
         }
         Update: {
           closes_at?: string | null
+          current_pick_deadline?: string | null
           id?: string
           league_id?: string
           opens_at?: string | null
@@ -218,7 +221,12 @@ export type Database = {
           created_at: string
           created_by: string
           current_stage: string
+          draft_active_end: number
+          draft_active_start: number
           draft_order: Json | null
+          draft_pick_window_minutes: number
+          draft_reminder_sent: boolean
+          draft_start_time: string | null
           draft_status: Database["public"]["Enums"]["draft_status_type"]
           id: string
           invite_code: string
@@ -228,7 +236,12 @@ export type Database = {
           created_at?: string
           created_by: string
           current_stage?: string
+          draft_active_end?: number
+          draft_active_start?: number
           draft_order?: Json | null
+          draft_pick_window_minutes?: number
+          draft_reminder_sent?: boolean
+          draft_start_time?: string | null
           draft_status?: Database["public"]["Enums"]["draft_status_type"]
           id?: string
           invite_code: string
@@ -238,7 +251,12 @@ export type Database = {
           created_at?: string
           created_by?: string
           current_stage?: string
+          draft_active_end?: number
+          draft_active_start?: number
           draft_order?: Json | null
+          draft_pick_window_minutes?: number
+          draft_reminder_sent?: boolean
+          draft_start_time?: string | null
           draft_status?: Database["public"]["Enums"]["draft_status_type"]
           id?: string
           invite_code?: string

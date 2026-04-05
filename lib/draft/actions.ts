@@ -9,6 +9,12 @@ import {
   TOTAL_ROUNDS,
   type DraftPick,
 } from './logic'
+import {
+  calculatePickDeadline,
+  DEFAULT_ACTIVE_START,
+  DEFAULT_ACTIVE_END,
+  DEFAULT_PICK_WINDOW_MINUTES,
+} from './activeHours'
 import { sendPushToUser } from '@/lib/notifications/push'
 import { autoAssignStartingXI } from '@/lib/squad/actions'
 
@@ -70,12 +76,19 @@ export async function startDraft(leagueId: string) {
 
   if (error) return { error: error.message }
 
-  // Create initial draft window
+  // Calculate deadline for the first picker
+  const windowMinutes = (league as Record<string, unknown>).draft_pick_window_minutes as number ?? DEFAULT_PICK_WINDOW_MINUTES
+  const activeStart = (league as Record<string, unknown>).draft_active_start as number ?? DEFAULT_ACTIVE_START
+  const activeEnd = (league as Record<string, unknown>).draft_active_end as number ?? DEFAULT_ACTIVE_END
+  const firstDeadline = calculatePickDeadline(new Date(), windowMinutes, activeStart, activeEnd)
+
+  // Create initial draft window with deadline
   await supabase.from('draft_windows').insert({
     league_id: leagueId,
     window_type: 'initial',
     status: 'active',
     opens_at: new Date().toISOString(),
+    current_pick_deadline: firstDeadline.toISOString(),
   })
 
   // Activity feed
@@ -205,15 +218,27 @@ export async function makePick(leagueId: string, playerId: string) {
     player_id: playerId,
   })
 
-  // Notify the next picker
+  // Notify the next picker and update deadline
   const totalPicksNeeded = TOTAL_ROUNDS * draftOrder.length
   const newPickCount = picks.length + 1
+  const windowMinutes = (league as Record<string, unknown>).draft_pick_window_minutes as number ?? DEFAULT_PICK_WINDOW_MINUTES
+  const activeStart = (league as Record<string, unknown>).draft_active_start as number ?? DEFAULT_ACTIVE_START
+  const activeEnd = (league as Record<string, unknown>).draft_active_end as number ?? DEFAULT_ACTIVE_END
 
   if (newPickCount < totalPicksNeeded) {
     const nextRound = Math.floor(newPickCount / draftOrder.length) + 1
     const nextPosInRound = newPickCount % draftOrder.length
     const nextRoundOrder = getPickOrderForRound(draftOrder, nextRound)
     const nextPickerUserId = nextRoundOrder[nextPosInRound]
+
+    // Refresh deadline for the next picker
+    const nextDeadline = calculatePickDeadline(new Date(), windowMinutes, activeStart, activeEnd)
+    await supabase
+      .from('draft_windows')
+      .update({ current_pick_deadline: nextDeadline.toISOString() })
+      .eq('league_id', leagueId)
+      .eq('window_type', 'initial')
+      .eq('status', 'active')
 
     if (nextPickerUserId && nextPickerUserId !== user.id) {
       sendPushToUser(nextPickerUserId, {

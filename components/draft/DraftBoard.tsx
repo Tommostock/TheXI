@@ -17,6 +17,7 @@ import {
 import type { Tables } from '@/types/database.types'
 import { Clock, Check, Zap } from 'lucide-react'
 import { showToast } from '@/components/ui/Toast'
+import { DraftTimer } from './DraftTimer'
 
 type Player = Tables<'players'>
 type LeagueMember = Tables<'league_members'>
@@ -35,6 +36,7 @@ export function DraftBoard({
   initialPicks,
   members,
   players,
+  pickDeadline,
 }: {
   leagueId: string
   draftOrder: string[]
@@ -42,8 +44,10 @@ export function DraftBoard({
   initialPicks: DraftPick[]
   members: LeagueMember[]
   players: Player[]
+  pickDeadline: string | null
 }) {
   const [picks, setPicks] = useState<DraftPick[]>(initialPicks)
+  const [currentDeadline, setCurrentDeadline] = useState<string | null>(pickDeadline)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPicker, setShowPicker] = useState(false)
@@ -73,7 +77,7 @@ export function DraftBoard({
     [currentUserId, picks]
   )
 
-  // Realtime subscription for new picks
+  // Realtime subscriptions for picks and deadline updates
   useEffect(() => {
     const supabase = createClient()
     const channel = supabase
@@ -88,7 +92,6 @@ export function DraftBoard({
         },
         async (payload) => {
           const newPick = payload.new as DraftPick
-          // Fetch the player data for this pick
           const { data: player } = await supabase
             .from('players')
             .select('id, name, nation, nation_flag_url, position')
@@ -101,6 +104,19 @@ export function DraftBoard({
             return [...prev, fullPick as DraftPick]
           })
           setShowPicker(false)
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'draft_windows',
+          filter: `league_id=eq.${leagueId}`,
+        },
+        (payload) => {
+          const updated = payload.new as { current_pick_deadline: string | null }
+          setCurrentDeadline(updated.current_pick_deadline)
         }
       )
       .subscribe()
@@ -203,6 +219,16 @@ export function DraftBoard({
           </>
         )}
       </div>
+
+      {!draftState.isComplete && (
+        <DraftTimer
+          expiresAt={currentDeadline}
+          isYourTurn={isMyTurn}
+          currentPicker={
+            memberMap.get(draftState.currentPickerUserId!)?.display_name || 'Unknown'
+          }
+        />
+      )}
 
       {error && (
         <p className="rounded border border-wc-crimson/30 bg-wc-crimson/10 p-2 text-center text-sm text-wc-crimson">

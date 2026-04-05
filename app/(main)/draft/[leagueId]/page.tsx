@@ -59,6 +59,15 @@ export default async function DraftLeaguePage({
     .eq('is_eliminated', false)
     .order('name', { ascending: true })
 
+  // Get current pick deadline from the active draft window
+  const { data: draftWindow } = await supabase
+    .from('draft_windows')
+    .select('current_pick_deadline')
+    .eq('league_id', leagueId)
+    .eq('window_type', 'initial')
+    .eq('status', 'active')
+    .single()
+
   return (
     <div className="p-4">
       <h1 className="mb-1 text-xl font-bold text-white">{league.name}</h1>
@@ -70,6 +79,7 @@ export default async function DraftLeaguePage({
         initialPicks={(picks || []) as unknown as DraftPick[]}
         members={members || []}
         players={players || []}
+        pickDeadline={draftWindow?.current_pick_deadline ?? null}
       />
     </div>
   )
