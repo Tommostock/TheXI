@@ -6,9 +6,9 @@ export default function MainLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(4rem + max(env(safe-area-inset-bottom), 12px))' }}>{children}</main>
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <main className="flex-1 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(4rem + max(env(safe-area-inset-bottom), 12px))' }}>{children}</main>
       <BottomNav />
-    </>
+    </div>
   )
 }

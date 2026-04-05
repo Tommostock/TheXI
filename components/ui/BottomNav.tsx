@@ -22,7 +22,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-bg-card/95 backdrop-blur-sm" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)', height: 'calc(4rem + max(env(safe-area-inset-bottom), 8px))' }}>
+    <nav className="shrink-0 z-50 flex items-center justify-around border-t border-border bg-bg-card" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)', height: 'calc(4rem + max(env(safe-area-inset-bottom), 8px))' }}>
       {navItems.map((item) => {
         const isActive = pathname.startsWith(item.href)
         const Icon = item.icon

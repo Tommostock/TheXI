@@ -200,3 +200,17 @@ export async function setCaptain(
   if (error) return { error: error.message }
   return { success: true }
 }
+
+export async function saveTeamName(leagueId: string, teamName: string) {
+  const { user, supabase } = await getActionUser()
+  if (!user) return { error: 'Not signed in' }
+
+  const { error } = await supabase
+    .from('league_members')
+    .update({ team_name: teamName.trim().slice(0, 25) })
+    .eq('league_id', leagueId)
+    .eq('user_id', user.id)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}

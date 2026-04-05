@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { changeFormation, toggleStarting, setCaptain } from '@/lib/squad/actions'
+import { changeFormation, toggleStarting, setCaptain, saveTeamName } from '@/lib/squad/actions'
 import { PitchView } from './PitchView'
 import { PlayerDetailCard } from '@/components/ui/PlayerDetailCard'
 import { ArrowUpDown, Info } from 'lucide-react'
@@ -441,9 +441,12 @@ export function SquadView({
     <div className="flex flex-col gap-1.5">
       {/* Lock Banner */}
       {isLocked && (
-        <div className="rounded-lg border border-wc-crimson/30 bg-wc-crimson/5 px-3 py-2 text-center">
-          <p className="text-[10px] font-medium text-wc-crimson">
-            Lineup locked — changes allowed at next draft window
+        <div className="rounded-lg border border-wc-crimson/30 bg-wc-crimson/5 px-3 py-3 text-center">
+          <p className="text-xs font-semibold text-wc-crimson">
+            Lineup Locked
+          </p>
+          <p className="text-[10px] text-wc-crimson/70 mt-0.5">
+            Formation and squad changes are locked during the match round. Changes will be available between matchdays.
           </p>
         </div>
       )}
@@ -468,22 +471,24 @@ export function SquadView({
         </button>
       </div>
 
-      {/* Formation selector */}
-      <div className="flex gap-1">
-        {FORMATIONS.map((f) => (
-          <button
-            key={f}
-            onClick={() => handleFormationChange(f)}
-            className={`flex-1 rounded-md border py-1.5 text-center text-[11px] font-bold transition-colors ${
-              formation === f
-                ? 'border-wc-purple bg-wc-purple/15 text-white'
-                : 'border-border text-text-secondary hover:border-text-secondary'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      {/* Formation selector — hidden when locked */}
+      {!isLocked && (
+        <div className="flex gap-1">
+          {FORMATIONS.map((f) => (
+            <button
+              key={f}
+              onClick={() => handleFormationChange(f)}
+              className={`flex-1 rounded-md border py-1.5 text-center text-[11px] font-bold transition-colors ${
+                formation === f
+                  ? 'border-wc-purple bg-wc-purple/15 text-white'
+                  : 'border-border text-text-secondary hover:border-text-secondary'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Team Name + Points — centred */}
       <div className="text-center py-1">
@@ -492,8 +497,8 @@ export function SquadView({
             type="text"
             value={localTeamName}
             onChange={(e) => setLocalTeamName(e.target.value)}
-            onBlur={() => setEditingTeamName(false)}
-            onKeyDown={(e) => { if (e.key === 'Enter') setEditingTeamName(false) }}
+            onBlur={() => { setEditingTeamName(false); saveTeamName(leagueId, localTeamName) }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { setEditingTeamName(false); saveTeamName(leagueId, localTeamName) } }}
             maxLength={25}
             autoFocus
             className="bg-transparent text-xl font-team text-white border-b border-wc-purple outline-none text-center w-56"

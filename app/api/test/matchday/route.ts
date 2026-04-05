@@ -244,10 +244,17 @@ export async function POST(request: Request) {
     })
   }
 
+  // Lock lineups after matchday
+  await supabase
+    .from('leagues')
+    .update({ lineup_locked: true, current_stage: 'group_stage' })
+    .eq('id', TEST_LEAGUE_ID)
+
   return NextResponse.json({
     message: 'Matchday 1 simulated',
     events_created: matchEvents.length,
     score_updates: scoreUpdates,
     captain_testing: 'Captain points are doubled in score calculation',
+    lineup_locked: true,
   })
 }

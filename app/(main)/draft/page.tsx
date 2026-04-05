@@ -22,10 +22,15 @@ export default async function DraftPage() {
     return [l]
   }) || []
 
-  // Redirect to active draft if one exists
+  // Redirect to active or completed draft if one exists
   const activeDraft = allLeagues.find((l) => l.draft_status === 'in_progress')
   if (activeDraft) {
     redirect(`/draft/${activeDraft.id}`)
+  }
+
+  const completedDraft = allLeagues.find((l) => l.draft_status === 'completed')
+  if (completedDraft) {
+    redirect(`/draft/${completedDraft.id}`)
   }
 
   // Check for pre-draft league where user is creator

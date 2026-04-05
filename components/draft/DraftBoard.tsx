@@ -46,6 +46,7 @@ export function DraftBoard({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPicker, setShowPicker] = useState(false)
+  const [pendingPlayer, setPendingPlayer] = useState<Player | null>(null)
 
   const memberMap = useMemo(() => {
     const map = new Map<string, LeagueMember>()
@@ -108,7 +109,7 @@ export function DraftBoard({
     }
   }, [leagueId])
 
-  async function handlePick(player: Player) {
+  function handlePlayerSelect(player: Player) {
     if (!isMyTurn || loading) return
 
     // Check position is allowed
@@ -117,13 +118,31 @@ export function DraftBoard({
       return
     }
 
+    // Check nation limit — show feedback instead of silent rejection
+    const userPicks = picks.filter((p) => p.user_id === currentUserId)
+    const nationCount = userPicks.filter((p) => p.player?.nation === player.nation).length
+    if (nationCount >= 3) {
+      setError(`You already have 3 players from ${player.nation} — that's the limit`)
+      return
+    }
+
     setError('')
+    setPendingPlayer(player)
+  }
+
+  async function confirmPick() {
+    if (!pendingPlayer || loading) return
     setLoading(true)
-    const result = await makePick(leagueId, player.id)
+    const result = await makePick(leagueId, pendingPlayer.id)
     if (result.error) {
       setError(result.error)
     }
+    setPendingPlayer(null)
     setLoading(false)
+  }
+
+  function cancelPick() {
+    setPendingPlayer(null)
   }
 
   return (
@@ -191,7 +210,32 @@ export function DraftBoard({
       )}
 
       {/* Pick Button / Player Browser */}
-      {isMyTurn && !draftState.isComplete && (
+      {/* Confirmation Popup */}
+      {pendingPlayer && (
+        <div className="rounded-xl border border-wc-purple/40 bg-bg-card p-4">
+          <p className="text-center text-xs text-text-secondary mb-1">Confirm your pick</p>
+          <p className="text-center text-lg font-bold text-white">{pendingPlayer.name}</p>
+          <p className="text-center text-sm text-text-secondary">{pendingPlayer.nation} &middot; {pendingPlayer.position}</p>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={cancelPick}
+              disabled={loading}
+              className="flex-1 rounded-lg border border-border py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:text-white disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmPick}
+              disabled={loading}
+              className="flex-1 rounded-lg bg-wc-peach py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {loading ? 'Picking...' : 'Confirm'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isMyTurn && !draftState.isComplete && !pendingPlayer && (
         <>
           {showPicker ? (
             <div>
@@ -211,7 +255,7 @@ export function DraftBoard({
                   allowedPositions.includes(p.position)
                 )}
                 excludeIds={draftedPlayerIds}
-                onSelect={handlePick}
+                onSelect={handlePlayerSelect}
               />
               {loading && (
                 <p className="mt-2 text-center text-sm text-text-secondary">
