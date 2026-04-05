@@ -16,6 +16,7 @@ import {
 } from '@/lib/draft/logic'
 import type { Tables } from '@/types/database.types'
 import { Clock, Check, Zap } from 'lucide-react'
+import { showToast } from '@/components/ui/Toast'
 
 type Player = Tables<'players'>
 type LeagueMember = Tables<'league_members'>
@@ -114,15 +115,15 @@ export function DraftBoard({
 
     // Check position is allowed
     if (!allowedPositions.includes(player.position)) {
-      setError(`Cannot draft more ${player.position} players`)
+      showToast(`Cannot draft more ${player.position} players`)
       return
     }
 
-    // Check nation limit — show feedback instead of silent rejection
+    // Check nation limit — show toast feedback
     const userPicks = picks.filter((p) => p.user_id === currentUserId)
     const nationCount = userPicks.filter((p) => p.player?.nation === player.nation).length
     if (nationCount >= 3) {
-      setError(`You already have 3 players from ${player.nation} — that's the limit`)
+      showToast(`You already have 3 players from ${player.nation} — that's the limit`)
       return
     }
 
@@ -210,27 +211,32 @@ export function DraftBoard({
       )}
 
       {/* Pick Button / Player Browser */}
-      {/* Confirmation Popup */}
+      {/* Confirmation Overlay — fixed so it floats wherever user has scrolled */}
       {pendingPlayer && (
-        <div className="rounded-xl border border-wc-purple/40 bg-bg-card p-4">
-          <p className="text-center text-xs text-text-secondary mb-1">Confirm your pick</p>
-          <p className="text-center text-lg font-bold text-white">{pendingPlayer.name}</p>
-          <p className="text-center text-sm text-text-secondary">{pendingPlayer.nation} &middot; {pendingPlayer.position}</p>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={cancelPick}
-              disabled={loading}
-              className="flex-1 rounded-lg border border-border py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:text-white disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmPick}
-              disabled={loading}
-              className="flex-1 rounded-lg bg-wc-peach py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            >
-              {loading ? 'Picking...' : 'Confirm'}
-            </button>
+        <div className="fixed inset-0 z-[90] flex items-end justify-center pb-24 px-4" onClick={cancelPick}>
+          <div
+            className="w-full max-w-sm rounded-xl border border-wc-purple/40 bg-bg-card p-4 shadow-2xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-center text-xs text-text-secondary mb-1">Confirm your pick</p>
+            <p className="text-center text-lg font-bold text-white">{pendingPlayer.name}</p>
+            <p className="text-center text-sm text-text-secondary">{pendingPlayer.nation} &middot; {pendingPlayer.position}</p>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={cancelPick}
+                disabled={loading}
+                className="flex-1 rounded-lg border border-border py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPick}
+                disabled={loading}
+                className="flex-1 rounded-lg bg-wc-peach py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {loading ? 'Picking...' : 'Confirm'}
+              </button>
+            </div>
           </div>
         </div>
       )}

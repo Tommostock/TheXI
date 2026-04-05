@@ -446,7 +446,7 @@ export function SquadView({
             Lineup Locked
           </p>
           <p className="text-[10px] text-wc-crimson/70 mt-0.5">
-            Formation and squad changes are locked during the match round. Changes will be available between matchdays.
+            Formation and squad changes are locked during this round. Changes will be available between rounds (e.g. after Group Stage ends, before R32 begins).
           </p>
         </div>
       )}
