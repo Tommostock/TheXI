@@ -41,15 +41,15 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {!hasLeague && (
+        <div className="px-4 pt-4">
+          <JoinLeague />
+        </div>
+      )}
       <DashboardClient
         displayName={displayName}
         eventsByMatch={eventsByMatch}
       />
-      {!hasLeague && (
-        <div className="px-4 pb-4">
-          <JoinLeague />
-        </div>
-      )}
     </>
   )
 }
