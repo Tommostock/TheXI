@@ -1,6 +1,7 @@
 import { requireUser } from '@/lib/supabase/auth'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import { DashboardClient } from '@/components/dashboard/DashboardClient'
+import { JoinLeague } from '@/components/league/JoinLeague'
 
 export default async function DashboardPage() {
   const { user, supabase } = await requireUser()
@@ -8,6 +9,15 @@ export default async function DashboardPage() {
 
   const displayName =
     user.user_metadata?.display_name || user.email?.split('@')[0] || 'Player'
+
+  // Check if user is in a league
+  const { data: memberships } = await supabase
+    .from('league_members')
+    .select('league_id')
+    .eq('user_id', user.id)
+    .limit(1)
+
+  const hasLeague = (memberships?.length || 0) > 0
 
   // Get match events keyed by fixture id for result details
   const { data: matchEvents } = await supabase
@@ -30,9 +40,16 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DashboardClient
-      displayName={displayName}
-      eventsByMatch={eventsByMatch}
-    />
+    <>
+      <DashboardClient
+        displayName={displayName}
+        eventsByMatch={eventsByMatch}
+      />
+      {!hasLeague && (
+        <div className="px-4 pb-4">
+          <JoinLeague />
+        </div>
+      )}
+    </>
   )
 }

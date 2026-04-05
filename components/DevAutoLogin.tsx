@@ -11,6 +11,12 @@ export function DevAutoLogin() {
   const [status, setStatus] = useState<'checking' | 'signing-in' | 'done'>('checking')
 
   useEffect(() => {
+    // Only auto-login in local dev, not on Vercel
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+      setStatus('done')
+      return
+    }
+
     const supabase = createClient()
 
     async function autoLogin() {

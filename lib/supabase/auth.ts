@@ -1,8 +1,8 @@
 import { createClient } from './server'
 import { redirect } from 'next/navigation'
 
-// DEV_MODE: set to false before deploy to re-enable auth redirects
-const DEV_MODE = true
+// DEV_MODE: only active in local dev, not on Vercel
+const DEV_MODE = !process.env.VERCEL
 
 /**
  * Get the current authenticated user for pages.

@@ -66,7 +66,7 @@ export async function createLeague(formData: FormData) {
     return { error: memberError.message }
   }
 
-  redirect(`/league/${league.id}`)
+  redirect(`/dashboard`)
 }
 
 export async function joinLeague(formData: FormData) {
@@ -136,5 +136,5 @@ export async function joinLeague(formData: FormData) {
     .update({ draft_order: newOrder })
     .eq('id', league.id)
 
-  redirect(`/league/${league.id}`)
+  redirect(`/dashboard`)
 }
