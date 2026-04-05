@@ -5,9 +5,11 @@ import {
   getCurrentDraftState,
   canDraftPosition,
   canDraftFromNation,
+  getPickOrderForRound,
   TOTAL_ROUNDS,
   type DraftPick,
 } from './logic'
+import { sendPushToUser } from '@/lib/notifications/push'
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]
@@ -82,6 +84,16 @@ export async function startDraft(leagueId: string) {
     description: 'The draft has begun! Good luck.',
     user_id: user.id,
   })
+
+  // Notify the first picker
+  const firstPicker = randomOrder[0]
+  if (firstPicker && firstPicker !== user.id) {
+    sendPushToUser(firstPicker, {
+      title: 'The XI — Draft Started!',
+      body: `The draft has begun in ${league.name}! You pick first!`,
+      url: `/draft/${leagueId}`,
+    }).catch(() => {})
+  }
 
   return { success: true }
 }
@@ -192,9 +204,26 @@ export async function makePick(leagueId: string, playerId: string) {
     player_id: playerId,
   })
 
-  // Check if draft is now complete
+  // Notify the next picker
   const totalPicksNeeded = TOTAL_ROUNDS * draftOrder.length
   const newPickCount = picks.length + 1
+
+  if (newPickCount < totalPicksNeeded) {
+    const nextRound = Math.floor(newPickCount / draftOrder.length) + 1
+    const nextPosInRound = newPickCount % draftOrder.length
+    const nextRoundOrder = getPickOrderForRound(draftOrder, nextRound)
+    const nextPickerUserId = nextRoundOrder[nextPosInRound]
+
+    if (nextPickerUserId && nextPickerUserId !== user.id) {
+      sendPushToUser(nextPickerUserId, {
+        title: 'The XI — Your Pick!',
+        body: `It's your turn to pick! (Round ${nextRound})`,
+        url: `/draft/${leagueId}`,
+      }).catch(() => {})
+    }
+  }
+
+  // Check if draft is now complete
   if (newPickCount >= totalPicksNeeded) {
     await supabase
       .from('leagues')
