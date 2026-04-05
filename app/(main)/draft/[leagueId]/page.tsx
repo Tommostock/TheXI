@@ -4,6 +4,8 @@ import { DraftBoard } from '@/components/draft/DraftBoard'
 import type { DraftPick } from '@/lib/draft/logic'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DraftLeaguePage({
   params,
 }: {

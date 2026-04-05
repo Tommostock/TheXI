@@ -158,7 +158,7 @@ function PitchPlayer({
       {(() => {
         const dp = isCaptain ? points * 2 : points
         return (
-          <div className="relative">
+          <div className="relative w-full">
             <div
               className="rounded-b-md w-full text-center py-0.5 -mt-px bg-wc-purple cursor-pointer"
               onClick={(e) => { e.stopPropagation(); onPointsTap?.() }}

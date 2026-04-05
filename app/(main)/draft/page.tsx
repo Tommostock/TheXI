@@ -5,6 +5,8 @@ import { LoadingShell } from '@/components/ui/LoadingShell'
 import { StartDraftButton } from '@/components/draft/StartDraftButton'
 import { OnboardingTip } from '@/components/ui/OnboardingTip'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DraftPage() {
   const { user, supabase } = await requireUser()
   if (!user) return <LoadingShell />
