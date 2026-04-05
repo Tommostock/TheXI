@@ -11,10 +11,10 @@ export default async function DraftPage() {
   // Find user's leagues
   const { data: memberships } = await supabase
     .from('league_members')
-    .select('league_id, leagues(id, name, draft_status, created_by)')
+    .select('league_id, leagues(id, name, draft_status, created_by, draft_start_time)')
     .eq('user_id', user.id)
 
-  type LeagueJoin = { id: string; name: string; draft_status: string; created_by: string }
+  type LeagueJoin = { id: string; name: string; draft_status: string; created_by: string; draft_start_time?: string }
 
   const allLeagues = memberships?.flatMap((m) => {
     const l = m.leagues as unknown as LeagueJoin | null

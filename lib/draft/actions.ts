@@ -10,6 +10,7 @@ import {
   type DraftPick,
 } from './logic'
 import { sendPushToUser } from '@/lib/notifications/push'
+import { autoAssignStartingXI } from '@/lib/squad/actions'
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]
@@ -241,6 +242,18 @@ export async function makePick(leagueId: string, playerId: string) {
       event_type: 'draft_pick',
       description: 'The draft is complete! Set your formations.',
     })
+
+    // Auto-assign starting XI for all members based on their formation
+    const { data: allMembers } = await supabase
+      .from('league_members')
+      .select('user_id, formation')
+      .eq('league_id', leagueId)
+
+    if (allMembers) {
+      for (const m of allMembers) {
+        await autoAssignStartingXI(supabase, leagueId, m.user_id, m.formation || '4-4-2')
+      }
+    }
   }
 
   return { success: true }

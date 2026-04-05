@@ -74,6 +74,45 @@ export async function POST(request: Request) {
         .from('leagues')
         .update({ draft_status: 'completed' })
         .eq('id', TEST_LEAGUE_ID)
+
+      // Auto-assign starting XI for all members
+      const { data: allMembers } = await supabase
+        .from('league_members')
+        .select('user_id, formation')
+        .eq('league_id', TEST_LEAGUE_ID)
+
+      if (allMembers) {
+        const FORMATION_SLOTS: Record<string, Record<string, number>> = {
+          '4-4-2': { GK: 1, DEF: 4, MID: 4, ATT: 2 },
+          '4-3-3': { GK: 1, DEF: 4, MID: 3, ATT: 3 },
+          '4-5-1': { GK: 1, DEF: 4, MID: 5, ATT: 1 },
+        }
+        for (const m of allMembers) {
+          const slots = FORMATION_SLOTS[m.formation || '4-4-2'] || FORMATION_SLOTS['4-4-2']
+          const { data: squadSlots } = await supabase
+            .from('squad_slots')
+            .select('*, player:players(id, position)')
+            .eq('league_id', TEST_LEAGUE_ID)
+            .eq('user_id', m.user_id)
+
+          if (squadSlots) {
+            const byPos: Record<string, typeof squadSlots> = { GK: [], DEF: [], MID: [], ATT: [] }
+            for (const s of squadSlots) {
+              const pos = (s as any).player?.position || s.position
+              if (byPos[pos]) byPos[pos].push(s)
+            }
+            for (const [pos, needed] of Object.entries(slots)) {
+              const available = byPos[pos] || []
+              for (let i = 0; i < available.length; i++) {
+                await supabase
+                  .from('squad_slots')
+                  .update({ is_starting: i < needed })
+                  .eq('id', available[i].id)
+              }
+            }
+          }
+        }
+      }
       break
     }
 

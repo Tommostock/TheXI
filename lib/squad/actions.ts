@@ -55,7 +55,7 @@ export async function changeFormation(leagueId: string, formation: string) {
   return { success: true }
 }
 
-async function autoAssignStartingXI(
+export async function autoAssignStartingXI(
   supabase: Awaited<ReturnType<typeof createClient>>,
   leagueId: string,
   userId: string,
