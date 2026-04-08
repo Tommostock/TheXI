@@ -3,6 +3,7 @@ import { LoadingShell } from '@/components/ui/LoadingShell'
 import { DashboardClient } from '@/components/dashboard/DashboardClient'
 import { JoinLeague } from '@/components/league/JoinLeague'
 import { ReplacementBanner } from '@/components/ui/ReplacementBanner'
+import { NotificationPrompt } from '@/components/ui/NotificationPrompt'
 
 export default async function DashboardPage() {
   const { user, supabase } = await requireUser()
@@ -72,6 +73,7 @@ export default async function DashboardPage() {
 
   return (
     <>
+      <NotificationPrompt />
       {!hasLeague && (
         <div className="px-4 pt-4">
           <JoinLeague />
