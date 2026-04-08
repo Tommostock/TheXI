@@ -2,6 +2,7 @@ import { requireUser } from '@/lib/supabase/auth'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import { DashboardClient } from '@/components/dashboard/DashboardClient'
 import { JoinLeague } from '@/components/league/JoinLeague'
+import { ReplacementBanner } from '@/components/ui/ReplacementBanner'
 
 export default async function DashboardPage() {
   const { user, supabase } = await requireUser()
@@ -39,11 +40,51 @@ export default async function DashboardPage() {
     eventsByMatch[e.match_id].push(e)
   }
 
+  // Check for active replacement window with eliminated squad players
+  let activeWindow: { window_type: string; closes_at: string | null } | null = null
+  let eliminatedCount = 0
+
+  if (hasLeague) {
+    const leagueId = memberships![0].league_id
+
+    const { data: window } = await supabase
+      .from('draft_windows')
+      .select('window_type, closes_at')
+      .eq('league_id', leagueId)
+      .eq('status', 'active')
+      .not('window_type', 'eq', 'initial')
+      .maybeSingle()
+
+    if (window) {
+      activeWindow = window
+
+      const { data: slots } = await supabase
+        .from('squad_slots')
+        .select('player:players(is_eliminated)')
+        .eq('league_id', leagueId)
+        .eq('user_id', user.id)
+
+      type SlotWithElim = { player: { is_eliminated: boolean } | null }
+      eliminatedCount = ((slots || []) as unknown as SlotWithElim[])
+        .filter((s) => s.player?.is_eliminated).length
+    }
+  }
+
   return (
     <>
       {!hasLeague && (
         <div className="px-4 pt-4">
           <JoinLeague />
+        </div>
+      )}
+      {activeWindow && eliminatedCount > 0 && hasLeague && (
+        <div className="px-4 pt-3">
+          <ReplacementBanner
+            leagueId={memberships![0].league_id}
+            windowType={activeWindow.window_type}
+            eliminatedCount={eliminatedCount}
+            closesAt={activeWindow.closes_at}
+          />
         </div>
       )}
       <DashboardClient

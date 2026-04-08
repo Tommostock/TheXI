@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Users } from 'lucide-react'
 import { LoadingShell } from '@/components/ui/LoadingShell'
 import { PullToRefresh } from '@/components/ui/PullToRefresh'
+import { ReplacementBanner } from '@/components/ui/ReplacementBanner'
 
 export default async function SquadPage() {
   const { user, supabase } = await requireUser()
@@ -78,10 +79,31 @@ export default async function SquadPage() {
     }
   }
 
+  // Check for active replacement window + eliminated players in squad
+  const { data: activeWindow } = await supabase
+    .from('draft_windows')
+    .select('window_type, closes_at')
+    .eq('league_id', leagueId)
+    .eq('status', 'active')
+    .not('window_type', 'eq', 'initial')
+    .maybeSingle()
+
+  type SlotWithEliminated = { player: { is_eliminated: boolean } | null }
+  const eliminatedCount = ((slots || []) as unknown as SlotWithEliminated[])
+    .filter((s) => s.player?.is_eliminated).length
+
   return (
     <PullToRefresh>
     <div className="px-2 pt-2 pb-0">
       <h1 className="mb-2 text-2xl font-display text-white px-1">My Squad</h1>
+      {activeWindow && eliminatedCount > 0 && (
+        <ReplacementBanner
+          leagueId={leagueId}
+          windowType={activeWindow.window_type}
+          eliminatedCount={eliminatedCount}
+          closesAt={activeWindow.closes_at}
+        />
+      )}
       <SquadView
         leagueId={leagueId}
         formation={formation}

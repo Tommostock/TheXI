@@ -7,6 +7,7 @@ import {
   DEFAULT_ACTIVE_END,
   DEFAULT_PICK_WINDOW_MINUTES,
 } from '@/lib/draft/activeHours'
+import { checkAndProcessEliminations } from '@/lib/tournament/eliminations'
 
 /**
  * GET /api/cron/draft-scheduler
@@ -173,6 +174,86 @@ export async function GET(request: Request) {
 
       actions.push(`Auto-started draft for ${league.name}`)
     }
+  }
+
+  // --- Check for expired replacement draft windows ---
+  const { data: activeWindows } = await supabase
+    .from('draft_windows')
+    .select('id, league_id, window_type, closes_at')
+    .eq('status', 'active')
+    .not('window_type', 'eq', 'initial')
+
+  for (const window of activeWindows || []) {
+    if (!window.closes_at) continue
+    const closesAt = new Date(window.closes_at)
+    if (now >= closesAt) {
+      // Window has expired — auto-replace remaining eliminated players and close it
+      const windowType = window.window_type as 'post_groups' | 'post_r32' | 'post_r16' | 'post_qf' | 'post_sf'
+
+      // Auto-replace eliminated players
+      const { data: eliminatedSlots } = await supabase
+        .from('squad_slots')
+        .select('id, user_id, player_id, position, player:players(id, name, is_eliminated)')
+        .eq('league_id', window.league_id)
+
+      type SlotWithPlayer = { id: string; user_id: string; player_id: string; position: string; player: { id: string; name: string; is_eliminated: boolean } | null }
+      const slotsNeedingReplacement = ((eliminatedSlots || []) as unknown as SlotWithPlayer[])
+        .filter((s) => s.player?.is_eliminated)
+
+      if (slotsNeedingReplacement.length > 0) {
+        const { data: allSlots } = await supabase
+          .from('squad_slots')
+          .select('player_id')
+          .eq('league_id', window.league_id)
+        const draftedIds = new Set((allSlots || []).map((s) => s.player_id))
+
+        for (const slot of slotsNeedingReplacement) {
+          const { data: available } = await supabase
+            .from('players')
+            .select('id, name')
+            .eq('position', slot.position)
+            .eq('is_eliminated', false)
+            .limit(50)
+
+          const candidates = (available || []).filter((p) => !draftedIds.has(p.id))
+          if (candidates.length === 0) continue
+
+          const picked = candidates[Math.floor(Math.random() * candidates.length)]
+          await supabase.from('squad_slots').update({ player_id: picked.id, updated_at: now.toISOString() }).eq('id', slot.id)
+          await supabase.from('transfers').insert({
+            league_id: window.league_id, user_id: slot.user_id,
+            dropped_player_id: slot.player_id, picked_player_id: picked.id,
+            draft_window: windowType, is_auto_pick: true,
+          })
+
+          const { data: member } = await supabase.from('league_members').select('display_name').eq('league_id', window.league_id).eq('user_id', slot.user_id).single()
+          await supabase.from('activity_feed').insert({
+            league_id: window.league_id, event_type: 'auto_pick',
+            description: `${member?.display_name} missed the window — system replaced ${slot.player?.name} with ${picked.name}`,
+            user_id: slot.user_id, player_id: picked.id,
+          })
+          draftedIds.add(picked.id)
+        }
+      }
+
+      // Close the window
+      await supabase.from('draft_windows').update({ status: 'complete' }).eq('id', window.id)
+      await supabase.from('activity_feed').insert({
+        league_id: window.league_id, event_type: 'transfer',
+        description: 'Draft window closed. All eliminated players have been replaced.',
+      })
+
+      // Re-lock lineups
+      await supabase.from('leagues').update({ lineup_locked: true }).eq('id', window.league_id)
+
+      actions.push(`Closed expired ${windowType} window for league ${window.league_id}`)
+    }
+  }
+
+  // --- Also check for new eliminations (safety net alongside live-poll) ---
+  const elimResult = await checkAndProcessEliminations(supabase)
+  if (elimResult.actions.length > 0) {
+    actions.push(...elimResult.actions)
   }
 
   return NextResponse.json({ message: 'Draft scheduler ran', actions })

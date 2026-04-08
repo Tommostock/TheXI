@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { apiFetch, WORLD_CUP_LEAGUE_ID, WORLD_CUP_SEASON } from '@/lib/api-football/client'
 import { POINTS, applyBenchMultiplier } from '@/lib/scoring/engine'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { checkAndProcessEliminations } from '@/lib/tournament/eliminations'
 
 /**
  * GET /api/live-poll
@@ -278,6 +279,13 @@ export async function GET() {
       matchesProcessed++
     }
 
+    // After processing matches, check for newly eliminated nations
+    let eliminationActions: string[] = []
+    if (matchesProcessed > 0) {
+      const elimResult = await checkAndProcessEliminations(supabase)
+      eliminationActions = elimResult.actions
+    }
+
     return NextResponse.json({
       message: matchesProcessed > 0
         ? `Processed ${matchesProcessed} match(es), ${eventsCreated} events`
@@ -285,6 +293,7 @@ export async function GET() {
       date: today,
       matches_processed: matchesProcessed,
       events_created: eventsCreated,
+      eliminations: eliminationActions,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
