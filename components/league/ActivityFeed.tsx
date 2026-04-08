@@ -3,9 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Tables } from '@/types/database.types'
-import { toggleReaction } from '@/lib/feed/actions'
 
-type FeedEvent = Tables<'activity_feed'> & { reactions?: Record<string, string[]> }
+type FeedEvent = Tables<'activity_feed'>
 
 function getEventIcon(event: FeedEvent): { text: string; color: string } {
   if (event.event_type === 'scoring_event') {
@@ -59,33 +58,6 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
-const REACTION_EMOJIS = ['😂', '😭', '🔥', '💀']
-
-function ReactionBar({ event, onReact }: { event: FeedEvent; onReact: (id: string, emoji: string) => void }) {
-  const reactions = event.reactions || {}
-  const hasAny = Object.keys(reactions).length > 0
-
-  return (
-    <div className="flex items-center gap-1 mt-1.5">
-      {REACTION_EMOJIS.map((emoji) => {
-        const count = (reactions[emoji] || []).length
-        return (
-          <button
-            key={emoji}
-            onClick={() => onReact(event.id, emoji)}
-            className={`flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs transition-colors ${
-              count > 0 ? 'bg-wc-purple/20 border border-wc-purple/30' : 'hover:bg-bg-surface'
-            }`}
-          >
-            <span className="text-[11px]">{emoji}</span>
-            {count > 0 && <span className="text-[9px] text-text-secondary">{count}</span>}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
 export function ActivityFeed({
   leagueId,
   initialEvents,
@@ -117,17 +89,6 @@ export function ActivityFeed({
       supabase.removeChannel(channel)
     }
   }, [leagueId])
-
-  async function handleReact(eventId: string, emoji: string) {
-    const result = await toggleReaction(eventId, emoji)
-    if (result.reactions) {
-      setEvents((prev) =>
-        prev.map((e) =>
-          e.id === eventId ? { ...e, reactions: result.reactions as Record<string, string[]> } : e
-        )
-      )
-    }
-  }
 
   if (events.length === 0) {
     return (
@@ -168,7 +129,6 @@ export function ActivityFeed({
                       {timeAgo(event.created_at)}
                     </p>
                   </div>
-                  <ReactionBar event={event} onReact={handleReact} />
                 </div>
               </div>
             ))}
