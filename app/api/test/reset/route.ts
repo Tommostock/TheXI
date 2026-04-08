@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const TEST_LEAGUE_ID = '22222222-2222-2222-2222-222222222222'
-const TOM_ID = '42c16e22-4291-4eaf-9bca-c4ff7fd2a727'
+const TOM_ID = '69892f2f-ebbf-43e2-8598-7dce101ee4ae'
 const DAVE_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 const JAKE_ID = 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff'
 
