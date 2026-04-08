@@ -40,23 +40,6 @@ export async function POST(request: Request) {
   await supabase.from('league_members').delete().eq('league_id', '11111111-1111-1111-1111-111111111111')
   await supabase.from('leagues').delete().eq('id', '11111111-1111-1111-1111-111111111111')
 
-  // Ensure bot users exist in auth.users
-  for (const [userId, email] of [
-    [TOM_ID, 'tom@thexi.test'],
-    [DAVE_ID, 'dave@thexi.test'],
-    [JAKE_ID, 'jake@thexi.test'],
-  ] as [string, string][]) {
-    const { data: existing } = await supabase.auth.admin.getUserById(userId)
-    if (!existing?.user) {
-      await supabase.auth.admin.createUser({
-        user_id: userId,
-        email,
-        password: 'testpassword123',
-        email_confirm: true,
-      })
-    }
-  }
-
   // Reset all players to non-eliminated
   await supabase.from('players').update({ is_eliminated: false, eliminated_at: null }).neq('id', '00000000-0000-0000-0000-000000000000')
 
