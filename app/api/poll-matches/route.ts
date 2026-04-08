@@ -65,7 +65,24 @@ export async function GET(request: Request) {
         minute: number | null
       }> = []
 
-      // Process goals, assists, cards
+      // Build substitution map: player_id -> minute they were subbed in or out
+      // subIn: minute the player entered the pitch
+      // subOut: minute the player left the pitch
+      const subIn = new Map<number, number>()
+      const subOut = new Map<number, number>()
+
+      for (const event of events) {
+        if (event.type === 'subst' && event.time?.elapsed != null) {
+          // event.player is the player going OFF, event.assist is the player coming ON
+          if (event.player?.id) subOut.set(event.player.id, event.time.elapsed)
+          if (event.assist?.id) subIn.set(event.assist.id, event.time.elapsed)
+        }
+      }
+
+      // Match duration in regular time (90 mins, capped — ignore extra time for scoring)
+      const fullTime = 90
+
+      // Process goals, assists, cards, penalty saves
       for (const event of events) {
         if (!event.player?.id) continue
 
@@ -77,6 +94,13 @@ export async function GET(request: Request) {
             matchEvents.push({
               api_player_id: event.player.id,
               event_type: 'own_goal',
+              minute: event.time?.elapsed ?? null,
+            })
+          } else if (event.detail === 'Penalty') {
+            // Normal penalty goal (not shootout) — counts as a goal
+            matchEvents.push({
+              api_player_id: event.player.id,
+              event_type: 'goal',
               minute: event.time?.elapsed ?? null,
             })
           } else {
@@ -111,63 +135,156 @@ export async function GET(request: Request) {
             })
           }
         }
+
+        // Penalty save — GK saves a penalty during regular play
+        if (
+          event.type === 'Goal' &&
+          event.detail === 'Missed Penalty' &&
+          event.comments !== 'Penalty Shootout'
+        ) {
+          // The goalkeeper who saved it isn't in the event data directly.
+          // We'll mark the opposing team's GK in the lineup processing below.
+          // Store the team that missed so we can credit the other team's GK.
+          // (handled after lineups are processed)
+        }
       }
 
-      // Process appearances from lineups
-      for (const team of lineups) {
-        const allPlayers = [
-          ...(team.startXI || []).map((p: { player: { id: number } }) => ({
-            ...p.player,
-            started: true,
-          })),
-          ...(team.substitutes || []).map(
-            (p: { player: { id: number } }) => ({
-              ...p.player,
-              started: false,
-            })
-          ),
-        ]
+      // Collect penalty misses (regular time only) to credit GK saves
+      const penaltyMissTeams = new Set<number>()
+      for (const event of events) {
+        if (
+          event.type === 'Goal' &&
+          event.detail === 'Missed Penalty' &&
+          event.comments !== 'Penalty Shootout' &&
+          event.team?.id
+        ) {
+          penaltyMissTeams.add(event.team.id)
+        }
+      }
 
-        for (const player of allPlayers) {
-          // Calculate minutes played (simplified — would need sub events for accuracy)
-          // For now, starters get 90, subs get estimated based on sub time
-          const minutesPlayed = player.started ? 90 : 30 // Simplified
+      // Process appearances from lineups using real sub times
+      for (let teamIdx = 0; teamIdx < lineups.length; teamIdx++) {
+        const team = lineups[teamIdx]
+        const teamId = team.team?.id
 
-          const appType =
-            minutesPlayed >= 60 ? 'appearance_full' : 'appearance_sub'
+        // Starters
+        for (const p of team.startXI || []) {
+          const playerId = p.player?.id
+          if (!playerId) continue
 
+          // Starter: played from minute 0 until subbed out or full time
+          const endMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          const minutesPlayed = Math.min(endMin, fullTime)
+
+          const appType = minutesPlayed >= 60 ? 'appearance_full' : 'appearance_sub'
           matchEvents.push({
-            api_player_id: player.id,
+            api_player_id: playerId,
             event_type: appType,
             minute: minutesPlayed,
           })
         }
-      }
 
-      // Check clean sheets
-      const homeGoals = fixture.goals?.home ?? 0
-      const awayGoals = fixture.goals?.away ?? 0
+        // Substitutes who came on
+        for (const p of team.substitutes || []) {
+          const playerId = p.player?.id
+          if (!playerId) continue
 
-      // Home team clean sheet check
-      if (awayGoals === 0 && lineups[0]) {
-        for (const p of lineups[0].startXI || []) {
-          // Would need position data — handled in process-matches via player table
+          // Only count subs who actually entered the match
+          if (!subIn.has(playerId)) continue
+
+          const enterMin = subIn.get(playerId)!
+          const exitMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          const minutesPlayed = Math.min(exitMin, fullTime) - Math.min(enterMin, fullTime)
+
+          if (minutesPlayed <= 0) continue
+
+          const appType = minutesPlayed >= 60 ? 'appearance_full' : 'appearance_sub'
           matchEvents.push({
-            api_player_id: p.player.id,
-            event_type: 'clean_sheet',
-            minute: null,
+            api_player_id: playerId,
+            event_type: appType,
+            minute: minutesPlayed,
           })
+        }
+
+        // Credit GK with penalty save if the OTHER team missed a penalty
+        if (penaltyMissTeams.size > 0 && teamId) {
+          // Check if the opposing team missed a penalty — credit this team's GK
+          const opposingTeamIdx = teamIdx === 0 ? 1 : 0
+          const opposingTeamId = lineups[opposingTeamIdx]?.team?.id
+          if (opposingTeamId && penaltyMissTeams.has(opposingTeamId)) {
+            // Find GK from startXI (first player is typically GK, or check grid position)
+            const gk = (team.startXI || [])[0]
+            if (gk?.player?.id) {
+              matchEvents.push({
+                api_player_id: gk.player.id,
+                event_type: 'penalty_save',
+                minute: null,
+              })
+            }
+          }
         }
       }
 
-      // Away team clean sheet check
+      // Check clean sheets — only starters/subs who played 60+ mins
+      const homeGoals = fixture.goals?.home ?? 0
+      const awayGoals = fixture.goals?.away ?? 0
+
+      // Home team clean sheet check (conceded 0 from away team)
+      if (awayGoals === 0 && lineups[0]) {
+        for (const p of lineups[0].startXI || []) {
+          const playerId = p.player?.id
+          if (!playerId) continue
+          const endMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          if (Math.min(endMin, fullTime) >= 60) {
+            matchEvents.push({
+              api_player_id: playerId,
+              event_type: 'clean_sheet',
+              minute: null,
+            })
+          }
+        }
+        // Subs who played 60+ also get clean sheet
+        for (const p of lineups[0].substitutes || []) {
+          const playerId = p.player?.id
+          if (!playerId || !subIn.has(playerId)) continue
+          const enterMin = subIn.get(playerId)!
+          const exitMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          if (Math.min(exitMin, fullTime) - Math.min(enterMin, fullTime) >= 60) {
+            matchEvents.push({
+              api_player_id: playerId,
+              event_type: 'clean_sheet',
+              minute: null,
+            })
+          }
+        }
+      }
+
+      // Away team clean sheet check (conceded 0 from home team)
       if (homeGoals === 0 && lineups[1]) {
         for (const p of lineups[1].startXI || []) {
-          matchEvents.push({
-            api_player_id: p.player.id,
-            event_type: 'clean_sheet',
-            minute: null,
-          })
+          const playerId = p.player?.id
+          if (!playerId) continue
+          const endMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          if (Math.min(endMin, fullTime) >= 60) {
+            matchEvents.push({
+              api_player_id: playerId,
+              event_type: 'clean_sheet',
+              minute: null,
+            })
+          }
+        }
+        for (const p of lineups[1].substitutes || []) {
+          const playerId = p.player?.id
+          if (!playerId || !subIn.has(playerId)) continue
+          const enterMin = subIn.get(playerId)!
+          const exitMin = subOut.has(playerId) ? subOut.get(playerId)! : fullTime
+          if (Math.min(exitMin, fullTime) - Math.min(enterMin, fullTime) >= 60) {
+            matchEvents.push({
+              api_player_id: playerId,
+              event_type: 'clean_sheet',
+              minute: null,
+            })
+          }
         }
       }
 
