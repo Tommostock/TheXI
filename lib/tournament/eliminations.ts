@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { apiFetch, WORLD_CUP_LEAGUE_ID, WORLD_CUP_SEASON } from '@/lib/api-football/client'
+import { sendPushToUser } from '@/lib/notifications/push'
 
 type DraftWindowType = 'post_groups' | 'post_r32' | 'post_r16' | 'post_qf' | 'post_sf'
 
@@ -155,6 +156,29 @@ export async function checkAndProcessEliminations(
         event_type: 'transfer',
         description: `Draft window open — replace eliminated players (${nationsList}${more}). First come, first served. Window closes in 24 hours.`,
       })
+
+      // Notify members who have eliminated players in their squad
+      const { data: affectedSlots } = await supabase
+        .from('squad_slots')
+        .select('user_id, player:players(is_eliminated)')
+        .eq('league_id', league.id)
+
+      type SlotRow = { user_id: string; player: { is_eliminated: boolean } | null }
+      const affectedUserIds = [
+        ...new Set(
+          ((affectedSlots || []) as unknown as SlotRow[])
+            .filter((s) => s.player?.is_eliminated)
+            .map((s) => s.user_id)
+        ),
+      ]
+
+      for (const userId of affectedUserIds) {
+        await sendPushToUser(userId, {
+          title: 'The XI — Replacement Window Open!',
+          body: `Players from ${newlyEliminated.length > 0 ? newlyEliminated.slice(0, 2).join(', ') : 'eliminated nations'} need replacing. You have 24 hours — first come, first served!`,
+          url: '/squad',
+        })
+      }
 
       actions.push(`Opened ${w.windowType} window for ${league.name}`)
     }

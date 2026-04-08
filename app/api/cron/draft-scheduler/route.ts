@@ -179,13 +179,53 @@ export async function GET(request: Request) {
   // --- Check for expired replacement draft windows ---
   const { data: activeWindows } = await supabase
     .from('draft_windows')
-    .select('id, league_id, window_type, closes_at')
+    .select('id, league_id, window_type, closes_at, closing_warned')
     .eq('status', 'active')
     .not('window_type', 'eq', 'initial')
 
   for (const window of activeWindows || []) {
     if (!window.closes_at) continue
     const closesAt = new Date(window.closes_at)
+    const msUntilClose = closesAt.getTime() - now.getTime()
+
+    // 1-hour closing warning (between 55 and 65 minutes remaining)
+    if (msUntilClose > 0 && msUntilClose <= 65 * 60 * 1000 && !window.closing_warned) {
+      const { data: members } = await supabase
+        .from('league_members')
+        .select('user_id')
+        .eq('league_id', window.league_id)
+
+      // Only notify users who still have eliminated players
+      const { data: eliminatedSlots } = await supabase
+        .from('squad_slots')
+        .select('user_id, player:players(is_eliminated)')
+        .eq('league_id', window.league_id)
+
+      type SlotRow = { user_id: string; player: { is_eliminated: boolean } | null }
+      const needsReplacementIds = new Set(
+        ((eliminatedSlots || []) as unknown as SlotRow[])
+          .filter((s) => s.player?.is_eliminated)
+          .map((s) => s.user_id)
+      )
+
+      for (const m of members || []) {
+        if (needsReplacementIds.has(m.user_id)) {
+          await sendPush(supabase, m.user_id, {
+            title: 'The XI — Window Closing Soon!',
+            body: 'You still have eliminated players in your squad. Less than 1 hour left to make your replacements!',
+            url: '/squad',
+          })
+        }
+      }
+
+      await supabase
+        .from('draft_windows')
+        .update({ closing_warned: true } as Record<string, unknown>)
+        .eq('id', window.id)
+
+      actions.push(`Sent closing warning for ${window.window_type} window in league ${window.league_id}`)
+    }
+
     if (now >= closesAt) {
       // Window has expired — auto-replace remaining eliminated players and close it
       const windowType = window.window_type as 'post_groups' | 'post_r32' | 'post_r16' | 'post_qf' | 'post_sf'
@@ -248,6 +288,71 @@ export async function GET(request: Request) {
 
       actions.push(`Closed expired ${windowType} window for league ${window.league_id}`)
     }
+  }
+
+  // --- Final standings notification ---
+  // Fires once per league when the post_sf window has been completed
+  // (signals the tournament is fully over and all squads are finalised)
+  const { data: completedLeagues } = await supabase
+    .from('leagues')
+    .select('id, name, final_standings_notified')
+    .eq('draft_status', 'completed')
+    .eq('final_standings_notified', false)
+
+  for (const league of completedLeagues || []) {
+    // Check if the post_sf window is complete for this league
+    const { data: sfWindow } = await supabase
+      .from('draft_windows')
+      .select('id, status')
+      .eq('league_id', league.id)
+      .eq('window_type', 'post_sf')
+      .eq('status', 'complete')
+      .maybeSingle()
+
+    if (!sfWindow) continue
+
+    // Get final scores for the league
+    const { data: scores } = await supabase
+      .from('scores')
+      .select('user_id, total_points')
+      .eq('league_id', league.id)
+      .order('total_points', { ascending: false })
+
+    if (!scores?.length) continue
+
+    // Get display names
+    const { data: members } = await supabase
+      .from('league_members')
+      .select('user_id, display_name')
+      .eq('league_id', league.id)
+
+    const nameMap: Record<string, string> = {}
+    for (const m of members || []) nameMap[m.user_id] = m.display_name
+
+    const winner = scores[0]
+    const winnerName = nameMap[winner.user_id] || 'Unknown'
+
+    // Notify each member with their rank
+    for (let i = 0; i < scores.length; i++) {
+      const rank = i + 1
+      const suffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'
+      const isWinner = rank === 1
+
+      await sendPush(supabase, scores[i].user_id, {
+        title: isWinner ? '🏆 The XI — You Won!' : 'The XI — Final Standings',
+        body: isWinner
+          ? `Congratulations! You won ${league.name} with ${winner.total_points} points!`
+          : `The World Cup is over. You finished ${rank}${suffix} in ${league.name} with ${scores[i].total_points} pts. Winner: ${winnerName}`,
+        url: '/leaderboard',
+      })
+    }
+
+    await supabase
+      .from('leagues')
+      .update({ final_standings_notified: true } as Record<string, unknown>)
+      .eq('id', league.id)
+
+    actions.push(`Sent final standings notifications for ${league.name}`)
   }
 
   // --- Also check for new eliminations (safety net alongside live-poll) ---
